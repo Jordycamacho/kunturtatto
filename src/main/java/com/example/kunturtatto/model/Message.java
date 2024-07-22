@@ -6,6 +6,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,5 +23,9 @@ public class Message {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idMessage;
     private String content;
-    private Date menssageDate;
+    private Date messageDate;
+
+    @ManyToOne
+    @JoinColumn(name = "idUser")
+    private User user;
 }

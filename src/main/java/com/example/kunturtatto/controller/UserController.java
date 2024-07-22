@@ -12,20 +12,20 @@ public class UserController {
     @GetMapping("")
     public String home() {
         
-        return "index";
+        return "user/index";
     }
 
     @GetMapping("/diseños")
     public String desings() {
         
-        return "desings";
+        return "user/desings";
     }
 
 
     @GetMapping("/profile/{idUsers----------}")
     public String perfilUsuario() {
         
-        return "profile";
+        return "user/profile";
     }
 
 }
