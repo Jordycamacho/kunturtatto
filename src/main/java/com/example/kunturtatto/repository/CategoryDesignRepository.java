@@ -1,5 +1,9 @@
 package com.example.kunturtatto.repository;
 
-public class CategoryDesignRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.example.kunturtatto.model.CategoryDesign;
+
+public interface CategoryDesignRepository extends JpaRepository<CategoryDesign, Long>{
     
 }
