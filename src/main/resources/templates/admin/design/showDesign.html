@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:insert="~{admin/design/templateAdmin.html::header}"></head>
+<body>
+    <div th:insert="~{admin/design/templateAdmin.html::nav_user}"></div>
+    <div th:insert="~{admin/design/templateAdmin.html::nav_admin}"></div>
+
+    <div class="container mt-5">
+        <h1>Diseños</h1>
+        <a class="btn btn-primary" th:href="@{/admin/diseños/crear}">Crear Diseño</a>
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Título</th>
+                    <th>Categoría</th>
+                    <th>Descripción</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Iterar sobre la lista de diseños -->
+                <tr th:each="design : ${designs}">
+                    <td th:text="${design.title}">Título</td>
+                    <td th:text="${design.categoryDesign.nameCategoryDesign}">Categoría</td>
+                    <td th:text="${design.description}">Descripción</td>
+                    <td>
+                        <!-- Botón de editar -->
+                        <a class="btn btn-warning btn-sm" th:href="@{/admin/diseños/editar/{id}(id=${design.idDesign})}">Editar</a>
+                        <!-- Botón de eliminar -->
+                        <form th:action="@{/admin/diseños/eliminar/{id}(id=${design.idDesign})}" method="post" style="display:inline;">
+                            <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div th:insert="~{admin/design/templateAdmin.html::script}"></div>
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:insert="~{admin/design/templateAdmin.html::header}"></head>
+<body>
+    <div th:insert="~{admin/design/templateAdmin.html::nav_user}"></div>
+    <div th:insert="~{admin/design/templateAdmin.html::nav_admin}"></div>
+
+    <div class="container mt-5">
+        <h1>Crear Diseño</h1>
+        <form th:action="@{/admin/diseños/crear/guardar}" method="post" enctype="multipart/form-data" class="row g-3">
+            <div class="col-md-6">
+                <label for="title" class="form-label">Título</label>
+                <input type="text" class="form-control" id="title" name="title" placeholder="Título del diseño" required>
+            </div>
+            <div class="col-md-6">
+                <label for="image" class="form-label">Imagen</label>
+                <input type="file" class="form-control" id="image" name="image" required>
+            </div>
+            <div class="col-12">
+                <label for="description" class="form-label">Descripción</label>
+                <textarea class="form-control" id="description" name="description" rows="3" placeholder="Descripción del diseño" required></textarea>
+            </div>
+            <div class="col-md-6">
+                <label for="categoryDesign" class="form-label">Categoría</label>
+                <select id="categoryDesign" name="categoryDesign" class="form-select" required>
+                    <option th:each="category : ${categoriesDesign}" th:value="${category.idCategoryDesign}" th:text="${category.nameCategoryDesign}">Categoría</option>
+                </select>
+            </div>
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary">Guardar</button>
+            </div>
+        </form>
+    </div>
+
+    <div th:insert="~{admin/design/templateAdmin.html::script}"></div>
+</body>
+</html>

@@ -8,10 +8,10 @@ import com.example.kunturtatto.model.Design;
 
 public interface IDesignService {
 
-    List<Design>findAll();
-    Optional<Design>findById(Long IdDesign);
+    List<Design> findAll();
+    Optional<Design> findById(Long idDesign);
     Design save(Design design);
-    void delete(Long IdDesign);
+    void delete(Long idDesign);
     Design update(Design design);
-    List<Design>findByCategoryDesign(CategoryDesign categoryDesign);
+    List<Design> findByCategoryDesign(CategoryDesign categoryDesign);
 }

@@ -7,8 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.example.kunturtatto.model.CategoryDesign;
 import com.example.kunturtatto.model.Design;
 
-public interface DesignRepository extends JpaRepository<Design, Long>{
+public interface DesignRepository extends JpaRepository<Design, Long> {
 
-    List<Design>findByCategoryDesign(CategoryDesign categoryDesign);
-
+    List<Design> findByCategoryDesign(CategoryDesign categoryDesign);
 }

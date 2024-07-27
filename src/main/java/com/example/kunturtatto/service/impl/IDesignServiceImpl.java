@@ -12,7 +12,7 @@ import com.example.kunturtatto.repository.DesignRepository;
 import com.example.kunturtatto.service.IDesignService;
 
 @Service
-public class IDesignServiceImpl implements IDesignService{
+public class IDesignServiceImpl implements IDesignService {
 
     @Autowired
     private DesignRepository designRepository;
@@ -23,8 +23,8 @@ public class IDesignServiceImpl implements IDesignService{
     }
 
     @Override
-    public Optional<Design> findById(Long IdDesign) {
-        return designRepository.findById(IdDesign);
+    public Optional<Design> findById(Long idDesign) {
+        return designRepository.findById(idDesign);
     }
 
     @Override
@@ -33,8 +33,8 @@ public class IDesignServiceImpl implements IDesignService{
     }
 
     @Override
-    public void delete(Long IdDesign) {
-        designRepository.deleteById(IdDesign);
+    public void delete(Long idDesign) {
+        designRepository.deleteById(idDesign);
     }
 
     @Override
@@ -46,5 +46,4 @@ public class IDesignServiceImpl implements IDesignService{
     public List<Design> findByCategoryDesign(CategoryDesign categoryDesign) {
         return designRepository.findByCategoryDesign(categoryDesign);
     }
-    
 }
