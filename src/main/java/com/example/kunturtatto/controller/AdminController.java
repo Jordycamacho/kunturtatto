@@ -14,9 +14,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.kunturtatto.model.CategoryDesign;
 import com.example.kunturtatto.model.Design;
+import com.example.kunturtatto.model.User;
 import com.example.kunturtatto.service.ICategoryDesignService;
 import com.example.kunturtatto.service.IDesignService;
 import com.example.kunturtatto.service.IUploadFileService;
+import com.example.kunturtatto.service.IUserService;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,15 +35,19 @@ public class AdminController {
     @Autowired
     private ICategoryDesignService categoryDesignService;
 
-    @Autowired
+    @Autowired 
     private IUploadFileService uploadFileService;
+
+    @Autowired
+    private IUserService userService;
 
     /*Create Designs */
     @GetMapping("")
     public String showDesign(Model model) {
+        List <CategoryDesign> categoryDesigns = categoryDesignService.findAll();
+        model.addAttribute("categories", categoryDesigns);
 
         List<Design> designs = designService.findAll();
-
         model.addAttribute("designs", designs);
 
         return "admin/design/showDesign";
@@ -49,6 +55,9 @@ public class AdminController {
 
     @GetMapping("/diseños/crear")
     public String createDesign(Model model) {
+
+        List <CategoryDesign> categoryDesigns = categoryDesignService.findAll();
+        model.addAttribute("categories", categoryDesigns);
 
         model.addAttribute("design", designService.findAll());
         model.addAttribute("categoriesDesign", categoryDesignService.findAll());
@@ -58,6 +67,9 @@ public class AdminController {
 
     @GetMapping("/diseños/editar/{id}")
     public String editDesign(@PathVariable Long id, Model model) {
+
+        List <CategoryDesign> categoryDesigns = categoryDesignService.findAll();
+        model.addAttribute("categories", categoryDesigns);
 
         Design design = new Design();
         Optional<Design> optionalDesign = designService.findById(id);
@@ -169,13 +181,15 @@ public class AdminController {
     @GetMapping("/categorias")
     public String showCategory(Model model){
         List <CategoryDesign> categoryDesigns = categoryDesignService.findAll();
-        model.addAttribute("categoryDesigns", categoryDesigns);
+        model.addAttribute("categories", categoryDesigns);
+
         return "admin/categoryDesign/showCategory";
     }
 
     @GetMapping("/categorias/crear")
     public String createCategory(Model model) {
 
+        
         model.addAttribute("categoriesDesign", categoryDesignService.findAll());
 
         return "admin/categoryDesign/createCategory";
@@ -194,11 +208,62 @@ public class AdminController {
     }
 
     @PostMapping("categorias/eliminar/{id}")
-    public String deleteCategoty(@PathVariable Long id) {
+    public String deleteCategoty(@PathVariable Long id ) {
         
         categoryDesignService.deleteById(id);
         
         return "redirect:/admin/categorias";
     }
     
+    /*Administracion usuarios */
+    @GetMapping("/usuarios")
+    public String showUsers(Model model) {
+        List<CategoryDesign> categoryDesigns = categoryDesignService.findAll();
+        model.addAttribute("categories", categoryDesigns);
+
+        List<User> users = userService.findAll();
+        model.addAttribute("users", users);
+
+        return "/admin/users/showUser";
+    }
+
+    @PostMapping("/admin/usuarios/eliminar/{id}")
+    public String deleteUser(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        userService.deleteById(id);
+        redirectAttributes.addFlashAttribute("message", "Usuario eliminado exitosamente.");
+        return "redirect:/usuarios";
+    }
+
+    /*Administracion citas */
+    @GetMapping("/citas")
+    public String showAppointments(Model model) {
+        
+        List<CategoryDesign> categoryDesigns = categoryDesignService.findAll();
+        model.addAttribute("categories",categoryDesigns);
+
+        return "/admin/appointment/showAppointment";
+    }
+
+    @GetMapping("/crear-citas")
+    public String createAppointments(Model model) {
+        List<CategoryDesign> categoryDesigns = categoryDesignService.findAll();
+        model.addAttribute("categories",categoryDesigns);
+
+        return "/admin/appointment/createAppointment";
+    }
+
+    @PostMapping("/crear-citas/crear")
+    public String createAppointment(){
+
+
+        return "redirect:/admin/crear-citas";
+    }
+
+    @PostMapping("/citas/eliminar")
+    public String deleteAppointment(){
+
+        return "redirect:/admin/citas";
+    }
+    
+
 }

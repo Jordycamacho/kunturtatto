@@ -12,8 +12,8 @@
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 </head>
 
-<div th:fragment="nav_t">
-    <div class="top-navbar" th:fragment="nav_t">
+<div th:fragment="nav_top">
+    <div class="top-navbar" th:fragment="nav_top">
         <div class="top-icons">
             <a href="https://instagram.com/cataliaboutique_?igshid=OGQ5ZDc2ODk2ZA==" target="_blank">
                 <i th:class="'fa-brands fa-instagram'"></i>
@@ -21,29 +21,24 @@
         </div>
         
         <div class="other-links">
-            <button id="btn-login"><a th:href="@{/usuario/ingresar}">Login</a></button>
-            <button id="btn-signup"><a th:href="@{/usuario/registro}">Sign up</a></button>
+            <button id="btn-login"><a th:href="@{/KunturTattoo/ingresar}">Login</a></button>
+            <button id="btn-signup"><a th:href="@{/KunturTattoo/registro}">Sign up</a></button>
 
-            <a th:href="@{/usuario/cerrar}">
+            <a th:href="@{/KunturTattoo/cerrar}">
                 <i class="fa-solid fa-right-from-bracket"></i>
             </a>
 
-            <a th:href="@{/usuario/compras}">
+            <a href="#">
                 <i class="fa-solid fa-user"></i>
-            </a>
-
-            <a th:href="@{/carrito}">
-                <i class="fa-solid fa-cart-shopping"></i>
             </a>
         </div>
     </div>
 </div>
 
-<!-- Navbar-->
-<nav th:fragment="nav">
+<nav th:fragment="nav_user">
     <div class="navbar navbar-expand-lg" id="navbar">
         <div class="container-fluid">
-            <a class="navbar-brand" th:href="@{/}">
+            <a class="navbar-brand" href="@{/}">
                 <img class="logo" src="#" alt="">
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
@@ -54,27 +49,24 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" th:href="@{/}">Inicio</a>
+                        <a class="nav-link active" aria-current="page" th:href="@{/KunturTattoo}">Inicio</a>
                     </li>
 
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                             aria-expanded="false">
-                            Categorias
+                            Diseños
                         </a>
-                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown" style="background-color: rgb(251, 248, 254)" >
-                            <li><a class="dropdown-item" th:href="@{/producto}">Todos</a></li>
-                            <li><a class="dropdown-item" th:href="@{/producto?categoria=categoria1}">Categoria 1</a></li>
-                            <li><a class="dropdown-item" th:href="@{/producto?categoria=categoria2}">Categoria 2</a></li>
-                            <li><a class="dropdown-item" th:href="@{/producto?categoria=categoria3}">Categoria 3</a></li>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown" style="background-color: rgb(251, 248, 254)">
+                            <li><a class="dropdown-item" th:href="@{/KunturTattoo/diseños}">Todos</a></li>
+                            <li th:each="category : ${categories}">
+                                <a class="dropdown-item" th:text="${category.nameCategoryDesign}" th:href="@{'/KunturTattoo/diseños/' + ${category.idCategoryDesign}}"></a>
+                            </li>
                         </ul>
 
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" th:href="@{/sobreNosotros}">Sobre Nosotros</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/contacto}">Contactanos</a>
+                        <a class="nav-link" th:href="@{/KunturTattoo/contacto}">Contactanos</a>
                     </li>
                 </ul>
 
@@ -89,8 +81,40 @@
     </div>
 </nav>
 
+<nav th:fragment="nav_admin">
+    <div class="navbar navbar-expand-lg" id="navbar">
+        <div class="container-fluid">
+            <a class="navbar-brand" th:href="@{/}">
+                <img class="logo" src="#" alt="">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <span><i class="fa-solid fa-bars" style="color: rgb(51, 49, 49);"></i></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/admin}">Diseños</a>
+                    </li>
 
-<!-- Footer -->
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/admin/categorias}">Categorias Diesños</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/admin/usuarios}">Usuarios</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/admin/citas}">Citas</a>
+                    </li>
+                </ul>
+
+            </div>
+        </div>
+    </div>
+</nav>
+
 <div th:fragment="footer">
     <footer id="footer" style="margin-top: 50px;">
         <div class="footer-top">
@@ -138,7 +162,6 @@
         </div>
     </footer>
 </div>
-
 
 <div th:fragment="script">
 

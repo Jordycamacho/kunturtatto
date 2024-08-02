@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:insert="~{user/templateUser.html::header}"></head>
+
+<body>
+    <div th:insert="~{user/templateUser.html::nav_top}"></div>
+    <div th:insert="~{user/templateUser.html::nav_user}"></div>
+    <div th:insert="~{user/templateUser.html::nav_admin}"></div>
+
+    <div class="container">
+        <h1 th:text="${category != null} ? ${category.nameCategoryDesign} : 'Todos los diseños'"></h1>
+        <div class="row">
+            <div class="col-md-4" th:each="design : ${designs}">
+                <div class="card">
+                    <img th:src="@{/images/{image} (image=${design.image})}" class="card-img-top" alt="Imagen del diseño">
+                    <div class="card-body">
+                        <h5 class="card-title" th:text="${design.title}">Nombre del diseño</h5>
+                        <p class="card-text" th:text="${design.description}">Descripción del diseño</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:insert="~{user/templateUser.html::script}"></div>
+</body>
+
+</html>

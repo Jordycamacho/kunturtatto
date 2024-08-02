@@ -43,7 +43,11 @@ public class IDesignServiceImpl implements IDesignService {
     }
 
     @Override
-    public List<Design> findByCategoryDesign(CategoryDesign categoryDesign) {
+    public List<Design> findByCategoryDesign(Long idCategory) {
+        CategoryDesign categoryDesign = new CategoryDesign();
+        categoryDesign.setIdCategoryDesign(idCategory);
         return designRepository.findByCategoryDesign(categoryDesign);
     }
+
+    
 }

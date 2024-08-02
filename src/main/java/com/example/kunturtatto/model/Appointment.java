@@ -22,8 +22,13 @@ public class Appointment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idAppointment; 
+    private String email;
     private String message;
+    private String body;
+    private String tattooCm; 
+    private String LinkReference;
     private Date messageDate;
+    
 
     @ManyToOne
     @JoinColumn(name = "idUser")

@@ -1,7 +1,115 @@
 <!DOCTYPE html>
-<html lang="en">
-<head th:include="user/templateUser.html::header"></head>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:insert="~{user/templateUser.html::header}"></head>
+
 <body>
-    
+    <div th:insert="~{user/templateUser.html::nav_top}"></div>
+    <div th:insert="~{user/templateUser.html::nav_user}"></div>
+    <div th:insert="~{user/templateUser.html::nav_admin}"></div>
+
+    <div class="portada">
+
+        <img src="#" class="img-inicio" />
+
+    </div>
+
+    <div class="espacio"></div>
+
+    <div class="container">
+
+        <h1 class="titulo-p">Kuntur Tattoo</h1>
+
+        <div class="separador"></div>
+
+        <div class="container">
+
+            <h5 class="titulo-t"> Bienvenido a Kuntur Tattoo: Donde el Arte y la Autenticidad se Fusionan</h5><br />
+
+            <div class="container">
+
+                <div class="container">
+
+                    <p class="texto-g">
+                        Estamos emocionados de ser parte de tu viaje artístico y de ayudarte a llevar tus ideas a la
+                        realidad.
+                        No dudes en ponerte en contacto con nosotros para programar una consulta o para hacer cualquier
+                        pregunta
+                        que tengas. ¡Esperamos ser tu destino para la expresión creativa y
+                        la transformación artística!
+                    </p>
+
+                    <button class="btn secondary"> <a th:href="@{/KunturTattoo/contacto}"><b>CONTACTO</b></a> </button>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="tarjeta">
+
+            <h4>TATUAJES</h4>
+
+            <p> Dale un vistaso a mi galeria de proyectos</p>
+
+            <button class="btn primary"> <a th:href="@{/KunturTattoo/diseños}"><b> GALERIA </b></a> </button>
+
+        </div>
+
+        <div class="con-img">
+
+            <img src="#" class="ns">
+
+        </div>
+
+        <div class="container">
+
+            <h5 class="titulo-t"> Compromiso con el cliente</h5>
+
+            <div class="container">
+
+                <div class="container">
+                    <p class="texto-g">
+                        la seguridad, la higiene y la satisfacción del cliente son nuestra máxima prioridad. Nuestro
+                        equipo altamente
+                        capacitado utiliza equipos de vanguardia y sigue prácticas rigurosas de esterilización para
+                        brindarte una
+                        experiencia segura y cómoda. Cada consulta es una oportunidad para colaborar y transformar tus
+                        visiones en
+                        tatuajes duraderos y hermosos.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="separador"></div>
+
+    <div class="container">
+
+
+        <h5 class="titulo-t"> Nuestra Misión </h5> <br>
+
+        <div class="container">
+
+            <div class="container">
+                <p class="texto-g">
+                    Nuestra misión es simple pero profunda: crear tatuajes que trasciendan el arte superficial y se
+                    conviertan en una extensión
+                    genuina de tu identidad. Cada tatuaje que creamos cuenta una historia, representa una creencia o
+                    captura un momento especial.
+                    Nos esforzamos por brindarte no solo una obra maestra visual, sino una experiencia que te empodere y
+                    celebre tu unicidad.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="con-img">
+
+        <img src="#" class="ns">
+
+    </div>
+
+    <div th:insert="~{user/templateUser.html::script}"></div>
 </body>
 </html>

@@ -3,7 +3,6 @@ package com.example.kunturtatto.service;
 import java.util.List;
 import java.util.Optional;
 
-import com.example.kunturtatto.model.CategoryDesign;
 import com.example.kunturtatto.model.Design;
 
 public interface IDesignService {
@@ -13,5 +12,5 @@ public interface IDesignService {
     Design save(Design design);
     void delete(Long idDesign);
     Design update(Design design);
-    List<Design> findByCategoryDesign(CategoryDesign categoryDesign);
+    List<Design> findByCategoryDesign(Long idCategory);
 }

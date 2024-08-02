@@ -12,8 +12,6 @@
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 </head>
 
-
-<!-- Navbar-->
 <nav th:fragment="nav_user">
     <div class="navbar navbar-expand-lg" id="navbar">
         <div class="container-fluid">
@@ -28,7 +26,7 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" th:href="@{/}">Inicio</a>
+                        <a class="nav-link active" aria-current="page" th:href="@{/KunturTattoo}">Inicio</a>
                     </li>
 
                     <li class="nav-item dropdown">
@@ -36,19 +34,16 @@
                             aria-expanded="false">
                             Categorias
                         </a>
-                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown" style="background-color: rgb(251, 248, 254)" >
-                            <li><a class="dropdown-item" href="">Todos</a></li>
-                            <li><a class="dropdown-item" href="">Categoria 1</a></li>
-                            <li><a class="dropdown-item" href="">Categoria 2</a></li>
-                            <li><a class="dropdown-item" href="">Categoria 3</a></li>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown" style="background-color: rgb(251, 248, 254)">
+                            <li><a class="dropdown-item" th:href="@{/KunturTattoo/diseños}">Todos</a></li>
+                            <li th:each="category : ${categories}">
+                                <a class="dropdown-item" th:text="${category.nameCategoryDesign}" th:href="@{'/KunturTattoo/diseños/' + ${category.idCategoryDesign}}"></a>
+                            </li>
                         </ul>
 
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Sobre Nosotros</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Contactanos</a>
+                        <a class="nav-link" th:href="@{/KunturTattoo/contacto}">Contactanos</a>
                     </li>
                 </ul>
 
@@ -84,7 +79,11 @@
                         <a class="nav-link" th:href="@{/admin/categorias}">Categorias Diesños</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" th:href="@{/contacto}">Usuarios</a>
+                        <a class="nav-link" th:href="@{/admin/usuarios}">Usuarios</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/admin/citas}">Citas</a>
                     </li>
                 </ul>
 
@@ -92,8 +91,6 @@
         </div>
     </div>
 </nav>
-
-
 
 <div th:fragment="script">
 
@@ -103,6 +100,3 @@
     <script src="https://kit.fontawesome.com/5971328ca7.js" crossorigin="anonymous"></script>
 
 </div>
-
-
-
