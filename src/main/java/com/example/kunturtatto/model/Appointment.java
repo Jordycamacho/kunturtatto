@@ -27,6 +27,7 @@ public class Appointment {
     private String body;
     private String tattooCm; 
     private String LinkReference;
+    private Double price;
     private Date messageDate;
     
 

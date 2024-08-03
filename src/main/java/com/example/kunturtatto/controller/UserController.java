@@ -92,6 +92,12 @@ public class UserController {
         return "user/contact";
     }
 
+    @PostMapping("/contacto/guardar")
+    public String saveContact() {
+
+        return "redirect:/KunturTattoo/contacto";
+    }
+
     @PostMapping("/login/guardar")
     public String saveLogIn() {
 
@@ -123,10 +129,5 @@ public class UserController {
         return "redirect:/KunturTattoo/ingresar";
     }
 
-    @PostMapping("/contacto/guardar")
-    public String saveContact() {
-
-        return "redirect:/KunturTattoo/contacto";
-    }
-
+    
 }

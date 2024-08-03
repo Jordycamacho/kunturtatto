@@ -31,13 +31,13 @@
             </div>
         </div>
 
-        <form class="form" th:action="@{/KunturTattoo/contacto/guardar}" method="post">
+        <form class="form" th:action="@{/mail/contacto/guardar}" method="post">
             <div class="row" style="margin-top: 30px;">
                 <div class="col-md-4 py-3 py-md-0">
                     <input type="email" class="form-control" name="email" placeholder="Email*" required>
                 </div>
                 <div class="col-md-4 py-3 py-md-0">
-                    <input type="text" class="form-control" name="asunto" placeholder="Asunto*" required>
+                    <input type="text" class="form-control" name="subject" placeholder="Asunto*" required>
                 </div>
                 <div class="col-md-4 py-3 py-md-0">
                     <input type="text" class="form-control" name="tattooCm" placeholder="Tamaño en CM(aprox.)*">
@@ -55,7 +55,11 @@
                 </div>
                 <br><br>
                 <div class="col-md-12 py-3 py-md-0">
-                    <textarea class="form-control" id="" cols="30" rows="5" name="linksReference" placeholder="Mensaje*" required></textarea>
+                    <textarea class="form-control" id="" cols="30" rows="2" name="linksReference" placeholder="Links de referencia"></textarea>
+                </div>
+                <br><br><br>
+                <div class="col-md-12 py-3 py-md-0">
+                    <textarea class="form-control" id="" cols="30" rows="5" name="message" placeholder="Mensaje*" required></textarea>
                 </div>
                 <div id="messagebtn" class="text-center" style="margin-top: 30px;">
                     <button type="submit" class="btn btn-primary">Enviar</button>
