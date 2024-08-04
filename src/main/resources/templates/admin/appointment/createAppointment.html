@@ -1,12 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
-<head th:insert="~{admin/appointment/templateAdmin.html::header}"></head>
+<head th:insert="~{admin/appointment/templateAdmin.html::header}">
+</head>
 <body>
     <div th:insert="~{admin/appointment/templateAdmin.html::nav_user}"></div>
     <div th:insert="~{admin/appointment/templateAdmin.html::nav_admin}"></div>
 
-    
-    <h1>Crear Citas</h1>
+    <div class="container mt-5">
+        <h1 class="text-center">Crear Citas</h1>
+
+        <form th:action="@{/admin/crear-citas/crear}" method="post" class="mt-4">
+
+            <h3>Datos Usuario</h3>
+            <div class="form-group">
+                <label for="customerEmail">Correo del Cliente:</label>
+                <input type="email" class="form-control" id="customerEmail" name="customerEmail" />
+            </div>
+            <br>
+            <h3>Datos de la cita</h3>
+            <div class="form-group">
+                <label for="date">Fecha:</label>
+                <input type="date" class="form-control" id="date" name="date" required />
+            </div>
+            <br>
+            <div class="form-group">
+                <label for="time">Hora:</label>
+                <input type="time" class="form-control" id="time" name="time" required />
+            </div>
+            <br>
+            <div class="form-group">
+                <label for="price">Precio acordado:</label>
+                <input type="text" class="form-control" id="price" name="price" />
+            </div>
+            <br>
+            <h3>Datos Diseño</h3>
+
+            <div class="form-group">
+                <label for="design">Diseño (opcional):</label>
+                <select id="design" class="form-control" name="design">
+                    <option value="">Seleccionar</option>
+                    <option th:each="design : ${designs}" th:value="${design.title}" th:text="${design.title}"></option>
+                </select>
+            </div>
+            <br>
+            
+            <div class="form-group">
+                <label for="tattooSize">Tamaño del Tatuaje:</label>
+                <input type="text" class="form-control" id="tattooSize" name="tattooCm" required/>
+            </div>
+            <br>
+            <div class="col-md-12 py-3 py-md-0">
+                <select class="form-control" name="body" required>
+                    <option value="" disabled selected >Selecciona la zona del cuerpo*</option>
+                    <option value="Brazo">Brazo</option>
+                    <option value="Pierna">Pierna</option>
+                    <option value="Espalda">Espalda</option>
+                    <option value="Pecho">Pecho</option>
+                    <option value="Otro">Otro</option>
+                </select>
+            </div>
+            <br>
+            <div class="form-group">
+                <label for="linkReference">Links de referencia (opcional):</label>
+                <input type="text" class="form-control" id="linkReference" name="linkReference"/>
+            </div>
+            <br>
+            <div class="form-group">
+                <label for="customDesignDescription">Descripción del Diseño Personalizado:</label>
+                <textarea id="customDesignDescription" class="form-control" name="message" rows="3"></textarea>
+            </div>
+            <br>
+            <button type="submit" class="btn btn-primary btn-block">Crear Cita</button>
+        </form>
+    </div>
 
     <div th:insert="~{admin/appointment/templateAdmin.html::script}"></div>
 </body>

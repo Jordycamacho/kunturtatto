@@ -2,12 +2,12 @@ package com.example.kunturtatto.model;
 
 import java.util.Date;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,17 +21,18 @@ import lombok.Setter;
 public class Appointment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idAppointment; 
-    private String email;
-    private String message;
-    private String body;
+    private Long idAppointment;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private Date date;
+    private String time;
+    private Double price;
+
+    private String customerEmail;
+
+    private String design;
     private String tattooCm; 
     private String LinkReference;
-    private Double price;
-    private Date messageDate;
+    private String body;
+    private String message;
     
-
-    @ManyToOne
-    @JoinColumn(name = "idUser")
-    private User user;
 }
