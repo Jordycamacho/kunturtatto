@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,6 +31,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
 @RequestMapping("/admin")
+@PreAuthorize("denyAll()")
 public class AdminController {
 
     @Autowired
@@ -49,6 +51,7 @@ public class AdminController {
 
     /* Create Designs */
     @GetMapping("")
+    @PreAuthorize("hasAuthority('CREATE')")
     public String showDesign(Model model) {
         List<CategoryDesign> categoryDesigns = categoryDesignService.findAll();
         model.addAttribute("categories", categoryDesigns);
@@ -60,6 +63,7 @@ public class AdminController {
     }
 
     @GetMapping("/diseños/crear")
+    @PreAuthorize("hasAuthority('CREATE')")
     public String createDesign(Model model) {
 
         List<CategoryDesign> categoryDesigns = categoryDesignService.findAll();
@@ -72,6 +76,7 @@ public class AdminController {
     }
 
     @GetMapping("/diseños/editar/{id}")
+    @PreAuthorize("hasAuthority('UPDATE')")
     public String editDesign(@PathVariable Long id, Model model) {
 
         List<CategoryDesign> categoryDesigns = categoryDesignService.findAll();
@@ -94,6 +99,7 @@ public class AdminController {
     }
 
     @PostMapping("/diseños/crear/guardar")
+    @PreAuthorize("hasAuthority('CREATE')")
     public String saveDesign(
             @RequestParam("title") String title,
             @RequestParam("description") String description,
@@ -129,6 +135,7 @@ public class AdminController {
     }
 
     @PostMapping("/diseños/editar/guardar")
+    @PreAuthorize("hasAuthority('UPDATE')")
     public String updateDesign(
             @RequestParam("idDesign") Long idDesign,
             @RequestParam("title") String title,
@@ -168,6 +175,7 @@ public class AdminController {
     }
 
     @PostMapping("/diseños/eliminar/{id}")
+    @PreAuthorize("hasAuthority('DELETE')")
     public String Delete(@PathVariable long id) {
 
         Design design = new Design();
@@ -184,6 +192,7 @@ public class AdminController {
 
     /* Create Categories */
     @GetMapping("/categorias")
+    @PreAuthorize("hasAuthority('CREATE')")
     public String showCategory(Model model) {
         List<CategoryDesign> categoryDesigns = categoryDesignService.findAll();
         model.addAttribute("categories", categoryDesigns);
@@ -192,6 +201,7 @@ public class AdminController {
     }
 
     @GetMapping("/categorias/crear")
+    @PreAuthorize("hasAuthority('CREATE')")
     public String createCategory(Model model) {
 
         model.addAttribute("categoriesDesign", categoryDesignService.findAll());
@@ -200,6 +210,7 @@ public class AdminController {
     }
 
     @PostMapping("categorias/crear/guardar")
+    @PreAuthorize("hasAuthority('CREATE')")
     public String saveCategory(@RequestParam("nameCategoryDesign") String nameCategoryDesign,
             RedirectAttributes redirectAttributes) {
 
@@ -213,6 +224,7 @@ public class AdminController {
     }
 
     @PostMapping("categorias/eliminar/{id}")
+    @PreAuthorize("hasAuthority('DELETE')")
     public String deleteCategoty(@PathVariable Long id) {
 
         categoryDesignService.deleteById(id);
@@ -222,6 +234,7 @@ public class AdminController {
 
     /* Administracion usuarios */
     @GetMapping("/usuarios")
+    @PreAuthorize("hasAuthority('CREATE')")
     public String showUsers(Model model) {
         List<CategoryDesign> categoryDesigns = categoryDesignService.findAll();
         model.addAttribute("categories", categoryDesigns);
@@ -233,6 +246,7 @@ public class AdminController {
     }
 
     @PostMapping("/usuarios/eliminar/{id}")
+    @PreAuthorize("hasAuthority('DELETE')")
     public String deleteUser(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         userService.deleteById(id);
         redirectAttributes.addFlashAttribute("message", "Usuario eliminado exitosamente.");
@@ -241,6 +255,7 @@ public class AdminController {
 
     /* Administracion citas */
     @GetMapping("/citas")
+    @PreAuthorize("hasAuthority('CREATE')")
     public String showAppointments(Model model) {
 
         List<CategoryDesign> categoryDesigns = categoryDesignService.findAll();
@@ -262,6 +277,7 @@ public class AdminController {
     }
 
     @GetMapping("/crear-citas")
+    @PreAuthorize("hasAuthority('CREATE')")
     public String createAppointments(Model model) {
         List<CategoryDesign> categoryDesigns = categoryDesignService.findAll();
         List<Design> designs = designService.findAll();
@@ -273,6 +289,7 @@ public class AdminController {
     }
 
     @GetMapping("/citas/editar/{id}")
+    @PreAuthorize("hasAuthority('UPDATE')")
     public String editAppointmentForm(@PathVariable Long id, Model model) {
         List<CategoryDesign> categoryDesigns = categoryDesignService.findAll();
         model.addAttribute("categories", categoryDesigns);
@@ -286,6 +303,7 @@ public class AdminController {
     }
 
     @GetMapping("/citas/verDetalles/{id}")
+    @PreAuthorize("hasAuthority('CREATE')")
     public String showAppointmentDetails(@PathVariable Long id, Model model) {
         List<CategoryDesign> categoryDesigns = categoryDesignService.findAll();
         model.addAttribute("categories", categoryDesigns);
@@ -296,12 +314,14 @@ public class AdminController {
     }
 
     @PostMapping("/crear-citas/crear")
+    @PreAuthorize("hasAuthority('CREATE')")
     public String createAppointment(Appointment appointment) {
         appointmentService.save(appointment);
         return "redirect:/admin/citas";
     }
 
     @PostMapping("/citas/editar/guardar/{id}")
+    @PreAuthorize("hasAuthority('UPDATE')")
     public String editAppointment(@PathVariable Long id, @ModelAttribute Appointment appointment,
             RedirectAttributes redirectAttributes) {
         appointment.setIdAppointment(id);
@@ -311,6 +331,7 @@ public class AdminController {
     }
 
     @PostMapping("/citas/eliminar/{id}")
+    @PreAuthorize("hasAuthority('DELETE')")
     public String deleteAppointment(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         appointmentService.deleteById(id);
         redirectAttributes.addFlashAttribute("message", "Cita eliminada exitosamente.");

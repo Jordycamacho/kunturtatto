@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
 @RequestMapping("/KunturTattoo")
+@PreAuthorize("permitAll()")
 public class UserController {
 
     @Autowired
@@ -57,7 +59,8 @@ public class UserController {
         return "user/singup";
     }
 
-    @GetMapping("/profile/{id}")
+    @GetMapping("/profile")
+    @PreAuthorize("hasAuthority('READ')")
     public String perfilUsuario(Model model) {
         List <CategoryDesign> categoryDesigns = categoryDesignService.findAll();
         model.addAttribute("categories", categoryDesigns);
@@ -107,7 +110,6 @@ public class UserController {
     @PostMapping("/registro/guardar")
     public String saveSignup(@RequestParam("email") String email, @RequestParam("password") String password,
             RedirectAttributes redirectAttributes) {
-        String rol = "USER";
         Date dateNow = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         @SuppressWarnings("unused")
@@ -119,7 +121,6 @@ public class UserController {
 
         user.setPassword(password);
 
-        user.setType(rol);
         user.setRegistrationDate(dateNow);
 
         // Guardar el usuario en el servicio
