@@ -14,8 +14,10 @@ import com.example.kunturtatto.model.RoleEnum;
 import com.example.kunturtatto.model.User;
 import com.example.kunturtatto.repository.UserRepository;
 */
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
+@EnableScheduling
 public class KunturtattoApplication {
 
         public static void main(String[] args) {

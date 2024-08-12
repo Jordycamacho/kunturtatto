@@ -1,5 +1,6 @@
 package com.example.kunturtatto.service.impl;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ public class IAppointmentServiceImpl implements IAppointmentService {
 
     @Autowired
     AppointmentRepository appointmentRepository;
+    
     @Override
     public List<Appointment> findAll() {
         return appointmentRepository.findAll();
@@ -37,6 +39,13 @@ public class IAppointmentServiceImpl implements IAppointmentService {
     @Override
     public Appointment findById(Long idAppointment) {
         return appointmentRepository.findById(idAppointment).orElse(null);
+    }
+
+
+    @Override
+    public List<Appointment> getTodaysAppointments() {
+        LocalDate today = LocalDate.now();
+        return appointmentRepository.findByDate(today);
     }
     
 }
