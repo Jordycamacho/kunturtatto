@@ -20,7 +20,6 @@ import com.example.kunturtatto.service.IDesignService;
 import com.example.kunturtatto.service.IUserService;
 
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
@@ -68,23 +67,22 @@ public class UserController {
     }
 
     @GetMapping("/diseños")
-    public String showDesigns(Model model) {
-        List<Design> designs = designService.findAll();
+    public String showDesigns(@RequestParam(required = false) Long categoryId, Model model) {
+        List<Design> designs;
+        
+        if (categoryId != null) {
+            // Filtrar diseños por categoría seleccionada
+            designs = designService.findByCategoryDesign(categoryId);
+        } else {
+            // Mostrar todos los diseños
+            designs = designService.findAll();
+        }
+
         List<CategoryDesign> categoryDesigns = categoryDesignService.findAll();
         model.addAttribute("designs", designs);
         model.addAttribute("categories", categoryDesigns);
-        return "user/designs";
-    }
+        model.addAttribute("selectedCategoryId", categoryId); // Para saber qué categoría está seleccionada
 
-     @GetMapping("/diseños/{categoryId}")
-    public String showDesignsByCategory(@PathVariable Long categoryId, Model model) {
-        List<Design> designs = designService.findByCategoryDesign(categoryId);
-        CategoryDesign category = categoryDesignService.findById(categoryId).orElse(null);
-
-        model.addAttribute("designs", designs);
-        model.addAttribute("category", category);
-        List<CategoryDesign> categoryDesigns = categoryDesignService.findAll();
-        model.addAttribute("categories", categoryDesigns);
         return "user/designs";
     }
 

@@ -7,11 +7,17 @@
 
     <div class="container mt-5">
         <h1>Crear Nueva Categoría</h1>
-        <form th:action="@{/admin/categorias/crear/guardar}" method="post" class="row g-3">
+        <form th:action="@{/admin/categorias/crear/guardar}" method="post"  enctype="multipart/form-data" class="row g-3">
             <div class="col-md-6">
                 <label for="nameCategoryDesign" class="form-label">Nombre de la Categoría</label>
                 <input type="text" class="form-control" id="nameCategoryDesign" name="nameCategoryDesign" placeholder="Nombre de la Categoría" required>
             </div>
+
+            <div class="col-md-6">
+                <label for="image" class="form-label">Imagen</label>
+                <input type="file" class="form-control" id="image" name="image" required>
+            </div>
+            
             <div class="col-12">
                 <button type="submit" class="btn btn-primary">Guardar</button>
             </div>

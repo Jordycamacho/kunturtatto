@@ -1,176 +1,199 @@
 <head th:fragment="header">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ecommerce</title>
+
+    <!--=============== FAVICON ===============-->
+    <link rel="shortcut icon" href="assets/img/favicon.png" type="image/x-icon">
+
+    <!--=============== REMIXICONS ===============-->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.2.0/fonts/remixicon.css" rel="stylesheet">
+
+    <!--=============== CSS ===============-->
     <link rel="stylesheet" th:href="@{/css/styles.css}">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
-    <script src="https://js.stripe.com/v3/"></script>
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <link rel="stylesheet" th:href="@{/css/contact.css}">
+
+    <title>KunturTattoo</title>
 </head>
 
-<div th:fragment="nav_top">
-    <div class="top-navbar" th:fragment="nav_top">
-        <div class="top-icons">
-            <a href="https://instagram.com/cataliaboutique_?igshid=OGQ5ZDc2ODk2ZA==" target="_blank">
-                <i th:class="'fa-brands fa-instagram'"></i>
-            </a>
+<header class="header" id="header" th:fragment="nav_user">
+    
+    <nav class="nav container">
+        <a th:href="@{/KunturTattoo}" class="nav__logo">
+            KunturTattoo
+        </a>
+
+        <div class="nav__menu" id="nav-menu">
+            <ul class="nav__list">
+                <li class="nav__item">
+                    <a th:href="@{/KunturTattoo}" class="nav__link">Inicio</a>
+                </li>
+
+                <li class="nav__item">
+                    <a th:href="@{/KunturTattoo/diseños}" class="nav__link">Galeria</a>
+                </li>
+
+                <li class="nav__item">
+                    <a th:href="@{/KunturTattoo/contacto}" class="nav__link">Contacto</a>
+                </li>
+            </ul>
+
+
+            <!--Close button-->
+            <div class="nav__close" id="nav-close">
+                <i class="ri-close-line"></i>
+            </div>
+        </div>
+
+        <!-- Toggle button-->
+        <div class="nav__toggle" id="nav-toggle">
+            <i class="ri-menu-fill"></i>
+        </div>
+
+    </nav>
+    <!--
+    <nav class="nav container">
+
+        <div class="nav__menu" id="nav-menu">
+            <ul class="nav__list">
+                <li class="nav__item">
+                    <a th:href="@{/admin}" class="nav__link">Diseños</a>
+                </li>
+
+                <li class="nav__item">
+                    <a th:href="@{/admin/categorias}" class="nav__link">Categorias diseños</a>
+                </li>
+
+                <li class="nav__item">
+                    <a th:href="@{/admin/usuarios}" class="nav__link">Usuarios</a>
+                </li>
+
+                <li class="nav__item">
+                    <a th:href="@{/admin/citas}" class="nav__link">Citas</a>
+                </li>
+            </ul>
+
+
+            <div class="nav__close" id="nav-close">
+                <i class="ri-close-line"></i>
+            </div>
         </div>
         
-        <div class="other-links">
-            <button id="btn-login"><a th:href="@{/KunturTattoo/ingresar}">Login</a></button>
-            <button id="btn-signup"><a th:href="@{/KunturTattoo/registro}">Sign up</a></button>
-
-            <a th:href="@{/KunturTattoo/cerrar}">
-                <i class="fa-solid fa-right-from-bracket"></i>
-            </a>
-
-            <a th:href="@{/KunturTattoo/profile}">
-                <i class="fa-solid fa-user"></i>
-            </a>
+        <div class="nav__toggle" id="nav-toggle">
+            <i class="ri-menu-fill"></i>
         </div>
-    </div>
-</div>
 
-<nav th:fragment="nav_user">
-    <div class="navbar navbar-expand-lg" id="navbar">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="@{/}">
-                <img class="logo" src="#" alt="">
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
-                aria-label="Toggle navigation">
-                <span><i class="fa-solid fa-bars" style="color: rgb(51, 49, 49);"></i></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" th:href="@{/KunturTattoo}">Inicio</a>
-                    </li>
+    </nav>
+-->
+</header>
 
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                            aria-expanded="false">
-                            Diseños
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown" style="background-color: rgb(251, 248, 254)">
-                            <li><a class="dropdown-item" th:href="@{/KunturTattoo/diseños}">Todos</a></li>
-                            <li th:each="category : ${categories}">
-                                <a class="dropdown-item" th:text="${category.nameCategoryDesign}" th:href="@{'/KunturTattoo/diseños/' + ${category.idCategoryDesign}}"></a>
+<!--==================== FOOTER ====================-->
+<div th:fragment="footer">
+    <footer class="footer">
+        <div class="footer__container container grid">
+            <div class="footer__content grid">
+                <div>
+                    <a href="#" class="footer__logo">KunturTatto</a>
+                    <p class="footer__description">
+                        Travel with us and explore <br>
+                        the world without limits.
+                    </p>
+                </div>
+
+                <div class="footer__data grid">
+                    <div>
+                        <h3 class="footer__title">About</h3>
+
+                        <ul class="footer__links">
+                            <li>
+                                <a href="#" class="footer__link">About Us</a>
+                            </li>
+                            <li>
+                                <a href="#" class="footer__link">Features</a>
+                            </li>
+                            <li>
+                                <a href="#" class="footer__link">News & Blog</a>
                             </li>
                         </ul>
-
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/KunturTattoo/contacto}">Contactanos</a>
-                    </li>
-                </ul>
-
-                <form class="d-flex" role="search" method="post" th:action="@{/buscar}">
-                    <input class="form-control me-2" type="search" placeholder="Buscar" aria-label="Search"
-                        name="nombre" autocomplete="off">
-                    <button class="btn btn-outline-success" type="submit" id="search-btn">Buscar</button>
-                </form>
-
-            </div>
-        </div>
-    </div>
-</nav>
-
-<nav th:fragment="nav_admin">
-    <div class="navbar navbar-expand-lg" id="navbar">
-        <div class="container-fluid">
-            <a class="navbar-brand" th:href="@{/}">
-                <img class="logo" src="#" alt="">
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
-                aria-label="Toggle navigation">
-                <span><i class="fa-solid fa-bars" style="color: rgb(51, 49, 49);"></i></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/admin}">Diseños</a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/admin/categorias}">Categorias Diesños</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/admin/usuarios}">Usuarios</a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/admin/citas}">Citas</a>
-                    </li>
-                </ul>
-
-            </div>
-        </div>
-    </div>
-</nav>
-
-<div th:fragment="footer">
-    <footer id="footer" style="margin-top: 50px;">
-        <div class="footer-top">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-3 col-md-6 footer-content">
-                        <h3>Contacto</h3>
-                        <p>Puedes contactarnos</p>
-
-                        <strong><i class="fas fa-phone"></i> Telefono: </strong>+34-658060366<br />
-                        <strong><br> cataliaboutique09@gmail.com</strong>
                     </div>
-                    <div class="col-lg-3 col-md-6 footer-content footer-links">
-                        <h4>Navegacion</h4>
-                        <ul>
-                            <li><a th:href="@{/}">Inicio</a></li>
-                            <li><a th:href="@{contacto}">contacto</a></li>
-                            <li><a th:href="@{sobreNosotros}">sobre nosotros</a></li>
-                            <li><a href="index.html">Politicas de privacidad</a></li>
+
+                    <div>
+                        <h3 class="footer__title">Company</h3>
+
+                        <ul class="footer__links">
+                            <li>
+                                <a href="#" class="footer__link">FAQs</a>
+                            </li>
+                            <li>
+                                <a href="#" class="footer__link">History</a>
+                            </li>
+                            <li>
+                                <a href="#" class="footer__link">Testimonials</a>
+                            </li>
                         </ul>
                     </div>
-                    <div class="col-lg-3 col-md-6 footer-links ">
-                        <h4>Nuestros Productos</h4>
-                        <ul>
-                            <li>Lazos</li>
-                            <li>Diademas</li>
-                            <li>Recien nacidos</li>
+
+                    <div>
+                        <h3 class="footer__title">Contact</h3>
+
+                        <ul class="footer__links">
+                            <li>
+                                <a href="#" class="footer__link">Call Center</a>
+                            </li>
+                            <li>
+                                <a href="#" class="footer__link">Support Center</a>
+                            </li>
+                            <li>
+                                <a href="#" class="footer__link">Contact Us</a>
+                            </li>
                         </ul>
                     </div>
-                    <div class="col-lg-3 col-md-6 footer-links">
-                        <h4>Redes Sociales</h4>
-                        <p>Puedes mantenerte informado</p>
-                        <div class="socail-links mt-3 ">
-                            <a href="https://instagram.com/cataliaboutique_?igshid=OGQ5ZDc2ODk2ZA=="><i th:class="'fa-brands fa-instagram'"></i></a>
-                        </div>
+
+                    <div>
+                        <h3 class="footer__title">Support</h3>
+
+                        <ul class="footer__links">
+                            <li>
+                                <a href="#" class="footer__link">Privacy Policy</a>
+                            </li>
+                            <li>
+                                <a href="#" class="footer__link">Terms & Services</a>
+                            </li>
+                            <li>
+                                <a href="#" class="footer__link">Payments</a>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </div>
-        </div>
-        <hr>
-        <div class="container py-4">
-            <div class="copyright">
-                &copy; Copyright <strong>Jordy camacho</strong>
+
+            <div class="footer__group">
+                <div class="footer__social">
+                    <a href="#" target="_blank" class="footer__social-link">
+                        <i class="ri-facebook-line"></i>
+                    </a>
+
+                    <a href="#" target="_blank" class="footer__social-link">
+                        <i class="ri-instagram-line"></i>
+                    </a>
+
+                    <a href="#" target="_blank" class="footer__social-link">
+                        <i class="ri-twitter-line"></i>
+                    </a>
+
+                    <a href="#" target="_blank" class="footer__social-link">
+                        <i class="ri-youtube-line"></i>
+                    </a>
+                </div>
+
+                <span class="footer__copy">
+                    &#169; Copyright Jordi Camacho. All rights reserved
+                </span>
             </div>
         </div>
     </footer>
 </div>
 
 <div th:fragment="script">
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
-        crossorigin="anonymous"></script>
-    <script src="https://kit.fontawesome.com/5971328ca7.js" crossorigin="anonymous"></script>
-
+    <script th:src="@{/js/main.js}"></script>
+    <script th:src="@{/js/scrollreveal.min.js}"></script>
 </div>
-
-
-

@@ -4,24 +4,53 @@
 <head th:insert="~{user/templateUser.html::header}"></head>
 
 <body>
-    <div th:insert="~{user/templateUser.html::nav_top}"></div>
     <div th:insert="~{user/templateUser.html::nav_user}"></div>
-    <div th:insert="~{user/templateUser.html::nav_admin}"></div>
+    <section class="home section" id="home">
+        <img src="../images/tatto-banner.png" alt="home image" class="home__bg">
+        <div class="home__shadow"></div>
 
-    <div class="container">
-        <h1 th:text="${category != null} ? ${category.nameCategoryDesign} : 'Todos los diseños'"></h1>
-        <div class="row">
-            <div class="col-md-4" th:each="design : ${designs}">
-                <div class="card">
-                    <img th:src="@{/images/{image} (image=${design.image})}" class="card-img-top" alt="Imagen del diseño">
-                    <div class="card-body">
-                        <h5 class="card-title" th:text="${design.title}">Nombre del diseño</h5>
-                        <p class="card-text" th:text="${design.description}">Descripción del diseño</p>
-                    </div>
-                </div>
+        <div class="home__container container grid">
+            <div class="home__data">
+                <h3 class="home__subtitle">
+                    KunturTattoo
+                </h3>
+                <h1 class="home__title">
+                    Explora <br>
+                    Nuestro diseño
+                </h1>
             </div>
+
+            <div class="wrapper">
+                <nav>
+                    <div class="items">
+                        <!-- Enlace para mostrar todos los diseños -->
+                        <a th:href="@{/KunturTattoo/diseños}" class="item" th:classappend="${selectedCategoryId == null} ? 'active' : ''">Todos</a>
+                        <!-- Itera sobre las categorías para mostrar dinámicamente -->
+                        <a th:each="category : ${categories}" 
+                           th:href="@{/KunturTattoo/diseños(categoryId=${category.idCategoryDesign})}" 
+                           th:text="${category.nameCategoryDesign}" 
+                           class="item"
+                           th:classappend="${selectedCategoryId == category.idCategoryDesign} ? 'active' : ''"></a>
+                    </div>
+                </nav>
+            </div>
+            <div class="space"></div>
+        </div>
+    </section>
+
+    <!-- Filter images -->
+    <div class="gallery">
+        <!-- Itera sobre los diseños y muestra las imágenes correspondientes -->
+        <div class="image" th:each="design : ${designs}">
+            <span>
+                <img th:src="@{/images/{imageName}(imageName=${design.image})}" th:alt="${design.title}" class="design-image">
+            </span>
         </div>
     </div>
+
+    <div class="space"></div>
+
+    <div th:insert="~{user/templateUser.html::footer}"></div>
 
     <div th:insert="~{user/templateUser.html::script}"></div>
 </body>

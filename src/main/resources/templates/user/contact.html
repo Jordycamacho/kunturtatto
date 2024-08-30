@@ -3,73 +3,45 @@
 
 <head th:insert="~{user/templateUser.html::header}"></head>
 
-<body>
-    <div th:insert="~{user/templateUser.html::nav_top}"></div>
+<body class="contact-page">
     <div th:insert="~{user/templateUser.html::nav_user}"></div>
-    <div th:insert="~{user/templateUser.html::nav_admin}"></div>
 
-    <div class="container" id="contact">
+    <div class="container-contact" id="contact">
         <h1 class="text-center">CONTACTANOS</h1>
-        <div class="row" style="margin-top: 50px;">
-            <div class="col-md-4 py-3 py-md-0">
-                <div class="card text-center">
-                    <i class="fas fa-phone fa-2x my-3"></i>
-                    <h6>+34-658060366</h6>
-                </div>
-            </div>
-            <div class="col-md-4 py-3 py-md-0">
-                <div class="card text-center">
-                    <i class="fa-solid fa-envelope fa-2x my-3"></i>
-                    <h6>prueba@gmail.com</h6>
-                </div>
-            </div>
-            <div class="col-md-4 py-3 py-md-0">
-                <div class="card text-center">
-                    <i class="fa-brands fa-instagram fa-2x my-3"></i>
-                    <h6>@prueba</h6>
-                </div>
-            </div>
-        </div>
+        
 
-        <form class="form" th:action="@{/mail/contacto/guardar}" method="post">
-            <div class="row" style="margin-top: 30px;">
-                <div class="col-md-4 py-3 py-md-0">
-                    <input type="email" class="form-control" name="email" placeholder="Email*" required>
-                </div>
-                <div class="col-md-4 py-3 py-md-0">
-                    <input type="text" class="form-control" name="subject" placeholder="Asunto*" required>
-                </div>
-                <div class="col-md-4 py-3 py-md-0">
-                    <input type="text" class="form-control" name="tattooCm" placeholder="Tamaño en CM(aprox.)*">
-                </div>
-                <br><br>
-                <div class="col-md-12 py-3 py-md-0">
-                    <select class="form-control" name="body" required>
-                        <option value="" disabled selected>Selecciona la zona del cuerpo*</option>
-                        <option value="Brazo">Brazo</option>
-                        <option value="Pierna">Pierna</option>
-                        <option value="Espalda">Espalda</option>
-                        <option value="Pecho">Pecho</option>
-                        <option value="Otro">Otro</option>
-                    </select>
-                </div>
-                <br><br>
-                <div class="col-md-12 py-3 py-md-0">
-                    <textarea class="form-control" id="" cols="30" rows="2" name="linksReference" placeholder="Links de referencia"></textarea>
-                </div>
-                <br><br><br>
-                <div class="col-md-12 py-3 py-md-0">
-                    <textarea class="form-control" id="" cols="30" rows="5" name="message" placeholder="Mensaje*" required></textarea>
-                </div>
-                <div id="messagebtn" class="text-center" style="margin-top: 30px;">
-                    <button type="submit" class="btn btn-primary">Enviar</button>
-                </div>
+        <form class="contact-form" th:action="@{/mail/contacto/guardar}" method="post">
+            <div class="form-row">
+                <input type="email" name="email" placeholder="Email*" required>
+                <input type="text" name="subject" placeholder="Asunto*" required>
+                <input type="text" name="tattooCm" placeholder="Tamaño en CM(aprox.)*">
+            </div>
+            <div class="form-row">
+                <select name="body" required>
+                    <option value="" disabled selected>Selecciona la zona del cuerpo*</option>
+                    <option value="Brazo">Brazo</option>
+                    <option value="Pierna">Pierna</option>
+                    <option value="Espalda">Espalda</option>
+                    <option value="Pecho">Pecho</option>
+                    <option value="Otro">Otro</option>
+                </select>
+            </div>
+            <div class="form-row">
+                <textarea cols="30" rows="2" name="linksReference" placeholder="Links de referencia"></textarea>
+            </div>
+            <div class="form-row">
+                <textarea cols="30" rows="5" name="message" placeholder="Mensaje*" required></textarea>
+            </div>
+            <div class="form-row">
+                <button type="submit">Enviar Mensaje</button>
             </div>
         </form>
         <div th:if="${mensajeEnviado}">
-            <p class="text-success text-center mt-3">¡Gracias por tu mensaje! Nos pondremos en contacto contigo pronto.</p>
+            <p class="message-success">¡Gracias por tu mensaje! Nos pondremos en contacto contigo pronto.</p>
         </div>
     </div>
+
+    <div th:insert="~{user/templateUser.html::footer}"></div>
 
     <div th:insert="~{user/templateUser.html::script}"></div>
 </body>

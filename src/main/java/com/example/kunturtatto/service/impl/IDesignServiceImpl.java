@@ -48,6 +48,4 @@ public class IDesignServiceImpl implements IDesignService {
         categoryDesign.setIdCategoryDesign(idCategory);
         return designRepository.findByCategoryDesign(categoryDesign);
     }
-
-    
 }

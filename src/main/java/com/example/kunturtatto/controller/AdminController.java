@@ -212,12 +212,28 @@ public class AdminController {
     @PostMapping("categorias/crear/guardar")
     @PreAuthorize("hasAuthority('CREATE')")
     public String saveCategory(@RequestParam("nameCategoryDesign") String nameCategoryDesign,
-            RedirectAttributes redirectAttributes) {
+                               @RequestParam("image") MultipartFile file,
+                               RedirectAttributes redirectAttributes) {
 
         CategoryDesign categoryDesign = new CategoryDesign();
         categoryDesign.setNameCategoryDesign(nameCategoryDesign);
-        categoryDesignService.save(categoryDesign);
+        
+        if (!file.isEmpty()) {
+            try {
 
+                String imageNamen = uploadFileService.saveImages(file);
+                categoryDesign.setImage(imageNamen);
+                
+            } catch (Exception e) {
+                e.printStackTrace();
+                redirectAttributes.addFlashAttribute("message", "Error al guardar la imagen");
+                return "redirect:/admin/categorias";
+            }
+        }else{
+            categoryDesign.setImage("default.jpg");
+        }
+        
+        categoryDesignService.save(categoryDesign);
         redirectAttributes.addFlashAttribute("message", "Categoría guardada exitosamente");
 
         return "redirect:/admin/categorias";
@@ -226,6 +242,11 @@ public class AdminController {
     @PostMapping("categorias/eliminar/{id}")
     @PreAuthorize("hasAuthority('DELETE')")
     public String deleteCategoty(@PathVariable Long id) {
+
+        CategoryDesign category = new CategoryDesign();
+        if (!category.getImage().equals("default.jpg")) {
+            uploadFileService.deleteImage(category.getImage());
+        }
 
         categoryDesignService.deleteById(id);
 

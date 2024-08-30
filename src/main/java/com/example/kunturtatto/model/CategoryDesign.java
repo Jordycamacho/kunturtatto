@@ -21,6 +21,7 @@ public class CategoryDesign {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idCategoryDesign;
     private String nameCategoryDesign;
+    private String image;
 
     @OneToMany(mappedBy = "categoryDesign")
     private List<Design> designs;

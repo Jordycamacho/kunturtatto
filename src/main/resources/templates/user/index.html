@@ -4,81 +4,69 @@
 <head th:insert="~{user/templateUser.html::header}"></head>
 
 <body>
-    <div th:insert="~{user/templateUser.html::nav_top}"></div>
-    <div th:insert="~{user/templateUser.html::nav_user}"></div>
-    <div th:insert="~{user/templateUser.html::nav_admin}"></div>
+    <header th:insert="~{user/templateUser.html::nav_user}"></header>
 
-    <div class="portada">
-        <img src="#" class="img-inicio" />
-    </div>
+    <main class="main">
+        <section class="home section" id="home">
+            <img src="./images/tatto-banner.png" alt="home image" class="home__bg">
+            <div class="home__shadow"></div>
 
-    <div class="espacio"></div>
+            <div class="home__container container grid">
+                <div class="home__data">
+                    <h3 class="home__subtitle">
+                        Bienvenido a KunturTattoo
+                    </h3>
+                    <h1 class="home__title">
+                        Explora <br>
+                        Nuestro contenido
+                    </h1>
 
-    <div class="container">
-        <h1 class="titulo-p">Kuntur Tattoo</h1>
-        <div class="separador"></div>
-
-        <div class="container">
-            <h5 class="titulo-t">Bienvenido a Kuntur Tattoo: Donde el Arte y la Autenticidad se Fusionan</h5><br />
-            <div class="container">
-                <div class="container">
-                    <p class="texto-g">
-                        Estamos emocionados de ser parte de tu viaje artístico y de ayudarte a llevar tus ideas a la
-                        realidad.
-                        No dudes en ponerte en contacto con nosotros para programar una consulta o para hacer cualquier
-                        pregunta
-                        que tengas. ¡Esperamos ser tu destino para la expresión creativa y la transformación artística!
+                    <p class="home__description">
+                        Donde el Arte y la Autenticidad se Fusionan
                     </p>
-                    <button class="btn secondary"> <a th:href="@{/KunturTattoo/contacto}"><b>CONTACTO</b></a> </button>
+
+                    <a th:href="@{/diseños}" class="button" >
+                        Ver todas las categorias<i class="ri-arrow-right-line"></i>
+                    </a>
+                </div>
+
+                <div class="home__cards grid">
+                    <!-- Itera sobre las categorías -->
+                    <div th:each="category : ${categories}">
+                        <article class="home__card">
+                            <img th:src="@{'/images/' + ${category.image}}" alt="home image" class="home__card-img">
+                            <h3 class="home__card-title" th:text="${category.nameCategoryDesign}">Categoría</h3>
+                            <div class="home__card-shadow"></div>
+                        </article>
+                    </div>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <div class="tarjeta">
-            <h4>TATUAJES</h4>
-            <p>Dale un vistazo a mi galería de proyectos</p>
-            <button class="btn primary"> <a th:href="@{/KunturTattoo/diseños}"><b> GALERÍA </b></a> </button>
-        </div>
+        <!-- Diseños -->
+        <section class="designs section" id="designs">
+            <h2 class="section__title">Diseños</h2>
 
-        <div class="con-img">
-            <img src="#" class="ns">
-        </div>
+            <nav>
+                <a th:href="@{/diseños}" th:classappend="${selectedCategoryId == null} ? 'active' : ''">Todos</a>
+                <a th:each="category : ${categories}" 
+                   th:href="@{diseños(categoryId=${category.idCategoryDesign})}" 
+                   th:text="${category.nameCategoryDesign}" 
+                   th:classappend="${selectedCategoryId == category.idCategoryDesign} ? 'active' : ''"></a>
+            </nav>
 
-        <div class="container">
-            <h5 class="titulo-t">Compromiso con el cliente</h5>
-            <div class="container">
-                <div class="container">
-                    <p class="texto-g">
-                        La seguridad, la higiene y la satisfacción del cliente son nuestra máxima prioridad. Nuestro
-                        equipo altamente capacitado utiliza equipos de vanguardia y sigue prácticas rigurosas de
-                        esterilización para brindarte una experiencia segura y cómoda. Cada consulta es una oportunidad
-                        para colaborar y transformar tus visiones en tatuajes duraderos y hermosos.
-                    </p>
+            <div class="gallery">
+                <!-- Itera sobre los diseños -->
+                <div class="image" th:each="design : ${designs}">
+                    <span>
+                        <img th:src="@{'/images/' + ${design.image}}" th:alt="${design.title}" class="design-image">
+                    </span>
                 </div>
             </div>
-        </div>
-    </div>
+        </section>
+    </main>
 
-    <div class="separador"></div>
-
-    <div class="container">
-        <h5 class="titulo-t">Nuestra Misión</h5><br>
-        <div class="container">
-            <div class="container">
-                <p class="texto-g">
-                    Nuestra misión es simple pero profunda: crear tatuajes que trasciendan el arte superficial y se
-                    conviertan en una extensión genuina de tu identidad. Cada tatuaje que creamos cuenta una historia,
-                    representa una creencia o captura un momento especial. Nos esforzamos por brindarte no solo una obra
-                    maestra visual, sino una experiencia que te empodere y celebre tu unicidad.
-                </p>
-            </div>
-        </div>
-    </div>
-
-    <div class="con-img">
-        <img src="#" class="ns">
-    </div>
-
+    <div th:insert="~{user/templateUser.html::footer}"></div>
     <div th:insert="~{user/templateUser.html::script}"></div>
 </body>
 
