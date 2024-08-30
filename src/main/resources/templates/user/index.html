@@ -7,6 +7,7 @@
     <header th:insert="~{user/templateUser.html::nav_user}"></header>
 
     <main class="main">
+        <!--==================== HOME ====================-->
         <section class="home section" id="home">
             <img src="./images/tatto-banner.png" alt="home image" class="home__bg">
             <div class="home__shadow"></div>
@@ -25,7 +26,7 @@
                         Donde el Arte y la Autenticidad se Fusionan
                     </p>
 
-                    <a th:href="@{/diseños}" class="button" >
+                    <a th:href="@{/KunturTattoo/diseños}" class="button" >
                         Ver todas las categorias<i class="ri-arrow-right-line"></i>
                     </a>
                 </div>
@@ -43,30 +44,138 @@
             </div>
         </section>
 
-        <!-- Diseños -->
-        <section class="designs section" id="designs">
-            <h2 class="section__title">Diseños</h2>
+        <!--==================== ABOUT ====================-->
+        <section class="about section" id="about">
+            <div class="about__container container grid">
+                <div class="about__data">
+                    <h2 class="section__title">
+                        Compromiso con el cliente
+                    </h2>
 
-            <nav>
-                <a th:href="@{/diseños}" th:classappend="${selectedCategoryId == null} ? 'active' : ''">Todos</a>
-                <a th:each="category : ${categories}" 
-                   th:href="@{diseños(categoryId=${category.idCategoryDesign})}" 
-                   th:text="${category.nameCategoryDesign}" 
-                   th:classappend="${selectedCategoryId == category.idCategoryDesign} ? 'active' : ''"></a>
-            </nav>
+                    <p class="about__description">
+                        La seguridad, la higiene y la satisfacción del cliente son nuestra máxima prioridad. Nuestro
+                        equipo altamente capacitado utiliza equipos de vanguardia y sigue prácticas rigurosas de
+                        esterilización para brindarte una experiencia segura y cómoda. Cada consulta es una oportunidad
+                        para colaborar y transformar tus visiones en tatuajes duraderos y hermosos.
+                    </p>
 
-            <div class="gallery">
-                <!-- Itera sobre los diseños -->
-                <div class="image" th:each="design : ${designs}">
-                    <span>
-                        <img th:src="@{'/images/' + ${design.image}}" th:alt="${design.title}" class="design-image">
-                    </span>
+                    <a href="#" class="button">
+                        Ver Diseños <i class="ri-arrow-right-line"></i>
+                    </a>
+                </div>
+
+                <div class="about__image">
+                    <img src="./images/tatto1.jpeg" alt="about image" class="about__img">
+                    <div class="about__shadow"></div>
+                </div>
+            </div>
+        </section>
+
+        <!--==================== POPULAR ====================-->
+        <section class="popular section" id="popular">
+            <h2 class="section__title">
+                Diseños Propios
+            </h2>
+
+            <div class="popular__container container grid">
+                <article class="popular__card">
+                    <div class="popular__image">
+                        <img src="./images/desings-tribal.jpg" alt="pupularv image" class="popular__img">
+                        <div class="popular__shadow"></div>
+                    </div>
+
+                    <h2 class="popular__title">
+                        Diseños tribal
+                    </h2>
+
+                </article>
+
+                <article class="popular__card">
+                    <div class="popular__image">
+                        <img src="./images/desings-realista.jpg" alt="pupularv image" class="popular__img">
+                        <div class="popular__shadow"></div>
+                    </div>
+
+                    <h2 class="popular__title">
+                        Diseños Realistas
+                    </h2>
+
+                </article>
+
+                <article class="popular__card">
+                    <div class="popular__image">
+                        <img src="./images/desings-oldschool.jpg" alt="pupularv image" class="popular__img">
+                        <div class="popular__shadow"></div>
+                    </div>
+
+                    <h2 class="popular__title">
+                        Diseños Old School
+                    </h2>
+                </article>
+            </div>
+        </section>
+
+        <!--==================== EXPLORE ====================-->
+        <section class="explore section" id="explore">
+            <div class="explore__container">
+                <div class="explore__image">
+                    <img src="./images/Tatto-inicio.jpg" alt="" class="explore__img">
+                    <div class="explore__shadow"></div>
+                </div>
+
+                <div class="explore__content container grid">
+                    <div class="explore__data">
+                        <h2 class="section__title">
+                            Nuestra Misión
+                        </h2>
+
+                        <p class="explore__description">
+                            crear tatuajes que trasciendan el arte superficial y se
+                            conviertan en una extensión genuina de tu identidad. Cada tatuaje que creamos cuenta una
+                            historia,
+                            representa una creencia o captura un momento especial. Nos esforzamos por brindarte no solo
+                            una obra
+                            maestra visual, sino una experiencia que te empodere y celebre tu unicidad.
+                        </p>
+                    </div>
+
+
+                </div>
+            </div>
+        </section>
+
+        <!--==================== JOIN ====================-->
+        <section class="join section">
+            <div class="join__container container grid">
+                <div class="join__data">
+                    <h2 class="section__title">
+                        ¿Quieres <br>
+                        Más Noticias?
+                    </h2>
+
+                    <p class="join__description">
+                        Get up to date with the latest
+                        travel and information from us.
+                    </p>
+
+                    <form action="" class="join__form">
+                        <input type="email" placeholder="Ingresa tu correo" class="join__input">
+                        <button class="join__button button">
+                            Subscribe Our Newsletter <i class="ri-arrow-right-line"></i>
+                        </button>
+                    </form>
+                </div>
+
+                <div class="join__image">
+                    <img src="./images/banner-tatto2.jpeg" alt="" class="join__img">
+                    <div class="join__shadow"></div>
                 </div>
             </div>
         </section>
     </main>
 
     <div th:insert="~{user/templateUser.html::footer}"></div>
+
     <div th:insert="~{user/templateUser.html::script}"></div>
 </body>
 
