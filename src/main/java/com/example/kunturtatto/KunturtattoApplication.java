@@ -57,9 +57,9 @@ public class KunturtattoApplication {
                                         .build();
 
                         // CREATE USERS
-                        User userJordy = User.builder()
-                                        .email("jordycamacho225@gmail.com")
-                                        .password("$2a$10$cMY29RPYoIHMJSuwRfoD3eQxU1J5Rww4VnNOUOAEPqCBshkNfrEf6")
+                        User userExample= User.builder()
+                                        .email("example@gmail.com")
+                                        .password("example")
                                         .isEnabled(true)
                                         .accountNoExpired(true)
                                         .accountNoLocked(true)
@@ -67,9 +67,9 @@ public class KunturtattoApplication {
                                         .roles(Set.of(roleAdmin))
                                         .build();
 
-                        User userDaniel = User.builder()
-                                        .email("daniel")
-                                        .password("$2a$10$cMY29RPYoIHMJSuwRfoD3eQxU1J5Rww4VnNOUOAEPqCBshkNfrEf6")
+                        User userexample2 = User.builder()
+                                        .email("example2@gmail.com")
+                                        .password("example2")
                                         .isEnabled(true)
                                         .accountNoExpired(true)
                                         .accountNoLocked(true)
@@ -77,7 +77,7 @@ public class KunturtattoApplication {
                                         .roles(Set.of(roleUser))
                                         .build();
 
-                        userRepository.saveAll(List.of(userJordy, userDaniel));
+                        userRepository.saveAll(List.of(userExample, userExample2));
                 };
         }
 
