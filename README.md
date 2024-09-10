@@ -1,5 +1,3 @@
-¡Claro! Vamos a estructurar y documentar tu proyecto `KunturTattoo` con un archivo `README.md` completo y detallado. Este archivo te ayudará a tener una referencia clara para otros desarrolladores, usuarios o colaboradores que deseen utilizar o contribuir a tu proyecto.
-
 ### README.md para `KunturTattoo`
 
 ```markdown
