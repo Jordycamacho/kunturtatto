@@ -1,7 +1,7 @@
 package com.example.kunturtatto.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 @Controller
 @RequestMapping("/mail")
 @Component
+@PreAuthorize("permitAll()")
 public class MailController {
     
     @Autowired
@@ -29,10 +30,4 @@ public class MailController {
         return "user/contact";
     }
     
-
-    @PostMapping("/recordatorio")
-    @Scheduled(cron = "0 0 9 * * ?")
-    public void sendAppointmentReminder(){
-        contactService.sendMailRemainder();
-    }
 }

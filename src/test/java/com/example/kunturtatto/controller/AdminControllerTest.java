@@ -2,6 +2,8 @@ package com.example.kunturtatto.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -190,7 +192,7 @@ public class AdminControllerTest {
     }
 
     @Test
-    public void testUpdateDesign() throws Exception {
+    public void testEditDesign() throws Exception {
         Long designId = 1L;
         Design design = designs.get(0);
         Optional<Design> optionalDesign = Optional.of(design);
@@ -203,6 +205,74 @@ public class AdminControllerTest {
                 .andExpect(view().name("/admin/design/editDesign"))
                 .andExpect(model().attribute("design", design))
                 .andExpect(model().attribute("categoriesDesign", categoriesDesign));
+    }
+
+    @Test
+    public void testUpdateDesign() throws Exception {
+        Long idDesign = 1L; // ID del diseño a actualizar
+        String title = "Nuevo Título";
+        String description = "Nueva Descripción";
+        Long categoryDesignId = 1L; // ID de la categoría del diseño
+        MockMultipartFile file = new MockMultipartFile("image", "image.jpg", "image/jpeg", "image content".getBytes());
+
+        // Configurar mock de diseño existente
+        Design existingDesign = new Design();
+        existingDesign.setIdDesign(idDesign);
+        existingDesign.setTitle("Título Antiguo");
+        existingDesign.setDescription("Descripción Antigua");
+
+        CategoryDesign categoryDesign = new CategoryDesign();
+        categoryDesign.setIdCategoryDesign(categoryDesignId);
+        existingDesign.setCategoryDesign(categoryDesign);
+
+        // Mock del servicio de búsqueda de diseño
+        when(designService.findById(idDesign)).thenReturn(Optional.of(existingDesign));
+        // Mock del servicio de búsqueda de categoría
+        when(categoryDesignService.findById(categoryDesignId)).thenReturn(Optional.of(categoryDesign));
+        // Mock del servicio de guardar imágenes
+        when(uploadFileService.saveImages(any(MultipartFile.class))).thenReturn("new-image.jpg");
+
+        // Realizar la solicitud POST a "/diseños/editar/guardar"
+        mockMvc.perform(multipart("/admin/diseños/editar/guardar")
+                .file(file)
+                .param("idDesign", idDesign.toString())
+                .param("title", title)
+                .param("description", description)
+                .param("categoryDesign", categoryDesignId.toString())) // Agregar protección CSRF si está habilitada
+                .andExpect(status().is3xxRedirection()) // Verificar que la respuesta sea una redirección 3xx
+                .andExpect(redirectedUrl("/admin")) // Verificar que la redirección sea a "/admin/diseños"
+                .andExpect(flash().attribute("message", "Diseño actualizado con éxito")); // Verificar mensaje flash
+                                                                                             // de éxito
+
+        // Verificar que el servicio `save` se llamó una vez con el objeto de diseño
+        // actualizado
+        verify(designService, times(1)).save(any(Design.class));
+    }
+
+    @Test
+    public void testUpdateDesignNotFound() throws Exception {
+        Long idDesign = 99L; // ID del diseño que no existe
+        String title = "Nuevo Título";
+        String description = "Nueva Descripción";
+        Long categoryDesignId = 1L; // ID de la categoría del diseño
+        MockMultipartFile file = new MockMultipartFile("image", "image.jpg", "image/jpeg", "image content".getBytes());
+
+        // Configurar mock para devolver diseño no encontrado
+        when(designService.findById(idDesign)).thenReturn(Optional.empty());
+
+        // Realizar la solicitud POST a "/diseños/editar/guardar"
+        mockMvc.perform(multipart("/admin/diseños/editar/guardar")
+                .file(file)
+                .param("idDesign", idDesign.toString())
+                .param("title", title)
+                .param("description", description)
+                .param("categoryDesign", categoryDesignId.toString()))
+                .andExpect(status().is3xxRedirection()) // Verificar que la respuesta sea una redirección 3xx
+                .andExpect(redirectedUrl("/admin")) // Verificar que la redirección sea a "/admin"
+                .andExpect(flash().attribute("error", "Diseño no encontrado")); // Verificar mensaje flash de error
+
+        // Verificar que el servicio `save` nunca fue llamado
+        verify(designService, never()).save(any(Design.class));
     }
 
     @Test
@@ -363,8 +433,56 @@ public class AdminControllerTest {
     }
 
     @Test
-    public void testShowAppointmentsdetails() {
+    public void testShowAppointmentDetails() throws Exception {
+        Long idAppointment = 1L;
 
+        Appointment appointment = appointments.get(0);
+
+        when(appointmentService.findById(idAppointment)).thenReturn(appointment);
+
+        mockMvc.perform(get("/admin/citas/verDetalles/{id}", idAppointment))
+                .andExpect(status().isOk())
+                .andExpect(view().name("/admin/appointment/showAppointmentDetails"))
+                .andExpect(model().attribute("categories", categoriesDesign))
+                .andExpect(model().attribute("appointment", appointment));
     }
 
+    @Test
+    public void testCreateAppointment() throws Exception {
+        Appointment appointment = appointments.get(0); // Usar una cita de ejemplo
+
+        when(appointmentService.save(any(Appointment.class))).thenReturn(appointment);
+
+        mockMvc.perform(post("/admin/crear-citas/crear")
+                .flashAttr("appointment", appointment))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/admin/citas"));
+
+        verify(appointmentService, times(1)).save(any(Appointment.class));
+    }
+
+    @Test
+    public void testEditAppointment() throws Exception {
+        Appointment appointment = appointments.get(0);
+        Long idAppointment = 1L;
+        when(appointmentService.findById(idAppointment)).thenReturn(appointment);
+        when(appointmentService.save(any(Appointment.class))).thenReturn(appointment);
+        mockMvc.perform(post("/admin/citas/editar/guardar/{id}", idAppointment)
+                .flashAttr("appointment", appointment))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(flash().attribute("message", "Cita actualizada exitosamente."))
+                .andExpect(redirectedUrl("/admin/citas"));
+    }
+
+    @Test
+    public void testDeleteAppointment() throws Exception {
+        Long idAppointment = 1L;
+
+        doNothing().when(appointmentService).deleteById(idAppointment);
+
+        mockMvc.perform(post("/admin/citas/eliminar/{id}", idAppointment))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(flash().attribute("message", "Cita eliminada exitosamente."))
+                .andExpect(redirectedUrl("/admin/citas"));
+    }
 }
