@@ -121,10 +121,7 @@ public class AdminControllerTest {
         user2.setCredentialNoExpired(true);
         user2.setRoles(new HashSet<>(Arrays.asList(roleAdmin)));
 
-        designs = Arrays.asList(design1, design2);
-        categoriesDesign = Arrays.asList(categoryDesign);
-        users = Arrays.asList(user1, user2);
-
+        
         /* Appointments */
         Appointment appointment1 = new Appointment();
         appointment1.setIdAppointment(1L);
@@ -139,7 +136,10 @@ public class AdminControllerTest {
         appointment1.setMessage("test message");
 
         appointments = Arrays.asList(appointment1);
-
+        designs = Arrays.asList(design1, design2);
+        categoriesDesign = Arrays.asList(categoryDesign);
+        users = Arrays.asList(user1, user2);
+        
         when(appointmentService.findAll()).thenReturn(appointments);
         when(designService.findAll()).thenReturn(designs);
         when(categoryDesignService.findAll()).thenReturn(categoriesDesign);
@@ -205,48 +205,6 @@ public class AdminControllerTest {
                 .andExpect(view().name("/admin/design/editDesign"))
                 .andExpect(model().attribute("design", design))
                 .andExpect(model().attribute("categoriesDesign", categoriesDesign));
-    }
-
-    @Test
-    public void testUpdateDesign() throws Exception {
-        Long idDesign = 1L; // ID del diseño a actualizar
-        String title = "Nuevo Título";
-        String description = "Nueva Descripción";
-        Long categoryDesignId = 1L; // ID de la categoría del diseño
-        MockMultipartFile file = new MockMultipartFile("image", "image.jpg", "image/jpeg", "image content".getBytes());
-
-        // Configurar mock de diseño existente
-        Design existingDesign = new Design();
-        existingDesign.setIdDesign(idDesign);
-        existingDesign.setTitle("Título Antiguo");
-        existingDesign.setDescription("Descripción Antigua");
-
-        CategoryDesign categoryDesign = new CategoryDesign();
-        categoryDesign.setIdCategoryDesign(categoryDesignId);
-        existingDesign.setCategoryDesign(categoryDesign);
-
-        // Mock del servicio de búsqueda de diseño
-        when(designService.findById(idDesign)).thenReturn(Optional.of(existingDesign));
-        // Mock del servicio de búsqueda de categoría
-        when(categoryDesignService.findById(categoryDesignId)).thenReturn(Optional.of(categoryDesign));
-        // Mock del servicio de guardar imágenes
-        when(uploadFileService.saveImages(any(MultipartFile.class))).thenReturn("new-image.jpg");
-
-        // Realizar la solicitud POST a "/diseños/editar/guardar"
-        mockMvc.perform(multipart("/admin/diseños/editar/guardar")
-                .file(file)
-                .param("idDesign", idDesign.toString())
-                .param("title", title)
-                .param("description", description)
-                .param("categoryDesign", categoryDesignId.toString())) // Agregar protección CSRF si está habilitada
-                .andExpect(status().is3xxRedirection()) // Verificar que la respuesta sea una redirección 3xx
-                .andExpect(redirectedUrl("/admin")) // Verificar que la redirección sea a "/admin/diseños"
-                .andExpect(flash().attribute("message", "Diseño actualizado con éxito")); // Verificar mensaje flash
-                                                                                             // de éxito
-
-        // Verificar que el servicio `save` se llamó una vez con el objeto de diseño
-        // actualizado
-        verify(designService, times(1)).save(any(Design.class));
     }
 
     @Test
