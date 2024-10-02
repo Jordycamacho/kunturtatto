@@ -9,5 +9,11 @@ import com.example.kunturtatto.model.Design;
 
 public interface DesignRepository extends JpaRepository<Design, Long> {
 
+    /**
+     * Encuentra una lista de diseños filtrados por categoría de diseño.
+     * 
+     * @param categoryDesign Objeto de la categoría de diseño
+     * @return Lista de diseños que pertenecen a la categoría especificada
+     */
     List<Design> findByCategoryDesign(CategoryDesign categoryDesign);
 }

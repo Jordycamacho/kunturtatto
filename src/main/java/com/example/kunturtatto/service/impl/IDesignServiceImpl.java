@@ -34,12 +34,20 @@ public class IDesignServiceImpl implements IDesignService {
 
     @Override
     public void delete(Long idDesign) {
-        designRepository.deleteById(idDesign);
+        if (designRepository.existsById(idDesign)) {
+            designRepository.deleteById(idDesign);
+        }else{
+            throw new IllegalArgumentException("No se puede actualizar: Diseño no encontrado.");
+        }
     }
 
     @Override
     public Design update(Design design) {
-        return designRepository.save(design);        
+        if (designRepository.existsById(design.getIdDesign())) {
+            return designRepository.save(design);        
+        }else{
+            throw new IllegalArgumentException("No se puede actualizar: Diseño no encontrado.");
+        }
     }
 
     @Override
