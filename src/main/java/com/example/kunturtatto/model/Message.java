@@ -1,31 +1,32 @@
 package com.example.kunturtatto.model;
 
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import lombok.*;
+
 import java.util.Date;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 @Entity
-@Table(name="message")
+@Table(name = "message")
 @Getter
 @Setter
 @NoArgsConstructor
+@EqualsAndHashCode(of = "idMessage")
+@ToString(exclude = "user")
 public class Message {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idMessage;
-    private String content;
-    private Date messageDate;
 
-    @ManyToOne
+    @NotBlank(message = "El contenido no puede estar vacío")
+    private String content;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date messageDate = new Date();
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idUser")
     private User user;
 }
+
