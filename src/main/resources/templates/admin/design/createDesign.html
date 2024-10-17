@@ -23,7 +23,7 @@
             <div class="col-md-6">
                 <label for="categoryDesign" class="form-label">Categoría</label>
                 <select id="categoryDesign" name="categoryDesign" class="form-select" required>
-                    <option th:each="category : ${categoriesDesign}" th:value="${category.idCategoryDesign}" th:text="${category.nameCategoryDesign}">Categoría</option>
+                    <option th:each="category : ${categories}" th:value="${category.idCategoryDesign}" th:text="${category.nameCategoryDesign}">Categoría</option>
                 </select>
             </div>
             <div class="col-12">
