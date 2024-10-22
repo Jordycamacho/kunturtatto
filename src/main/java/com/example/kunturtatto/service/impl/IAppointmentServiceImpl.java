@@ -1,6 +1,8 @@
 package com.example.kunturtatto.service.impl;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +14,8 @@ import com.example.kunturtatto.repository.AppointmentRepository;
 import com.example.kunturtatto.service.IAppointmentService;
 
 /**
- * Implementación del servicio para gestionar las operaciones relacionadas con citas.
+ * Implementación del servicio para gestionar las operaciones relacionadas con
+ * citas.
  */
 @Service
 public class IAppointmentServiceImpl implements IAppointmentService {
@@ -52,7 +55,8 @@ public class IAppointmentServiceImpl implements IAppointmentService {
     @Override
     @Transactional
     public Appointment update(Appointment appointment) {
-        if (appointment.getIdAppointment() == null || !appointmentRepository.existsById(appointment.getIdAppointment())) {
+        if (appointment.getIdAppointment() == null
+                || !appointmentRepository.existsById(appointment.getIdAppointment())) {
             throw new IllegalArgumentException("La cita no existe o el ID es inválido");
         }
         return appointmentRepository.save(appointment);
@@ -93,6 +97,9 @@ public class IAppointmentServiceImpl implements IAppointmentService {
     @Transactional(readOnly = true)
     public List<Appointment> getTodaysAppointments() {
         LocalDate today = LocalDate.now();
-        return appointmentRepository.findByDate(today);
+        LocalDateTime startOfDay = today.atStartOfDay(); // 2024-10-17T00:00
+        LocalDateTime endOfDay = today.atTime(LocalTime.MAX); // 2024-10-17T23:59:59.999999999
+
+        return appointmentRepository.findByDateBetween(startOfDay, endOfDay);
     }
 }

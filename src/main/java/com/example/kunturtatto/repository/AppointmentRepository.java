@@ -1,9 +1,12 @@
 package com.example.kunturtatto.repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.example.kunturtatto.model.Appointment;
@@ -18,4 +21,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
      * @return Lista de citas que ocurren en la fecha especificada
      */
     List<Appointment> findByDate(LocalDate date);
+
+    @Query("SELECT a FROM Appointment a WHERE a.date BETWEEN :startOfDay AND :endOfDay")
+    List<Appointment> findByDateBetween(@Param("startOfDay") LocalDateTime startOfDay, @Param("endOfDay") LocalDateTime endOfDay);
 }

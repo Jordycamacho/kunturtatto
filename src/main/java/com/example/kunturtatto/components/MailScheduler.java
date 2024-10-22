@@ -14,6 +14,12 @@ public class MailScheduler {
 
     @Scheduled(cron = "0 0 9 * * ?") // Corre todos los días a las 9 AM
     public void sendDailyAppointmentReminder() {
-        contactService.sendMailRemainder();
+        try {
+            contactService.sendMailRemainder();
+        } catch (Exception e) {
+            // Usar un logger en lugar de imprimir la traza de error
+            e.printStackTrace();
+        }
     }
+    
 }
