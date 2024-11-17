@@ -50,4 +50,6 @@ public class Design {
         this.image = image;
         this.categoryDesign = categoryDesign;
     }
+
+    
 }

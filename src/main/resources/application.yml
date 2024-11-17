@@ -1,23 +1,21 @@
 logging:
   level:
-    root: INFO # Nivel general para toda la aplicación
-    org.springframework: WARN # Nivel para las librerías de Spring
-    com.example.kunturtatto: DEBUG # Nivel para tu paquete principal
-    # Puedes definir niveles específicos para clases o servicios
-    com.example.kunturtatto.components: TRACE # Nivel más detallado para componentes específicos
-    com.example.kunturtatto.service.impl.IContactServiceImpl: DEBUG # Debug para la implementación del servicio de contacto
-    com.example.kunturtatto.repository: INFO # Información general para la capa de repositorios
-    
+    root: INFO  # Nivel general para toda la aplicación
+    org.springframework: WARN  # Nivel para las librerías de Spring
+    com.example.kunturtatto: DEBUG  # Nivel para tu paquete principal
+    com.example.kunturtatto.components: TRACE  # Nivel más detallado para componentes específicos
+    com.example.kunturtatto.service.impl.IContactServiceImpl: DEBUG  # Debug para la implementación del servicio de contacto
+    com.example.kunturtatto.controller.MailController: DEBUG  # Log más detallado para MailController
+
   file:
-    name: logs/kunturtatto.log # Archivo de logs
+    name: logs/kunturtatto.log  # Archivo de logs
 
   pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n" # Formato de los logs en consola
-    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n" # Formato de los logs en archivo
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"  # Formato de los logs en consola
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"  # Formato de los logs en archivo
 
-  # Configuración para rodar archivos de logs cuando alcancen cierto tamaño
   logback:
     rollingpolicy:
-      file-name-pattern: logs/kunturtatto.%d{yyyy-MM-dd}.log
-      max-file-size: 10MB
-      max-history: 30 # Mantener archivos de los últimos 30 días
+      file-name-pattern: logs/kunturtatto.%d{yyyy-MM-dd}.log  # Nombre de los archivos log (con fecha)
+      max-file-size: 10MB  # Tamaño máximo de cada archivo de log
+      max-history: 30  # Mantener archivos de log de los últimos 30 días

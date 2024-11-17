@@ -1,9 +1,6 @@
 package com.example.kunturtatto.model;
 
 import java.util.List;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -18,6 +15,12 @@ import lombok.*;
 @ToString(exclude = "designs")
 public class CategoryDesign {
 
+    public CategoryDesign(Long idCategoryDesign, String nameCategoryDesign, String image) {
+        this.idCategoryDesign = idCategoryDesign;
+        this.nameCategoryDesign = nameCategoryDesign;
+        this.image = image;
+ 
+    }
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idCategoryDesign;
