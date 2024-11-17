@@ -7,26 +7,22 @@ import com.example.kunturtatto.service.ICategoryDesignService;
 import com.example.kunturtatto.service.IDesignService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-
-import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.Arrays;
 import java.util.List;
 
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(UserController.class)
+@WebMvcTest(UserViewController.class)
 @Import(TestSecurityConfig.class)
-public class UserControllerTest {
+public class UserViewControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -42,54 +38,60 @@ public class UserControllerTest {
 
     @BeforeEach
     public void setup() {
-        MockitoAnnotations.openMocks(this);
-
-        // Simular categorías
         categoryDesignList = Arrays.asList(
             new CategoryDesign(1L, "Category1", "image1.jpg"),
             new CategoryDesign(2L, "Category2", "image2.jpg")
         );
 
-        // Simular diseños
         designList = Arrays.asList(
             new Design("Design1", "Description1", "image1.jpg", categoryDesignList.get(0)),
             new Design("Design2", "Description2", "image2.jpg", categoryDesignList.get(1))
         );
 
-        // Configurar respuestas simuladas para los servicios
         when(categoryDesignService.findAll()).thenReturn(categoryDesignList);
         when(designService.findAll()).thenReturn(designList);
         when(designService.findByCategoryDesign(1L)).thenReturn(Arrays.asList(designList.get(0)));
     }
 
     @Test
-    public void testGetDesignsWithoutCategory() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/KunturTattoo/designs")
-                .contentType(MediaType.APPLICATION_JSON))
+    public void testShowHomePage() throws Exception {
+        mockMvc.perform(get("/KunturTattoo"))
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$.length()").value(designList.size()));
+            .andExpect(view().name("user/index"))
+            .andExpect(model().attributeExists("categories"))
+            .andExpect(model().attribute("categories", categoryDesignList));
     }
 
     @Test
-    public void testGetDesignsWithCategory() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/KunturTattoo/designs")
-                .param("categoryId", "1")
-                .contentType(MediaType.APPLICATION_JSON))
+    public void testShowDesignsWithoutCategory() throws Exception {
+        mockMvc.perform(get("/KunturTattoo/diseños"))
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$.length()").value(1))
-            .andExpect(jsonPath("$[0].title").value("Design1"));
+            .andExpect(view().name("user/designs"))
+            .andExpect(model().attributeExists("designs"))
+            .andExpect(model().attributeExists("categories"))
+            .andExpect(model().attribute("designs", designList))
+            .andExpect(model().attribute("categories", categoryDesignList))
+            .andExpect(model().attribute("selectedCategoryId", (Object) null));
     }
 
     @Test
-    public void testGetCategories() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/KunturTattoo/categories")
-                .contentType(MediaType.APPLICATION_JSON))
+    public void testShowDesignsWithCategory() throws Exception {
+        mockMvc.perform(get("/KunturTattoo/diseños").param("categoryId", "1"))
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$.length()").value(categoryDesignList.size()))
-            .andExpect(jsonPath("$[0].nameCategoryDesign").value("Category1"))
-            .andExpect(jsonPath("$[1].nameCategoryDesign").value("Category2"));
+            .andExpect(view().name("user/designs"))
+            .andExpect(model().attributeExists("designs"))
+            .andExpect(model().attributeExists("categories"))
+            .andExpect(model().attribute("designs", Arrays.asList(designList.get(0))))
+            .andExpect(model().attribute("categories", categoryDesignList))
+            .andExpect(model().attribute("selectedCategoryId", 1L));
+    }
+
+    @Test
+    public void testShowContactPage() throws Exception {
+        mockMvc.perform(get("/KunturTattoo/contacto"))
+            .andExpect(status().isOk())
+            .andExpect(view().name("user/contact"))
+            .andExpect(model().attributeExists("categories"))
+            .andExpect(model().attribute("categories", categoryDesignList));
     }
 }

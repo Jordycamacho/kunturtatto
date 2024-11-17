@@ -1,446 +1,284 @@
 package com.example.kunturtatto.controller;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
-
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import com.example.kunturtatto.config.TestSecurityConfig;
+import com.example.kunturtatto.model.Design;
+import com.example.kunturtatto.model.User;
+import com.example.kunturtatto.model.Appointment;
+import com.example.kunturtatto.model.CategoryDesign;
+import com.example.kunturtatto.service.IDesignService;
+import com.example.kunturtatto.service.ICategoryDesignService;
+import com.example.kunturtatto.service.IUploadFileService;
+import com.example.kunturtatto.service.IAppointmentService;
+import com.example.kunturtatto.service.IUserService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import com.example.kunturtatto.model.Appointment;
-import com.example.kunturtatto.model.CategoryDesign;
-import com.example.kunturtatto.model.Design;
-import com.example.kunturtatto.model.Role;
-import com.example.kunturtatto.model.RoleEnum;
-import com.example.kunturtatto.model.User;
-import com.example.kunturtatto.service.IAppointmentService;
-import com.example.kunturtatto.service.ICategoryDesignService;
-import com.example.kunturtatto.service.IDesignService;
-import com.example.kunturtatto.service.IUploadFileService;
-import com.example.kunturtatto.service.IUserService;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
-@SpringBootTest
-@AutoConfigureMockMvc
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doThrow;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+@WebMvcTest(AdminController.class)
+@Import(TestSecurityConfig.class)
 public class AdminControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
-    private ICategoryDesignService categoryDesignService;
-
-    @MockBean
-    private IDesignService designService;
-
-    @MockBean
-    private IUserService userService;
-
-    @MockBean
-    private IUploadFileService uploadFileService;
-
-    @MockBean
-    private IAppointmentService appointmentService;
-
-    private List<Design> designs;
-    private List<CategoryDesign> categoriesDesign;
-    private List<User> users;
-    private List<Appointment> appointments;
-
-    @BeforeEach
-    public void setUp() {
-        CategoryDesign categoryDesign = new CategoryDesign();
-        categoryDesign.setIdCategoryDesign(1L);
-        categoryDesign.setNameCategoryDesign("Tattoos");
-        categoryDesign.setImage("test-image.png");
-
-        Design design1 = new Design();
-        design1.setIdDesign(1L);
-        design1.setTitle("Design 1");
-        design1.setDescription("Description 1");
-        design1.setCategoryDesign(categoryDesign);
-        design1.setImage("image1.jpg");
-
-        Design design2 = new Design();
-        design2.setIdDesign(2L);
-        design2.setTitle("Design 2");
-        design2.setDescription("Description 2");
-        design2.setCategoryDesign(categoryDesign);
-        design2.setImage("image2.jpg");
-
-        // Crear roles utilizando RoleEnum
-        Role roleUser = new Role();
-        roleUser.setIdRol(1L);
-        roleUser.setRoleEnum(RoleEnum.USER);
-
-        Role roleAdmin = new Role();
-        roleAdmin.setIdRol(2L);
-        roleAdmin.setRoleEnum(RoleEnum.ADMIN);
-
-        // Crear usuarios de prueba
-        User user1 = new User();
-        user1.setIdUser(1L);
-        user1.setEmail("user1@example.com");
-        user1.setPassword("password1");
-        user1.setEnabled(true);
-        user1.setAccountNoExpired(true);
-        user1.setAccountNoLocked(true);
-        user1.setCredentialNoExpired(true);
-        user1.setRoles(new HashSet<>(Arrays.asList(roleUser)));
-
-        User user2 = new User();
-        user2.setIdUser(2L);
-        user2.setEmail("admin@example.com");
-        user2.setPassword("password2");
-        user2.setEnabled(true);
-        user2.setAccountNoExpired(true);
-        user2.setAccountNoLocked(true);
-        user2.setCredentialNoExpired(true);
-        user2.setRoles(new HashSet<>(Arrays.asList(roleAdmin)));
-
-        
-        /* Appointments */
-        Appointment appointment1 = new Appointment();
-        appointment1.setIdAppointment(1L);
-        appointment1.setDate(new Date());
-        appointment1.setTime("14:30");
-        appointment1.setPrice(35.00);
-        appointment1.setCustomerEmail("Test@gmail.com");
-        appointment1.setDesign("design1");
-        appointment1.setTattooCm("42cm");
-        appointment1.setLinkReference("https://Test.com");
-        appointment1.setBody("Arm");
-        appointment1.setMessage("test message");
-
-        appointments = Arrays.asList(appointment1);
-        designs = Arrays.asList(design1, design2);
-        categoriesDesign = Arrays.asList(categoryDesign);
-        users = Arrays.asList(user1, user2);
-        
-        when(appointmentService.findAll()).thenReturn(appointments);
-        when(designService.findAll()).thenReturn(designs);
-        when(categoryDesignService.findAll()).thenReturn(categoriesDesign);
-        when(userService.findAll()).thenReturn(users);
-    }
-
-    /* Test Design */
-    @Test
-    public void testShowDesign() throws Exception {
-        mockMvc.perform(get("/admin"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("admin/design/showDesign"))
-                .andExpect(model().attribute("designs", designs))
-                .andExpect(model().attribute("categories", categoriesDesign));
-
-    }
-
-    @Test
-    public void testCreateDesign() throws Exception {
-        mockMvc.perform(get("/admin/diseños/crear"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("admin/design/createDesign"))
-                .andExpect(model().attribute("design", designs))
-                .andExpect(model().attribute("categoriesDesign", categoriesDesign));
-    }
-
-    @Test
-    public void testsaveDesign() throws Exception {
-        Long categoryDesignId = 1L;
-        String title = "Nes Design";
-        String description = "Nes Design Description";
-        String image = "newImage.jpg";
-        MockMultipartFile file = new MockMultipartFile("image", "newImage.jpg", image, "image content".getBytes());
-
-        when(categoryDesignService.findById(categoryDesignId)).thenReturn(Optional.of(categoriesDesign.get(0)));
-
-        when(uploadFileService.saveImages(file)).thenReturn(image);
-
-        mockMvc.perform(multipart("/admin/diseños/crear/guardar")
-                .file(file)
-                .param("title", title)
-                .param("description", description)
-                .param("categoryDesign", String.valueOf(categoryDesignId)))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/admin"))
-                .andExpect(flash().attribute("message", "Diseño guardado exitosamente"));
-
-        // Verifica que se haya llamado al servicio de guardado de diseño
-        verify(designService).save(any(Design.class));
-    }
-
-    @Test
-    public void testEditDesign() throws Exception {
-        Long designId = 1L;
-        Design design = designs.get(0);
-        Optional<Design> optionalDesign = Optional.of(design);
-
-        when(designService.findById(designId)).thenReturn(optionalDesign);
-
-        // Realiza la llamada GET y verifica la respuesta
-        mockMvc.perform(get("/admin/diseños/editar/{id}", designId))
-                .andExpect(status().isOk())
-                .andExpect(view().name("/admin/design/editDesign"))
-                .andExpect(model().attribute("design", design))
-                .andExpect(model().attribute("categoriesDesign", categoriesDesign));
-    }
-
-    @Test
-    public void testUpdateDesignNotFound() throws Exception {
-        Long idDesign = 99L; // ID del diseño que no existe
-        String title = "Nuevo Título";
-        String description = "Nueva Descripción";
-        Long categoryDesignId = 1L; // ID de la categoría del diseño
-        MockMultipartFile file = new MockMultipartFile("image", "image.jpg", "image/jpeg", "image content".getBytes());
-
-        // Configurar mock para devolver diseño no encontrado
-        when(designService.findById(idDesign)).thenReturn(Optional.empty());
-
-        // Realizar la solicitud POST a "/diseños/editar/guardar"
-        mockMvc.perform(multipart("/admin/diseños/editar/guardar")
-                .file(file)
-                .param("idDesign", idDesign.toString())
-                .param("title", title)
-                .param("description", description)
-                .param("categoryDesign", categoryDesignId.toString()))
-                .andExpect(status().is3xxRedirection()) // Verificar que la respuesta sea una redirección 3xx
-                .andExpect(redirectedUrl("/admin")) // Verificar que la redirección sea a "/admin"
-                .andExpect(flash().attribute("error", "Diseño no encontrado")); // Verificar mensaje flash de error
-
-        // Verificar que el servicio `save` nunca fue llamado
-        verify(designService, never()).save(any(Design.class));
-    }
-
-    @Test
-    public void testDeleteDesign() throws Exception {
-        Long designId = 1L;
-        Design design = designs.get(0);
-        Optional<Design> optionalDesign = Optional.of(design);
-
-        when(designService.findById(designId)).thenReturn(optionalDesign);
-
-        doNothing().when(uploadFileService).deleteImage(design.getImage());
-
-        mockMvc.perform(post("/admin/diseños/eliminar/{id}", designId))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/admin"));
-
-        verify(designService).delete(designId);
-        verify(uploadFileService).deleteImage(design.getImage());
-    }
-
-    /* Test Categories */
-    @Test
-    public void testShowCategoryDesign() throws Exception {
-        mockMvc.perform(get("/admin/categorias"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("admin/categoryDesign/showCategory"))
-                .andExpect(model().attribute("categories", categoriesDesign));
-
-    }
-
-    @Test
-    public void testCreateCategoryDesign() throws Exception {
-        mockMvc.perform(get("/admin/categorias/crear"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("admin/categoryDesign/createCategory"))
-                .andExpect(model().attribute("categoriesDesign", categoriesDesign));
-    }
-
-    @Test
-    public void testSaveCategory() throws Exception {
-        String nameCategoryDesign = "New Category";
-        MockMultipartFile file = new MockMultipartFile(
-                "image", "test.jpg", "image/jpeg", "Test Image Content".getBytes());
-
-        // Simula el comportamiento del servicio de carga de archivos
-        when(uploadFileService.saveImages(any(MultipartFile.class))).thenReturn("test.jpg");
-
-        mockMvc.perform(multipart("/admin/categorias/crear/guardar")
-                .file(file)
-                .param("nameCategoryDesign", nameCategoryDesign))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/admin/categorias"))
-                .andExpect(flash().attribute("message", "Categoría guardada exitosamente"));
-
-        verify(categoryDesignService).save(any(CategoryDesign.class));
-    }
-
-    @Test
-    public void testDeleteCategory() throws Exception {
-        Long categoryId = 1L;
-
-        CategoryDesign category = new CategoryDesign();
-        category.setIdCategoryDesign(categoryId);
-        category.setImage("someImage.jpg");
-        category.setNameCategoryDesign("someCategory");
-
-        when(categoryDesignService.findById(categoryId)).thenReturn(Optional.of(category));
-
-        doNothing().when(uploadFileService).deleteImage("someImage.jpg");
-        doNothing().when(categoryDesignService).deleteById(categoryId);
-
-        mockMvc.perform(post("/admin/categorias/eliminar/{id}", categoryId))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/admin/categorias"));
-
-        verify(uploadFileService).deleteImage("someImage.jpg");
-        verify(categoryDesignService).deleteById(categoryId);
-    }
-
-    /* Tes Users */
-    @Test
-    public void testShowUsers() throws Exception {
-        mockMvc.perform(get("/admin/usuarios"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("/admin/users/showUser"))
-                .andExpect(model().attribute("users", users))
-                .andExpect(model().attribute("categories", categoriesDesign));
-    }
-
-    @Test
-    public void testDeleteUser() throws Exception {
-        Long userId = 1L;
-
-        Role roleUser = new Role();
-        roleUser.setIdRol(1L);
-        roleUser.setRoleEnum(RoleEnum.USER);
-
-        User user1 = new User();
-        user1.setIdUser(userId);
-        user1.setEmail("user1@example.com");
-        user1.setPassword("password1");
-        user1.setEnabled(true);
-        user1.setAccountNoExpired(true);
-        user1.setAccountNoLocked(true);
-        user1.setCredentialNoExpired(true);
-        user1.setRoles(new HashSet<>(Arrays.asList(roleUser)));
-
-        doNothing().when(userService).deleteById(userId);
-
-        mockMvc.perform(post("/admin/usuarios/eliminar/{id}", userId))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/usuarios"))
-                .andExpect(flash().attribute("message", "Usuario eliminado exitosamente."));
-        verify(userService).deleteById(userId);
-
-    }
-
-    /* Test Appointments */
-    @Test
-    public void testShowAppointments() throws Exception {
-        mockMvc.perform(get("/admin/citas"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("/admin/appointment/showAppointment"))
-                .andExpect(model().attribute("categories", categoriesDesign))
-                .andExpect(model().attribute("appointments", appointments));
-    }
-
-    @Test
-    public void testCreateAppointments() throws Exception {
-        mockMvc.perform(get("/admin/crear-citas"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("/admin/appointment/createAppointment"))
-                .andExpect(model().attribute("designs", designs))
-                .andExpect(model().attribute("categories", categoriesDesign));
-    }
-
-    @Test
-    public void testEditAppointmentForm() throws Exception {
-        Long idAppointment = 1L;
-
-        // Obtener una cita simulada de la lista para la prueba
-        Appointment appointment = appointments.get(0);
-
-        // Configurar los mocks para que devuelvan los datos necesarios
-        when(appointmentService.findById(idAppointment)).thenReturn(appointment); // Devolver la cita específica
-        when(categoryDesignService.findAll()).thenReturn(categoriesDesign); // Devolver las categorías
-        when(designService.findAll()).thenReturn(designs); // Devolver los diseños
-
-        // Realizar la solicitud GET a "/admin/citas/editar/{id}"
-        mockMvc.perform(get("/admin/citas/editar/{id}", idAppointment))
-                .andExpect(status().isOk()) // Verificar que la respuesta es OK (200)
-                .andExpect(view().name("/admin/appointment/editAppointment")) // Verificar el nombre de la vista
-                .andExpect(model().attribute("appointment", appointment)) // Verificar que el modelo contiene el
-                                                                          // Appointment correcto
-                .andExpect(model().attribute("categories", categoriesDesign)) // Verificar que el modelo contiene las
-                                                                              // categorías
-                .andExpect(model().attribute("design", designs)); // Verificar que el modelo contiene los diseños
-    }
-
-    @Test
-    public void testShowAppointmentDetails() throws Exception {
-        Long idAppointment = 1L;
-
-        Appointment appointment = appointments.get(0);
-
-        when(appointmentService.findById(idAppointment)).thenReturn(appointment);
-
-        mockMvc.perform(get("/admin/citas/verDetalles/{id}", idAppointment))
-                .andExpect(status().isOk())
-                .andExpect(view().name("/admin/appointment/showAppointmentDetails"))
-                .andExpect(model().attribute("categories", categoriesDesign))
-                .andExpect(model().attribute("appointment", appointment));
-    }
-
-    @Test
-    public void testCreateAppointment() throws Exception {
-        Appointment appointment = appointments.get(0); // Usar una cita de ejemplo
-
-        when(appointmentService.save(any(Appointment.class))).thenReturn(appointment);
-
-        mockMvc.perform(post("/admin/crear-citas/crear")
-                .flashAttr("appointment", appointment))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/admin/citas"));
-
-        verify(appointmentService, times(1)).save(any(Appointment.class));
-    }
-
-    @Test
-    public void testEditAppointment() throws Exception {
-        Appointment appointment = appointments.get(0);
-        Long idAppointment = 1L;
-        when(appointmentService.findById(idAppointment)).thenReturn(appointment);
-        when(appointmentService.save(any(Appointment.class))).thenReturn(appointment);
-        mockMvc.perform(post("/admin/citas/editar/guardar/{id}", idAppointment)
-                .flashAttr("appointment", appointment))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(flash().attribute("message", "Cita actualizada exitosamente."))
-                .andExpect(redirectedUrl("/admin/citas"));
-    }
-
-    @Test
-    public void testDeleteAppointment() throws Exception {
-        Long idAppointment = 1L;
-
-        doNothing().when(appointmentService).deleteById(idAppointment);
-
-        mockMvc.perform(post("/admin/citas/eliminar/{id}", idAppointment))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(flash().attribute("message", "Cita eliminada exitosamente."))
-                .andExpect(redirectedUrl("/admin/citas"));
-    }
+        @Autowired
+        private MockMvc mockMvc;
+
+        @MockBean
+        private IDesignService designService;
+
+        @MockBean
+        private ICategoryDesignService categoryDesignService;
+
+        @MockBean
+        private IAppointmentService appointmentService;
+
+        @MockBean
+        private IUploadFileService uploadFileService;
+
+        @MockBean
+        private IUserService userService;
+
+        private List<CategoryDesign> categoryDesignList;
+        private List<Design> designList;
+        private List<User> userList;
+        private List<Appointment> appointmentList;
+
+        @BeforeEach
+        public void setup() {
+                categoryDesignList = Arrays.asList(
+                                new CategoryDesign(1L, "Category1", "image1.jpg"),
+                                new CategoryDesign(2L, "Category2", "image2.jpg"));
+
+                designList = Arrays.asList(
+                                new Design("Design1", "Description1", "image1.jpg", categoryDesignList.get(0)),
+                                new Design("Design2", "Description2", "image2.jpg", categoryDesignList.get(1)));
+
+                userList = Arrays.asList(
+                                new User(1L, "prueba@gmail.com", "password", null, false, false, false, false, null,
+                                                null));
+
+                appointmentList = Arrays.asList(
+                                new Appointment(1L, new Date(), "10:00", 100.0, "customer1@example.com",
+                                                "Dragon Tattoo", "10x10", "http://example.com/ref",
+                                                "arm", "Message for appointment."),
+                                new Appointment(2L, new Date(), "15:00", 150.0, "customer2@example.com",
+                                                "Phoenix Tattoo", "15x15", "http://example.com/ref2",
+                                                "back", "Another message."));
+
+                when(categoryDesignService.findById(1L)).thenReturn(Optional.of(categoryDesignList.get(0)));
+                when(categoryDesignService.findAll()).thenReturn(categoryDesignList);
+                when(designService.findAll()).thenReturn(designList);
+                when(designService.findById(1L)).thenReturn(Optional.of(designList.get(0)));
+                when(designService.findById(99L)).thenReturn(Optional.empty());
+                when(userService.findUserById(1L)).thenReturn(Optional.of(userList.get(0)));
+                when(appointmentService.findById(1L)).thenReturn(appointmentList.get(0));
+                when(appointmentService.findById(99L)).thenThrow(new IllegalArgumentException("Invalid ID"));
+        }
+
+        @Test
+        public void testSaveDesign_Success() throws Exception {
+                MockMultipartFile file = new MockMultipartFile("image", "image.jpg", "image/jpeg",
+                                "test image".getBytes());
+                when(categoryDesignService.findById(1L)).thenReturn(Optional.of(new CategoryDesign()));
+
+                mockMvc.perform(((MockMultipartHttpServletRequestBuilder) MockMvcRequestBuilders
+                                .multipart("/api/admin/diseños/crear")
+                                .param("title", "New Design")
+                                .param("description", "Description of the design")
+                                .param("categoryDesign", "1"))
+                                .file("image", file.getBytes()))
+                                .andExpect(status().isOk())
+                                .andExpect(content().string("Diseño guardado exitosamente."));
+        }
+
+        @Test
+        public void testSaveDesign_CategoryNotFound() throws Exception {
+                MockMultipartFile file = new MockMultipartFile("image", "image.jpg", "image/jpeg",
+                                "test image".getBytes());
+                when(categoryDesignService.findById(1L)).thenReturn(Optional.empty());
+
+                mockMvc.perform(((MockMultipartHttpServletRequestBuilder) MockMvcRequestBuilders
+                                .multipart("/api/admin/diseños/crear")
+                                .param("title", "New Design")
+                                .param("description", "Description of the design")
+                                .param("categoryDesign", "1"))
+                                .file("image", file.getBytes()))
+                                .andExpect(status().isInternalServerError())
+                                .andExpect(content().string("Ocurrió un error al guardar el diseño."));
+        }
+
+        @Test
+        public void testUpdateDesign_Success() throws Exception {
+                MockMultipartFile file = new MockMultipartFile("image", "image.jpg", "image/jpeg",
+                                "test image".getBytes());
+                Design design = new Design();
+                design.setIdDesign(1L);
+                when(designService.findById(1L)).thenReturn(Optional.of(design));
+                when(categoryDesignService.findById(1L)).thenReturn(Optional.of(new CategoryDesign()));
+
+                mockMvc.perform(((MockMultipartHttpServletRequestBuilder) MockMvcRequestBuilders
+                                .multipart("/api/admin/disenos/editar")
+                                .param("idDesign", "1")
+                                .param("title", "Updated Design")
+                                .param("description", "Updated description")
+                                .param("categoryDesign", "1"))
+                                .file("image", file.getBytes()))
+                                .andExpect(status().isOk())
+                                .andExpect(content().string("Diseño actualizado exitosamente."));
+        }
+
+        @Test
+        public void testUpdateDesign_NotFound() throws Exception {
+                MockMultipartFile file = new MockMultipartFile("image", "image.jpg", "image/jpeg",
+                                "test image".getBytes());
+                when(designService.findById(1L)).thenReturn(Optional.empty());
+
+                mockMvc.perform(((MockMultipartHttpServletRequestBuilder) MockMvcRequestBuilders
+                                .multipart("/api/admin/disenos/editar")
+                                .param("idDesign", "1")
+                                .param("title", "Updated Design")
+                                .param("description", "Updated description")
+                                .param("categoryDesign", "1"))
+                                .file("image", file.getBytes()))
+                                .andExpect(status().isNotFound())
+                                .andExpect(content().string("Diseño no encontrado."));
+        }
+
+        @Test
+        public void testDeleteDesign_Success() throws Exception {
+                Design design = new Design();
+                design.setIdDesign(1L);
+                design.setImage("image.jpg");
+                when(designService.findById(1L)).thenReturn(Optional.of(design));
+
+                mockMvc.perform(MockMvcRequestBuilders.post("/api/admin/diseños/eliminar/1"))
+                                .andExpect(status().isOk())
+                                .andExpect(content().string("Diseño eliminado correctamente."));
+        }
+
+        @Test
+        public void testDeleteDesign_NotFound() throws Exception {
+                when(designService.findById(1L)).thenReturn(Optional.empty());
+
+                mockMvc.perform(MockMvcRequestBuilders.post("/api/admin/diseños/eliminar/1"))
+                                .andExpect(status().isNotFound())
+                                .andExpect(content().string("Diseño no encontrado."));
+        }
+
+        @Test
+        public void testDeleteDesign_ServerError() throws Exception {
+                Design design = new Design();
+                design.setIdDesign(1L);
+                design.setImage("image.jpg");
+                when(designService.findById(1L)).thenReturn(Optional.of(design));
+                doThrow(new RuntimeException("Delete failed")).when(designService).delete(1L);
+
+                mockMvc.perform(MockMvcRequestBuilders.post("/api/admin/diseños/eliminar/1"))
+                                .andExpect(status().isInternalServerError())
+                                .andExpect(content().string("Ocurrió un error al eliminar el diseño."));
+        }
+
+        @Test
+        public void testSaveCategory_Success() throws Exception {
+                MockMultipartFile file = new MockMultipartFile("image", "image.jpg", "image/jpeg",
+                                "test image".getBytes());
+                mockMvc.perform(((MockMultipartHttpServletRequestBuilder) MockMvcRequestBuilders
+                                .multipart("/api/admin/categorias/crear/guardar")
+                                .param("nameCategoryDesign", "New Category"))
+                                .file("image", file.getBytes()))
+                                .andExpect(status().isOk())
+                                .andExpect(content().string("Categoría creada exitosamente."));
+        }
+
+        @Test
+        public void testSaveCategory_BadRequest() throws Exception {
+                MockMultipartFile file = new MockMultipartFile("image", "image.jpg", "image/jpeg",
+                                "test image".getBytes());
+                mockMvc.perform(((MockMultipartHttpServletRequestBuilder) MockMvcRequestBuilders
+                                .multipart("/api/admin/categorias/crear/guardar")
+                                .param("nameCategoryDesign", "") // Parametro vacío
+                )
+                                .file("image", file.getBytes()))
+                                .andExpect(status().isBadRequest())
+                                .andExpect(content().string("El nombre de la categoría no puede estar vacío."));
+        }
+
+        @Test
+        public void testDeleteCategory_Success() throws Exception {
+
+                mockMvc.perform(MockMvcRequestBuilders.post("/api/admin/categorias/eliminar/{id}", 1L))
+                                .andExpect(status().isOk())
+                                .andExpect(content().string("Categoría eliminada exitosamente."));
+        }
+
+        @Test
+        public void testDeleteCategory_NotFound() throws Exception {
+                mockMvc.perform(MockMvcRequestBuilders.post("/api/admin/categorias/eliminar/{id}", 99L))
+                                .andExpect(status().isNotFound())
+                                .andExpect(content().string("Categoría no encontrada."));
+        }
+
+        @Test
+        public void testDeleteUser_Success() throws Exception {
+
+                mockMvc.perform(MockMvcRequestBuilders.post("/api/admin/usuarios/eliminar/{id}", 1L))
+                                .andExpect(status().isOk())
+                                .andExpect(content().string("User deleted successfully."));
+        }
+
+        @Test
+        public void testDeleteUser_NotFound() throws Exception {
+                when(userService.findUserById(99L)).thenReturn(java.util.Optional.empty());
+
+                mockMvc.perform(MockMvcRequestBuilders.post("/api/admin/usuarios/eliminar/{id}", 99L))
+                                .andExpect(status().isNotFound())
+                                .andExpect(content().string("User not found."));
+        }
+
+        @Test
+        public void testCreateAppointment_Success() throws Exception {
+                
+
+                mockMvc.perform(MockMvcRequestBuilders.post("/api/admin/crear-citas/crear")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(new ObjectMapper().writeValueAsString(appointmentList)))
+                                .andExpect(status().isCreated())
+                                .andExpect(content().string("Appointment created successfully."));
+        }
+
+        @Test
+        public void testEditAppointment_Success() throws Exception {
+
+                mockMvc.perform(MockMvcRequestBuilders.post("/api/admin/citas/editar/{id}", 1L)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(new ObjectMapper().writeValueAsString(appointmentList)))
+                                .andExpect(status().isOk())
+                                .andExpect(content().string("Appointment updated successfully."));
+        }
+
+        @Test
+        public void testDeleteAppointment_Success() throws Exception {
+                when(appointmentService.findById(1L)).thenReturn(appointmentList.get(0));
+
+                mockMvc.perform(MockMvcRequestBuilders.post("/api/admin/citas/eliminar/{id}", 1L))
+                                .andExpect(status().isOk())
+                                .andExpect(content().string("Appointment deleted successfully."));
+        }
 }
