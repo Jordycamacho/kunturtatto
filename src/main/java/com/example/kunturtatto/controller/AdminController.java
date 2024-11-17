@@ -1,18 +1,17 @@
 package com.example.kunturtatto.controller;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.kunturtatto.model.Appointment;
 import com.example.kunturtatto.model.CategoryDesign;
@@ -24,15 +23,18 @@ import com.example.kunturtatto.service.IDesignService;
 import com.example.kunturtatto.service.IUploadFileService;
 import com.example.kunturtatto.service.IUserService;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-
-@Controller
-@RequestMapping("/admin")
-@PreAuthorize("permitAll()")
+@RestController
+@RequestMapping("/api/admin")
 public class AdminController {
+
+    Logger logger = LoggerFactory.getLogger(AdminController.class);
 
     @Autowired
     private IDesignService designService;
@@ -49,379 +51,293 @@ public class AdminController {
     @Autowired
     private IUserService userService;
 
-    /* Create Designs */
-    /**
-     * Muestra la página principal de gestión de diseños.
-     *
-     * @param model El modelo para pasar datos a la vista.
-     * @return El nombre de la vista para mostrar los diseños.
-     */
-    @GetMapping("")
-    @PreAuthorize("hasAuthority('CREATE')")
-    public String showDesign(Model model) {
-        addCategoriesAndDesignsToModel(model);
-        return "admin/design/showDesign";
-    }
+    /* <================ Create Designs ================> */
 
-    /**
-     * Muestra el formulario para crear un nuevo diseño.
-     *
-     * @param model El modelo para pasar datos a la vista.
-     * @return El nombre de la vista para crear un diseño.
-     */
-    @GetMapping("/diseños/crear")
-    public String createDesign(Model model) {
-        addCategoriesToModel(model);
-        model.addAttribute("design", new Design());
-        return "admin/design/createDesign";
-    }
-
-    /**
-     * Muestra el formulario para editar un diseño existente.
-     *
-     * @param id    El ID del diseño a editar.
-     * @param model El modelo para pasar datos a la vista.
-     * @return El nombre de la vista para editar un diseño.
-     */
-    @GetMapping("/diseños/editar/{id}")
-    public String editDesign(@PathVariable Long id, Model model) {
-        addCategoriesToModel(model);
-        Optional<Design> optionalDesign = designService.findById(id);
-
-        if (optionalDesign.isPresent()) {
-            model.addAttribute("design", optionalDesign.get());
-        } else {
-            model.addAttribute("error", "No se encontró el diseño");
-        }
-
-        return "/admin/design/editDesign";
-    }
-
-    /**
-     * Guarda un nuevo diseño.
-     * 
-     * @param redirectAttributes Atributos para redirección.
-     * @return Redirige a la página de gestión de diseños.
-     */
-    @PostMapping("/diseños/crear/guardar")
-    public String saveDesign(
+    @PostMapping("/diseños/crear")
+    @Operation(summary = "Crear un diseño nuevo", description = "Permite guardar un nuevo diseño en la base de datos.")
+    public ResponseEntity<String> saveDesign(
             @RequestParam("title") String title,
             @RequestParam("description") String description,
             @RequestParam("categoryDesign") Long categoryDesignId,
-            @RequestParam("image") MultipartFile file,
-            RedirectAttributes redirectAttributes) {
+            @RequestParam("image") MultipartFile file) {
 
-        Design design = new Design();
-        design.setTitle(title);
-        design.setDescription(description);
-        CategoryDesign categoryDesign = categoryDesignService.findById(categoryDesignId)
-                .orElseThrow(() -> new IllegalArgumentException("Categoría no encontrada"));
+        logger.info("Iniciando la creación de un nuevo diseño: {}", title);
 
-        design.setCategoryDesign(categoryDesign);
+        try {
+            Design design = new Design();
+            design.setTitle(title);
+            design.setDescription(description);
 
-        handleImageUpload(file, design, redirectAttributes);
-        designService.save(design);
-        redirectAttributes.addFlashAttribute("message", "Diseño guardado exitosamente");
-        return "redirect:/admin";
+            CategoryDesign categoryDesign = categoryDesignService.findById(categoryDesignId)
+                    .orElseThrow(() -> new IllegalArgumentException("Categoría no encontrada"));
+
+            design.setCategoryDesign(categoryDesign);
+
+            handleImageUpload(file, design);
+            designService.save(design);
+
+            logger.info("Diseño creado exitosamente: {}", title);
+            return ResponseEntity.ok("Diseño guardado exitosamente.");
+        } catch (Exception e) {
+            logger.error("Error al guardar el diseño: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Ocurrió un error al guardar el diseño.");
+        }
     }
 
-    /**
-     * Actualiza un diseño existente.
-     * 
-     * @param idDesign           ID del diseño a actualizar.
-     * @param title              Nuevo título del diseño.
-     * @param description        Nueva descripción del diseño.
-     * @param categoryDesignId   ID de la nueva categoría del diseño.
-     * @param file               Archivo de imagen para el diseño.
-     * @param redirectAttributes Atributos para redirección.
-     * @return Redirige a la página de administración si la actualización es
-     *         exitosa, o a la página principal si no se encuentra el diseño.
-     */
-    @PostMapping("/diseños/editar/guardar")
-    public String updateDesign(
+    @PostMapping("/disenos/editar")
+    @Operation(summary = "Actualizar un diseño existente", description = "Actualiza los datos de un diseño, incluyendo su título, descripción, categoría e imagen.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Diseño actualizado correctamente."),
+            @ApiResponse(responseCode = "404", description = "Diseño o categoría no encontrados."),
+            @ApiResponse(responseCode = "500", description = "Error interno al actualizar el diseño.")
+    })
+    public ResponseEntity<String> updateDesign(
             @RequestParam("idDesign") Long idDesign,
             @RequestParam("title") String title,
             @RequestParam("description") String description,
             @RequestParam("categoryDesign") Long categoryDesignId,
-            @RequestParam("image") MultipartFile file,
-            RedirectAttributes redirectAttributes) {
+            @RequestParam("image") MultipartFile file) {
+
+        logger.info("Iniciando actualización del diseño con ID: {}", idDesign);
 
         Optional<Design> optionalDesign = designService.findById(idDesign);
         if (!optionalDesign.isPresent()) {
-            redirectAttributes.addFlashAttribute("error", "Diseño no encontrado");
-            return "redirect:/admin";
+            logger.warn("Diseño no encontrado para el ID: {}", idDesign);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Diseño no encontrado.");
         }
 
         Design design = optionalDesign.get();
         design.setTitle(title);
         design.setDescription(description);
+
         CategoryDesign categoryDesign = categoryDesignService.findById(categoryDesignId).orElse(null);
-        if (categoryDesign != null) {
-            design.setCategoryDesign(categoryDesign);
+        if (categoryDesign == null) {
+            logger.warn("Categoría no encontrada para el ID: {}", categoryDesignId);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Categoría no encontrada.");
         }
+        design.setCategoryDesign(categoryDesign);
 
-        handleImageUpload(file, design, redirectAttributes);
-        designService.update(design);
-        redirectAttributes.addFlashAttribute("message", "Diseño actualizado con éxito");
-        return "redirect:/admin";
+        try {
+            handleImageUpload(file, design);
+            designService.update(design);
+            logger.info("Diseño actualizado exitosamente: {}", title);
+            return ResponseEntity.ok("Diseño actualizado exitosamente.");
+        } catch (Exception e) {
+            logger.error("Error al actualizar el diseño: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Ocurrió un error al actualizar el diseño.");
+        }
     }
 
-    /**
-     * Elimina un diseño existente.
-     * 
-     * @param id ID del diseño a eliminar.
-     * @return Redirige a la página de administración.
-     */
     @PostMapping("/diseños/eliminar/{id}")
-    public String deleteDesign(@PathVariable long id) {
-        Design design = designService.findById(id).orElse(null);
+    @Operation(summary = "Eliminar un diseño existente", description = "Elimina un diseño de la base de datos, incluyendo su imagen si no es predeterminada.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Diseño eliminado correctamente."),
+            @ApiResponse(responseCode = "404", description = "Diseño no encontrado."),
+            @ApiResponse(responseCode = "500", description = "Error interno al eliminar el diseño.")
+    })
+    public ResponseEntity<String> deleteDesign(@PathVariable long id) {
 
-        if (design != null && !design.getImage().equals("default.jpg")) {
-            uploadFileService.deleteImage(design.getImage());
+        logger.info("Iniciando eliminación del diseño con ID: {}", id);
+
+        Optional<Design> optionalDesign = designService.findById(id);
+        if (!optionalDesign.isPresent()) {
+            logger.warn("Diseño no encontrado para el ID: {}", id);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Diseño no encontrado.");
         }
 
-        designService.delete(id);
-        return "redirect:/admin";
-    }
+        Design design = optionalDesign.get();
 
-    /* Create Categories */
-
-    /**
-     * Muestra la lista de categorías.
-     * 
-     * @param model Modelo para agregar atributos.
-     * @return Vista de la página de categorías.
-     */
-    @GetMapping("/categorias")
-    public String showCategory(Model model) {
-        addCategoriesToModel(model);
-        return "admin/categoryDesign/showCategory";
-    }
-
-    /**
-     * Muestra el formulario para crear una nueva categoría.
-     * 
-     * @param model Modelo para agregar atributos.
-     * @return Vista del formulario de creación de categoría.
-     */
-    @GetMapping("/categorias/crear")
-    public String createCategory(Model model) {
-        addCategoriesToModel(model);
-        return "admin/categoryDesign/createCategory";
-    }
-
-    /**
-     * Guarda una nueva categoría.
-     * 
-     * @param nameCategoryDesign Nombre de la nueva categoría.
-     * @param file               Archivo de imagen para la categoría.
-     * @param redirectAttributes Atributos para redirección.
-     * @return Redirige a la página de gestión de categorías.
-     */
-    @PostMapping("categorias/crear/guardar")
-    public String saveCategory(@RequestParam("nameCategoryDesign") String nameCategoryDesign,
-            @RequestParam("image") MultipartFile file,
-            RedirectAttributes redirectAttributes) {
-
-        CategoryDesign categoryDesign = new CategoryDesign();
-        categoryDesign.setNameCategoryDesign(nameCategoryDesign);
-
-        handleCategoryImageUpload(file, categoryDesign, redirectAttributes);
-        categoryDesignService.save(categoryDesign);
-        redirectAttributes.addFlashAttribute("message", "Categoría guardada exitosamente");
-
-        return "redirect:/admin/categorias";
-    }
-
-    /**
-     * Elimina una categoría existente.
-     * 
-     * @param id ID de la categoría a eliminar.
-     * @return Redirige a la página de gestión de categorías.
-     */
-    @PostMapping("categorias/eliminar/{id}")
-    public String deleteCategory(@PathVariable Long id) {
-        CategoryDesign category = categoryDesignService.findById(id).orElse(null);
-
-        if (category != null && !category.getImage().equals("default.jpg")) {
-            uploadFileService.deleteImage(category.getImage());
+        try {
+            if (design != null && !design.getImage().equals("default.jpg")) {
+                uploadFileService.deleteImage(design.getImage());
+                logger.info("Imagen eliminada correctamente: {}", design.getImage());
+            }
+            designService.delete(id);
+            logger.info("Diseño eliminado correctamente con ID: {}", id);
+            return ResponseEntity.ok("Diseño eliminado correctamente.");
+        } catch (Exception e) {
+            logger.error("Error al eliminar el diseño con ID: {}", id, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Ocurrió un error al eliminar el diseño.");
         }
-
-        categoryDesignService.deleteById(id);
-        return "redirect:/admin/categorias";
     }
 
-    /* Administracion usuarios */
+    /* <================ Create Categories ================> */
 
-    /**
-     * Muestra la lista de usuarios.
-     * 
-     * @param model Modelo para agregar atributos.
-     * @return Vista de la página de usuarios.
-     */
-    @GetMapping("/usuarios")
-    public String showUsers(Model model) {
-        addCategoriesToModel(model);
-        List<User> users = userService.findAll();
-        model.addAttribute("users", users);
-        return "/admin/users/showUser";
+    @PostMapping("/categorias/crear/guardar")
+    @Operation(summary = "Guardar una nueva categoría", description = "Permite crear y guardar una nueva categoría con su respectiva imagen.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Categoría guardada exitosamente."),
+            @ApiResponse(responseCode = "400", description = "Error en los datos proporcionados."),
+            @ApiResponse(responseCode = "500", description = "Error interno al guardar la categoría.")
+    })
+    public ResponseEntity<String> saveCategory(@RequestParam("nameCategoryDesign") String nameCategoryDesign,
+            @RequestParam("image") MultipartFile file) {
+        logger.info("Iniciando creación de una nueva categoría con nombre: {}", nameCategoryDesign);
+        try {
+            if (nameCategoryDesign == null || nameCategoryDesign.trim().isEmpty()) {
+                logger.warn("Nombre de la categoría vacío o nulo.");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("El nombre de la categoría no puede estar vacío.");
+            }
+
+            CategoryDesign categoryDesign = new CategoryDesign();
+            categoryDesign.setNameCategoryDesign(nameCategoryDesign);
+
+            handleCategoryImageUpload(file, categoryDesign);
+            categoryDesignService.save(categoryDesign);
+            logger.info("Categoría creada exitosamente: {}", nameCategoryDesign);
+            return ResponseEntity.ok("Categoría creada exitosamente.");
+        } catch (Exception e) {
+            logger.error("Error al crear la categoría: {}", nameCategoryDesign, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al guardar la categoría.");
+        }
     }
 
-    /**
-     * Elimina un usuario existente.
-     * 
-     * @param id                 ID del usuario a eliminar.
-     * @param redirectAttributes Atributos para redirección.
-     * @return Redirige a la página de gestión de usuarios.
-     */
+    @PostMapping("/categorias/eliminar/{id}")
+    @Operation(summary = "Eliminar una categoría", description = "Permite eliminar una categoría específica por su ID, incluyendo su imagen si aplica.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Categoría eliminada exitosamente."),
+            @ApiResponse(responseCode = "404", description = "Categoría no encontrada."),
+            @ApiResponse(responseCode = "500", description = "Error interno al eliminar la categoría.")
+    })
+    public ResponseEntity<String> deleteCategory(@PathVariable Long id) {
+        logger.info("Iniciando eliminación de categoría con ID: {}", id);
+        try {
+            Optional<CategoryDesign> optionalCategory = categoryDesignService.findById(id);
+            if (!optionalCategory.isPresent()) {
+                logger.warn("Categoría no encontrada con ID: {}", id);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Categoría no encontrada.");
+            }
+
+            CategoryDesign category = optionalCategory.get();
+            if (!category.getImage().equals("default.jpg")) {
+                uploadFileService.deleteImage(category.getImage());
+                logger.info("Imagen eliminada correctamente: {}", category.getImage());
+            }
+
+            categoryDesignService.deleteById(id);
+            logger.info("Categoría eliminada correctamente con ID: {}", id);
+            return ResponseEntity.ok("Categoría eliminada exitosamente.");
+        } catch (Exception e) {
+            logger.error("Error al eliminar la categoría con ID: {}", id, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al eliminar la categoría.");
+        }
+    }
+
+    /* <================ Create Users ================> */
+
     @PostMapping("/usuarios/eliminar/{id}")
-    public String deleteUser(@PathVariable Long id, RedirectAttributes redirectAttributes) {
-        userService.deleteById(id);
-        redirectAttributes.addFlashAttribute("message", "Usuario eliminado exitosamente.");
-        return "redirect:/usuarios";
+    @Operation(summary = "Delete a user", description = "Deletes a user from the database by their ID.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User deleted successfully."),
+            @ApiResponse(responseCode = "404", description = "User not found."),
+            @ApiResponse(responseCode = "500", description = "Internal error while deleting the user.")
+    })
+    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
+        logger.info("Starting deletion of user with ID: {}", id);
+        try {
+            Optional<User> optionalUser = userService.findUserById(id);
+            if (!optionalUser.isPresent()) {
+                logger.warn("User not found for ID: {}", id);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+            }
+
+            userService.deleteById(id);
+            logger.info("User deleted successfully with ID: {}", id);
+            return ResponseEntity.ok("User deleted successfully.");
+        } catch (Exception e) {
+            logger.error("Error deleting user with ID: {}", id, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error occurred while deleting the user.");
+        }
     }
 
-    /* Administracion citas */
-    /**
-     * Muestra la lista de citas.
-     * 
-     * @param model Modelo para agregar atributos.
-     * @return Vista de la página de citas.
-     */
-    @GetMapping("/citas")
-    public String showAppointments(Model model) {
-        addCategoriesToModel(model);
-        List<Appointment> appointments = appointmentService.findAll().stream()
-                .sorted((a1, a2) -> {
-                    int dateCompare = a1.getDate().compareTo(a2.getDate());
-                    return dateCompare == 0 ? a1.getTime().compareTo(a2.getTime()) : dateCompare;
-                })
-                .collect(Collectors.toList());
+    /* <================ Create Appointments ================> */
 
-        model.addAttribute("appointments", appointments);
-        return "/admin/appointment/showAppointment";
-    }
-
-    /**
-     * Muestra el formulario para crear una nueva cita.
-     * 
-     * @param model Modelo para agregar atributos.
-     * @return Vista del formulario de creación de citas.
-     */
-    @GetMapping("/crear-citas")
-    public String createAppointments(Model model) {
-        addCategoriesToModel(model);
-        model.addAttribute("designs", designService.findAll());
-        return "/admin/appointment/createAppointment";
-    }
-
-    /**
-     * Muestra el formulario para editar una cita existente.
-     * 
-     * @param id    ID de la cita a editar.
-     * @param model Modelo para agregar atributos.
-     * @return Vista del formulario de edición de citas.
-     */
-
-    @GetMapping("/citas/editar/{id}")
-    public String editAppointmentForm(@PathVariable Long id, Model model) {
-        addCategoriesToModel(model);
-        model.addAttribute("design", designService.findAll());
-        model.addAttribute("appointment", appointmentService.findById(id));
-        return "/admin/appointment/editAppointment";
-    }
-
-    /**
-     * Muestra los detalles de una cita específica.
-     * 
-     * @param id    ID de la cita.
-     * @param model Modelo para agregar atributos.
-     * @return Vista de la página de detalles de la cita.
-     */
-    @GetMapping("/citas/verDetalles/{id}")
-    public String showAppointmentDetails(@PathVariable Long id, Model model) {
-        addCategoriesToModel(model);
-        model.addAttribute("appointment", appointmentService.findById(id));
-        return "/admin/appointment/showAppointmentDetails";
-    }
-
-    /**
-     * Crea una nueva cita.
-     * 
-     * @param appointment Objeto Appointment con los detalles de la cita.
-     * @return Redirige a la página de gestión de citas.
-     */
     @PostMapping("/crear-citas/crear")
-    public String createAppointment(Appointment appointment) {
-        appointmentService.save(appointment);
-        return "redirect:/admin/citas";
+    @Operation(summary = "Create a new appointment", description = "Creates a new appointment and saves it to the database.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Appointment created successfully."),
+            @ApiResponse(responseCode = "400", description = "Invalid appointment data."),
+            @ApiResponse(responseCode = "500", description = "Error creating the appointment.")
+    })
+    public ResponseEntity<String> createAppointment(@RequestBody Appointment appointment) {
+        logger.info("Starting creation of a new appointment.");
+        try {
+            appointmentService.save(appointment);
+            logger.info("Appointment created successfully.");
+            return ResponseEntity.status(HttpStatus.CREATED).body("Appointment created successfully.");
+        } catch (Exception e) {
+            logger.error("Error creating appointment.", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error occurred while creating the appointment.");
+        }
     }
 
-    /**
-     * Actualiza una cita existente.
-     * 
-     * @param id                 ID de la cita a actualizar.
-     * @param appointment        Objeto Appointment con los nuevos detalles.
-     * @param redirectAttributes Atributos para redirección.
-     * @return Redirige a la página de gestión de citas.
-     */
-    @PostMapping("/citas/editar/guardar/{id}")
-    public String editAppointment(@PathVariable Long id, @ModelAttribute Appointment appointment,
-            RedirectAttributes redirectAttributes) {
-        appointment.setIdAppointment(id);
-        appointmentService.save(appointment);
-        redirectAttributes.addFlashAttribute("message", "Cita actualizada exitosamente.");
-        return "redirect:/admin/citas";
+    @PostMapping("/citas/editar/{id}")
+    @Operation(summary = "Edit an existing appointment", description = "Updates the details of an existing appointment.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Appointment updated successfully."),
+            @ApiResponse(responseCode = "404", description = "Appointment not found."),
+            @ApiResponse(responseCode = "500", description = "Error updating the appointment.")
+    })
+    public ResponseEntity<String> editAppointment(@PathVariable Long id, @RequestBody Appointment appointment) {
+        logger.info("Starting update for appointment with ID: {}", id);
+        try {
+            appointment.setIdAppointment(id);
+            appointmentService.save(appointment);
+            logger.info("Appointment updated successfully.");
+            return ResponseEntity.ok("Appointment updated successfully.");
+        } catch (Exception e) {
+            logger.error("Error updating appointment with ID: {}", id, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error occurred while updating the appointment.");
+        }
     }
 
-    /**
-     * Elimina una cita existente.
-     * 
-     * @param id                 ID de la cita a eliminar.
-     * @param redirectAttributes Atributos para redirección.
-     * @return Redirige a la página de gestión de citas.
-     */
     @PostMapping("/citas/eliminar/{id}")
-    public String deleteAppointment(@PathVariable Long id, RedirectAttributes redirectAttributes) {
-        appointmentService.deleteById(id);
-        redirectAttributes.addFlashAttribute("message", "Cita eliminada exitosamente.");
-        return "redirect:/admin/citas";
+    @Operation(summary = "Delete an appointment", description = "Deletes an existing appointment by its ID.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Appointment deleted successfully."),
+            @ApiResponse(responseCode = "404", description = "Appointment not found."),
+            @ApiResponse(responseCode = "500", description = "Error deleting the appointment.")
+    })
+    public ResponseEntity<String> deleteAppointment(@PathVariable Long id) {
+        logger.info("Starting deletion of appointment with ID: {}", id);
+        try {
+            appointmentService.deleteById(id);
+            logger.info("Appointment deleted successfully.");
+            return ResponseEntity.ok("Appointment deleted successfully.");
+        } catch (Exception e) {
+            logger.error("Error deleting appointment with ID: {}", id, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error occurred while deleting the appointment.");
+        }
     }
 
     /* Métodos Utilitarios */
-    private void addCategoriesToModel(Model model) {
-        List<CategoryDesign> categoryDesigns = categoryDesignService.findAll();
-        model.addAttribute("categories", categoryDesigns);
-    }
 
-    private void addCategoriesAndDesignsToModel(Model model) {
-        addCategoriesToModel(model);
-        model.addAttribute("designs", designService.findAll());
-    }
-
-    private void handleImageUpload(MultipartFile file, Design design, RedirectAttributes redirectAttributes) {
+    private void handleImageUpload(MultipartFile file, Design design) throws IOException {
         if (!file.isEmpty()) {
-            try {
-                String imageName = uploadFileService.saveImages(file);
-                design.setImage(imageName);
-            } catch (IOException e) {
-                e.printStackTrace();
-                redirectAttributes.addFlashAttribute("message", "Error al guardar la imagen");
-            }
+            String imageName = uploadFileService.saveImages(file);
+            design.setImage(imageName);
         } else {
             design.setImage("default.jpg");
         }
     }
 
-    private void handleCategoryImageUpload(MultipartFile file, CategoryDesign categoryDesign,
-            RedirectAttributes redirectAttributes) {
+    private void handleCategoryImageUpload(MultipartFile file, CategoryDesign categoryDesign) {
         if (!file.isEmpty()) {
             try {
                 String imageName = uploadFileService.saveImages(file);
                 categoryDesign.setImage(imageName);
             } catch (Exception e) {
                 e.printStackTrace();
-                redirectAttributes.addFlashAttribute("message", "Error al guardar la imagen");
+
             }
         } else {
             categoryDesign.setImage("default.jpg");

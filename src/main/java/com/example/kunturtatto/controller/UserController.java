@@ -1,76 +1,57 @@
 package com.example.kunturtatto.controller;
-
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.example.kunturtatto.model.CategoryDesign;
 import com.example.kunturtatto.model.Design;
 import com.example.kunturtatto.service.ICategoryDesignService;
 import com.example.kunturtatto.service.IDesignService;
 
-@Controller
-@RequestMapping("/KunturTattoo")
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/v1/KunturTattoo")
 public class UserController {
 
-    @Autowired
-    private ICategoryDesignService categoryDesignService;
+    private final ICategoryDesignService categoryDesignService;
+    private final IDesignService designService;
 
-    @Autowired
-    private IDesignService designService;
-
-    /**
-     * Método para mostrar la página principal.
-     * @param model objeto para pasar datos a la vista
-     * @return la plantilla de la página de inicio
-     */
-    @GetMapping("")
-    public String showHomePage(Model model) {
-        addCategoriesToModel(model);
-        return "user/index";
+    public UserController(ICategoryDesignService categoryDesignService, IDesignService designService) {
+        this.categoryDesignService = categoryDesignService;
+        this.designService = designService;
     }
 
-    /**
-     * Método para mostrar los diseños, filtrando opcionalmente por categoría.
-     * @param categoryId ID opcional de la categoría para filtrar los diseños
-     * @param model objeto para pasar datos a la vista
-     * @return la plantilla de la página de diseños
-     */
-    @GetMapping("/diseños")
-    public String showDesigns(@RequestParam(required = false) Long categoryId, Model model) {
-        List<Design> designs = (categoryId != null) ? 
-            designService.findByCategoryDesign(categoryId) : 
+    @Operation(summary = "Obtener lista de diseños con filtro opcional por categoría")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Lista de diseños obtenida correctamente"),
+        @ApiResponse(responseCode = "404", description = "Categoría no encontrada")
+    })
+    @GetMapping("/designs")
+    public ResponseEntity<List<Design>> getDesigns(
+            @Parameter(description = "ID opcional de la categoría para filtrar los diseños") 
+            @RequestParam(required = false) Long categoryId) {
+
+        List<Design> designs = (categoryId != null) ?
+            designService.findByCategoryDesign(categoryId) :
             designService.findAll();
 
-        addCategoriesToModel(model);
-        model.addAttribute("designs", designs);
-        model.addAttribute("selectedCategoryId", categoryId);
-        
-        return "user/designs";
-    }
-    
-    /**
-     * Método para mostrar la página de contacto.
-     * @param model objeto para pasar datos a la vista
-     * @return la plantilla de la página de contacto
-     */
-    @GetMapping("/contacto")
-    public String showContactPage(Model model) {
-        addCategoriesToModel(model);
-        return "user/contact";
+        return ResponseEntity.ok(designs);
     }
 
-    /**
-     * Método de utilidad para añadir la lista de categorías al modelo.
-     * @param model objeto para pasar datos a la vista
-     */
-    private void addCategoriesToModel(Model model) {
-        List<CategoryDesign> categoryDesigns = categoryDesignService.findAll();
-        model.addAttribute("categories", categoryDesigns);
+    @Operation(summary = "Obtener lista de categorías")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Lista de categorías obtenida correctamente")
+    })
+    @GetMapping("/categories")
+    public ResponseEntity<List<CategoryDesign>> getCategories() {
+        List<CategoryDesign> categories = categoryDesignService.findAll();
+        return ResponseEntity.ok(categories);
     }
 }
