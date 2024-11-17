@@ -28,7 +28,7 @@
                         <!-- Botón de editar -->
                         <a class="btn btn-warning btn-sm" th:href="@{/admin/diseños/editar/{id}(id=${design.idDesign})}">Editar</a>
                         <!-- Botón de eliminar -->
-                        <form th:action="@{/admin/diseños/eliminar/{id}(id=${design.idDesign})}" method="post" style="display:inline;">
+                        <form th:action="@{/api/admin/diseños/eliminar/{id}(id=${design.idDesign})}" method="post" style="display:inline;">
                             <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
                         </form>
                     </td>

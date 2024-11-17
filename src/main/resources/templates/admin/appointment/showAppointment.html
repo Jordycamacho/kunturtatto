@@ -27,7 +27,7 @@
                         <td>
                             <a class="btn btn-info btn-sm" th:href="@{/admin/citas/verDetalles/{id}(id=${appointment.idAppointment})}">Ver Detalles</a>
                             <a class="btn btn-warning btn-sm" th:href="@{/admin/citas/editar/{id}(id=${appointment.idAppointment})}">Editar</a>
-                            <form th:action="@{/admin/citas/eliminar/{id}(id=${appointment.idAppointment})}" method="post" style="display:inline;">
+                            <form th:action="@{/api/admin/citas/eliminar/{id}(id=${appointment.idAppointment})}" method="post" style="display:inline;">
                                 <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
                             </form>
                         </td>

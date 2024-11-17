@@ -8,8 +8,8 @@
     <div class="container mt-5">
         <h1 class="text-center">Editar Cita</h1>
 
-        <form th:action="@{/admin/citas/editar/guardar/{id}(id=${appointment.idAppointment})}" method="post" class="mt-4">
-            <!-- Campo oculto para ID -->
+        <form th:action="@{/api/admin/citas/editar/{id}(id=${appointment.idAppointment})}" method="post" class="mt-4">
+           
             <input type="hidden" name="id" th:value="${appointment.idAppointment}" />
 
             <h3>Datos Usuario</h3>

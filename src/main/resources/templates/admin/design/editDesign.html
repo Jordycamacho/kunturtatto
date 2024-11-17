@@ -7,7 +7,7 @@
 
     <div class="container mt-5">
         <h1>Editar Diseño</h1>
-        <form action="/admin/diseños/editar/guardar" method="post" enctype="multipart/form-data" class="row g-3">
+        <form action="/api/admin/disenos/editar" method="post" enctype="multipart/form-data" class="row g-3">
             <!-- Campo oculto para el ID del diseño -->
             <input type="text" name="idDesign" th:value="${design.idDesign}"/>
 
@@ -30,7 +30,7 @@
             <div class="col-md-6">
                 <label for="categoryDesign" class="form-label">Categoría</label>
                 <select id="categoryDesign" name="categoryDesign" class="form-select" required>
-                    <option th:each="category : ${categoriesDesign}" 
+                    <option th:each="category : ${categories}" 
                             th:value="${category.idCategoryDesign}" 
                             th:text="${category.nameCategoryDesign}"
                             th:selected="${category.idCategoryDesign == design.categoryDesign.idCategoryDesign}">Categoría</option>
