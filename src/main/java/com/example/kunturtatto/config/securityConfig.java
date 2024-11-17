@@ -17,37 +17,61 @@ import org.springframework.security.web.SecurityFilterChain;
 
 import com.example.kunturtatto.service.impl.IUserDetailServiceImpl;
 
-
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class securityConfig {
 
-    
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
-        .csrf(csrf -> csrf.disable())
-        .httpBasic(Customizer.withDefaults())
-        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .build();
+                .csrf(csrf -> csrf.disable())
+                .httpBasic(Customizer.withDefaults())
+                .formLogin(form -> form.disable()) 
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/css/**",
+                                "/js/**",
+                                "/images/**")
+                        .permitAll()
+
+                        .requestMatchers(
+                                "/KunturTattoo",
+                                "/KunturTattoo/diseños",
+                                "/KunturTattoo/contacto",
+                                "/api/v1/KunturTattoo",
+                                "/api/v1/KunturTattoo/diseños",
+                                "/api/v1/KunturTattoo/contacto")
+                        .permitAll()
+
+                        .requestMatchers(
+                                "/admin/**",
+                                "/api/admin/**")
+                        .hasRole("ADMIN")
+
+                        .anyRequest().authenticated())
+                .build();
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
+            throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
     @Bean
-    public AuthenticationProvider authenticationProvider(IUserDetailServiceImpl userDetailService){
+    public AuthenticationProvider authenticationProvider(IUserDetailServiceImpl userDetailService) {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setPasswordEncoder(passwordEncoder());
         provider.setUserDetailsService(userDetailService);
         return provider;
     }
 
-    public PasswordEncoder passwordEncoder(){
+    @Bean
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-    
+
 }
