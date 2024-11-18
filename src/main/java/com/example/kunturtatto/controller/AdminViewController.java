@@ -7,12 +7,15 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.example.kunturtatto.dtos.DesignDTO;
 import com.example.kunturtatto.model.Appointment;
 import com.example.kunturtatto.model.CategoryDesign;
 import com.example.kunturtatto.model.Design;
@@ -26,6 +29,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
+@CrossOrigin(origins = "http://localhost:3000")
 @Controller
 @RequestMapping("/admin")
 public class AdminViewController {
@@ -45,12 +49,18 @@ public class AdminViewController {
     private IUserService userService;
 
     /* <================ Métodos para Diseños ================> */
-    @GetMapping("")
-    @Operation(summary = "Página principal de administración de diseños", description = "Muestra la lista de diseños y las categorías disponibles para su gestión.")
-    public String showDesign(Model model) {
-        logger.info("Accediendo a la página principal de administración de diseños.");
-        addCategoriesAndDesignsToModel(model);
-        return "admin/design/showDesign";
+    @GetMapping("/diseños")
+    public ResponseEntity<List<DesignDTO>> getAllDesigns() {
+        logger.info("Obteniendo todos los diseños");
+        List<DesignDTO> designs = designService.findAll().stream()
+                .map(design -> new DesignDTO(
+                        design.getIdDesign(),
+                        design.getTitle(),
+                        design.getDescription(),
+                        design.getImage(),
+                        design.getCategoryDesign().getNameCategoryDesign()))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(designs);
     }
 
     @GetMapping("/diseños/crear")
@@ -199,8 +209,8 @@ public class AdminViewController {
             Appointment appointment = appointmentService.findById(id);
             if (appointment != null) {
                 addCategoriesToModel(model);
-            model.addAttribute("appointment", appointment);
-            return "/admin/appointment/editAppointment";
+                model.addAttribute("appointment", appointment);
+                return "/admin/appointment/editAppointment";
             } else {
                 logger.warn("Appointment not found for ID: {}", id);
                 model.addAttribute("error", "Appointment not found.");
@@ -244,10 +254,5 @@ public class AdminViewController {
     private void addCategoriesToModel(Model model) {
         List<CategoryDesign> categoryDesigns = categoryDesignService.findAll();
         model.addAttribute("categories", categoryDesigns);
-    }
-
-    private void addCategoriesAndDesignsToModel(Model model) {
-        addCategoriesToModel(model);
-        model.addAttribute("designs", designService.findAll());
     }
 }

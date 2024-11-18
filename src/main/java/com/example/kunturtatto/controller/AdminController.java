@@ -28,8 +28,10 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 @RestController
 @RequestMapping("/api/admin")
 public class AdminController {
@@ -85,7 +87,7 @@ public class AdminController {
         }
     }
 
-    @PostMapping("/disenos/editar")
+    @PutMapping("/disenos/editar")
     @Operation(summary = "Actualizar un diseño existente", description = "Actualiza los datos de un diseño, incluyendo su título, descripción, categoría e imagen.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Diseño actualizado correctamente."),
@@ -130,7 +132,7 @@ public class AdminController {
         }
     }
 
-    @PostMapping("/diseños/eliminar/{id}")
+    @DeleteMapping("/diseños/eliminar/{id}")
     @Operation(summary = "Eliminar un diseño existente", description = "Elimina un diseño de la base de datos, incluyendo su imagen si no es predeterminada.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Diseño eliminado correctamente."),

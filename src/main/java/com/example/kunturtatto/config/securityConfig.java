@@ -49,7 +49,7 @@ public class securityConfig {
                         .requestMatchers(
                                 "/admin/**",
                                 "/api/admin/**")
-                        .hasRole("ADMIN")
+                        .permitAll()
 
                         .anyRequest().authenticated())
                 .build();
