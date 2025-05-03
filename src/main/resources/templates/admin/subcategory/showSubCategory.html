@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:insert="~{admin/templateAdmin.html::header}"></head>
+<body>
+    <div th:insert="~{admin/templateAdmin.html::nav_user}"></div>
+    <div th:insert="~{admin/templateAdmin.html::nav_admin}"></div>
+
+    <div class="container mt-5">
+        <h1>Subcategorías</h1>
+        
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+        
+        <a class="btn btn-primary mb-3" th:href="@{/admin/subcategorias/crear}">Crear Nueva Subcategoría</a>
+
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Categoría Padre</th>
+                        <th>Imagen</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="subCategory : ${subCategories}">
+                        <td th:text="${subCategory.name}">Nombre</td>
+                        <td th:text="${subCategory.categoryName}">Categoría</td>
+                        <td>
+                            <img th:src="@{'/images/' + ${subCategory.image}}" 
+                                 alt="SubCategory Image" style="max-width: 100px;">
+                        </td>
+                        <td>
+                            <form th:action="@{/admin/subcategorias/eliminar/{id}(id=${subCategory.id})}" 
+                                  method="post" style="display:inline;">
+                                <button type="submit" class="btn btn-danger btn-sm" 
+                                        onclick="return confirm('¿Estás seguro de eliminar esta subcategoría?')">
+                                    Eliminar
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div th:insert="~{admin/templateAdmin.html::script}"></div>
+</body>
+</html>
