@@ -42,10 +42,10 @@
                         <a th:href="@{/KunturTattoo/diseños}" class="item" th:classappend="${selectedCategoryId == null} ? 'active' : ''">Todos</a>
                         <!-- Itera sobre las categorías para mostrar dinámicamente -->
                         <a th:each="category : ${categories}" 
-                           th:href="@{/KunturTattoo/diseños(categoryId=${category.idCategoryDesign})}" 
-                           th:text="${category.nameCategoryDesign}" 
+                           th:href="@{/KunturTattoo/diseños(categoryId=${category.id})}" 
+                           th:text="${category.name}" 
                            class="item"
-                           th:classappend="${selectedCategoryId == category.idCategoryDesign} ? 'active' : ''"></a>
+                           th:classappend="${selectedCategoryId == category.id} ? 'active' : ''"></a>
                     </div>
                 </nav>
             </div>

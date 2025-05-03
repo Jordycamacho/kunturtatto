@@ -51,7 +51,7 @@
                     <div th:each="category : ${categories}">
                         <article class="home__card">
                             <img th:src="@{'/images/' + ${category.image}}" alt="home image" class="home__card-img">
-                            <h3 class="home__card-title" th:text="${category.nameCategoryDesign}">Categoría</h3>
+                            <h3 class="home__card-title" th:text="${category.name}">Categoría</h3>
                             <div class="home__card-shadow"></div>
                         </article>
                     </div>
