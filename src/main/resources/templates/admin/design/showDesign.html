@@ -1,42 +1,57 @@
 <!DOCTYPE html>
-<html lang="en">
-<head th:insert="~{admin/design/templateAdmin.html::header}"></head>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:insert="~{admin/templateAdmin.html::header}"></head>
 <body>
-    <div th:insert="~{admin/design/templateAdmin.html::nav_user}"></div>
-    <div th:insert="~{admin/design/templateAdmin.html::nav_admin}"></div>
+    <div th:insert="~{admin/templateAdmin.html::nav_user}"></div>
+    <div th:insert="~{admin/templateAdmin.html::nav_admin}"></div>
 
     <div class="container mt-5">
         <h1>Diseños</h1>
-        <a class="btn btn-primary" th:href="@{/admin/diseños/crear}">Crear Diseño</a>
+        
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+        
+        <a class="btn btn-primary mb-3" th:href="@{/admin/diseños/crear}">Crear Nuevo Diseño</a>
 
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Título</th>
-                    <th>Categoría</th>
-                    <th>Descripción</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Iterar sobre la lista de diseños -->
-                <tr th:each="design : ${designs}">
-                    <td th:text="${design.title}">Título</td>
-                    <td th:text="${design.categoryDesign.nameCategoryDesign}">Categoría</td>
-                    <td th:text="${design.description}">Descripción</td>
-                    <td>
-                        <!-- Botón de editar -->
-                        <a class="btn btn-warning btn-sm" th:href="@{/admin/diseños/editar/{id}(id=${design.idDesign})}">Editar</a>
-                        <!-- Botón de eliminar -->
-                        <form th:action="@{/admin/diseños/eliminar/{id}(id=${design.idDesign})}" method="post" style="display:inline;">
-                            <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
-                        </form>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Título</th>
+                        <th>Descripción</th>
+                        <th>Subcategoría</th>
+                        <th>Categoría</th>
+                        <th>Imagen</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="design : ${designs}">
+                        <td th:text="${design.title}">Título</td>
+                        <td th:text="${design.description}">Descripción</td>
+                        <td th:text="${design.subCategoryName}">Subcategoría</td>
+                        <td th:text="${design.categoryName}">Categoría</td>
+                        <td>
+                            <img th:src="@{'/images/' + ${design.image}}" 
+                                 alt="Design Image" style="max-width: 100px;">
+                        </td>
+                        <td>
+                            <a th:href="@{/admin/diseños/editar/{id}(id=${design.id})}" 
+                               class="btn btn-warning btn-sm me-1">Editar</a>
+                            <form th:action="@{/admin/diseños/eliminar/{id}(id=${design.id})}" 
+                                  method="post" style="display:inline;">
+                                <button type="submit" class="btn btn-danger btn-sm" 
+                                        onclick="return confirm('¿Estás seguro de eliminar este diseño?')">
+                                    Eliminar
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
-    <div th:insert="~{admin/design/templateAdmin.html::script}"></div>
+    <div th:insert="~{admin/templateAdmin.html::script}"></div>
 </body>
 </html>

@@ -1,47 +1,62 @@
 <!DOCTYPE html>
-<html lang="en">
-<head th:insert="~{admin/design/templateAdmin.html::header}"></head>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:insert="~{admin/templateAdmin.html::header}"></head>
 <body>
-    <div th:insert="~{admin/design/templateAdmin.html::nav_user}"></div>
-    <div th:insert="~{admin/design/templateAdmin.html::nav_admin}"></div>
+    <div th:insert="~{admin/templateAdmin.html::nav_user}"></div>
+    <div th:insert="~{admin/templateAdmin.html::nav_admin}"></div>
 
     <div class="container mt-5">
         <h1>Editar Diseño</h1>
-        <form action="/admin/diseños/editar/guardar" method="post" enctype="multipart/form-data" class="row g-3">
-            <!-- Campo oculto para el ID del diseño -->
-            <input type="text" name="idDesign" th:value="${design.idDesign}"/>
-
+        
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+        
+        <form th:action="@{/admin/diseños/editar/guardar/{id}(id=${design.id})}" method="post" enctype="multipart/form-data" class="row g-3">
             <div class="col-md-6">
                 <label for="title" class="form-label">Título</label>
-                <input type="text" class="form-control" id="title" name="title" th:value="${design.title}" placeholder="Título del diseño" required>
+                <input type="text" class="form-control" id="title" 
+                       name="title" th:value="${design.title}" required>
             </div>
+
             <div class="col-md-6">
-                <label for="image" class="form-label">Imagen</label>
-                <input type="file" class="form-control" id="image" name="image">
-                <!-- Mostrar imagen actual si existe -->
-                <div th:if="${design.image != null}">
-                    <img th:src="@{/images/{image}(image=${design.image})}" alt="Imagen actual" style="max-width: 100px;"/>
-                </div>
-            </div>
-            <div class="col-12">
-                <label for="description" class="form-label">Descripción</label>
-                <textarea class="form-control" id="description" name="description" rows="3" placeholder="Descripción del diseño" required th:text="${design.description}"></textarea>
-            </div>
-            <div class="col-md-6">
-                <label for="categoryDesign" class="form-label">Categoría</label>
-                <select id="categoryDesign" name="categoryDesign" class="form-select" required>
-                    <option th:each="category : ${categoriesDesign}" 
-                            th:value="${category.idCategoryDesign}" 
-                            th:text="${category.nameCategoryDesign}"
-                            th:selected="${category.idCategoryDesign == design.categoryDesign.idCategoryDesign}">Categoría</option>
+                <label for="subCategoryId" class="form-label">Subcategoría</label>
+                <select class="form-select" id="subCategoryId" 
+                        name="subCategoryId" required>
+                    <option value="">Seleccione una subcategoría</option>
+                    <th:block th:each="category : ${categories}">
+                        <optgroup th:label="${category.name}">
+                            <option th:each="subCategory : ${category.subCategories}" 
+                                    th:value="${subCategory.id}" 
+                                    th:text="${subCategory.name}"
+                                    th:selected="${subCategory.id == design.subCategoryId}"></option>
+                        </optgroup>
+                    </th:block>
                 </select>
             </div>
+
             <div class="col-12">
-                <button type="submit" class="btn btn-primary">Guardar</button>
+                <label for="description" class="form-label">Descripción</label>
+                <textarea class="form-control" id="description" 
+                          name="description" rows="3" th:text="${design.description}"></textarea>
+            </div>
+
+            <div class="col-md-12">
+                <label class="form-label">Imagen Actual</label>
+                <div>
+                    <img th:src="@{'/images/' + ${design.image}}" alt="Current Image" style="max-width: 200px;" class="mb-2">
+                </div>
+                <label for="imageFile" class="form-label">Nueva Imagen (opcional)</label>
+                <input type="file" class="form-control" id="imageFile" 
+                       name="imageFile" accept="image/*">
+            </div>
+            
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary">Actualizar</button>
+                <a th:href="@{/admin/diseños}" class="btn btn-secondary">Cancelar</a>
             </div>
         </form>
     </div>
 
-    <div th:insert="~{admin/design/templateAdmin.html::script}"></div>
+    <div th:insert="~{admin/templateAdmin.html::script}"></div>
 </body>
 </html>
