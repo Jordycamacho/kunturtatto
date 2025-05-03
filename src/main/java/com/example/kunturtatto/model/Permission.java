@@ -8,24 +8,23 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
-@Table(name="Permissions")
-@Getter
-@Setter
+@Table(name = "permissions")
+@Data
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor 
+@AllArgsConstructor 
 public class Permission {
-
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idPermission;
-
-    @Column(unique = true, nullable = false, updatable = false)
+    
+    @Column(unique = true, nullable = false)
     private String name;
     
+    private String description;
 }

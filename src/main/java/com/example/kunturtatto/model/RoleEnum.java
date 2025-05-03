@@ -1,6 +1,8 @@
 package com.example.kunturtatto.model;
 
 public enum RoleEnum {
-    ADMIN, USER, INVITED
-    
+    ROLE_ADMIN,
+    ROLE_USER,
+    ROLE_ARTIST,
+    ROLE_CLIENT
 }
