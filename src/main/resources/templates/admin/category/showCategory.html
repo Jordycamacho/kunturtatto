@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:insert="~{admin/templateAdmin.html::header}"></head>
+<body>
+    <div th:insert="~{admin/templateAdmin.html::nav_user}"></div>
+    <div th:insert="~{admin/templateAdmin.html::nav_admin}"></div>
+
+    <div class="container mt-5">
+        <h1>Categorías</h1>
+        
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+        
+        <a class="btn btn-primary mb-3" th:href="@{/admin/categorias/crear}">Crear Nueva Categoría</a>
+
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Imagen</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="category : ${categories}">
+                        <td th:text="${category.name}">Nombre</td>
+                        <td>
+                            <img th:src="@{'/images/' + ${category.image}}" 
+                                 alt="Category Image" style="max-width: 100px;">
+                        </td>
+                        <td>
+                            <form th:action="@{/admin/categorias/eliminar/{id}(id=${category.id})}" 
+                                  method="post" style="display:inline;">
+                                <button type="submit" class="btn btn-danger btn-sm" 
+                                        onclick="return confirm('¿Estás seguro de eliminar esta categoría?')">
+                                    Eliminar
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div th:insert="~{admin/templateAdmin.html::script}"></div>
+</body>
+</html>
