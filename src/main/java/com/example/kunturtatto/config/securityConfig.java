@@ -26,7 +26,7 @@ public class securityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/admin/**").permitAll()
-                        .requestMatchers("/admin/categorias/**").permitAll()
+                        .requestMatchers("/mail/**").permitAll()
                         .requestMatchers("/KunturTattoo/**").permitAll()
                         .requestMatchers("/", "/KunturTattoo/ingresar", "/register", "/css/**", "/js/**", "/images/**").permitAll()
                         .anyRequest().authenticated())
