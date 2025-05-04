@@ -1,8 +1,10 @@
 package com.example.kunturtatto.service;
 
+import com.example.kunturtatto.request.ContactRequest;
+
 public interface IContactService {
     
-    void sendEmail( String email, String subject, String message, String tattooCm, String body, String linksReference); 
+    void sendContactEmail(ContactRequest request); 
 
     void sendMailRemainder();
 }
