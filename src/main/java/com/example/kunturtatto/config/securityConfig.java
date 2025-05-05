@@ -27,6 +27,7 @@ public class securityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/admin/**").permitAll()
                         .requestMatchers("/mail/**").permitAll()
+                        .requestMatchers("/admin/appointments/**").permitAll()
                         .requestMatchers("/KunturTattoo/**").permitAll()
                         .requestMatchers("/", "/KunturTattoo/ingresar", "/register", "/css/**", "/js/**", "/images/**").permitAll()
                         .anyRequest().authenticated())

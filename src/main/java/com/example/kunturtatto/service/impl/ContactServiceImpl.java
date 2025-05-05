@@ -1,19 +1,18 @@
 package com.example.kunturtatto.service.impl;
 
-import java.util.List;
+import java.time.format.DateTimeFormatter;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.example.kunturtatto.exception.EmailException;
 import com.example.kunturtatto.model.Appointment;
 import com.example.kunturtatto.request.ContactRequest;
-import com.example.kunturtatto.service.IAppointmentService;
 import com.example.kunturtatto.service.IContactService;
 
 import jakarta.transaction.Transactional;
@@ -29,7 +28,6 @@ public class ContactServiceImpl implements IContactService {
     private String myEmail;
 
     private final JavaMailSender javaMailSender;
-    private final IAppointmentService appointmentService;
 
     @Override
     @Transactional
@@ -54,30 +52,81 @@ public class ContactServiceImpl implements IContactService {
         }
     }
 
-    @Override
-    @Scheduled(cron = "0 0 9 * * ?")
-    public void sendMailRemainder() {
-        List<Appointment> todayAppointments = appointmentService.getTodaysAppointments();
-        if (todayAppointments.isEmpty()) {
-            return;
-        }
+    public void sendAppointmentConfirmation(Appointment appointment) {
+        String subject = "Confirmación de Cita - Kuntur Tattoo";
+        String content = """
+                Hola %s,
 
-        MimeMessagePreparator messagePreparator = mimeMessage -> {
-            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
+                Tu cita ha sido confirmada para el %s a las %s.
 
-            helper.setFrom(myEmail);
-            helper.setTo(myEmail);
-            helper.setSubject("Recordatorio de Citas del Día");
+                Diseño: %s
+                Tamaño: %s cm
+                Zona: %s
 
-            String htmlContent = buildReminderEmailHtml(todayAppointments);
-            helper.setText(htmlContent, true);
-        };
+                Por favor llega 15 minutos antes.
+
+                ¡Gracias!
+                """.formatted(
+                appointment.getCustomerName(),
+                appointment.getDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+                appointment.getTime(),
+                appointment.getDesign() != null ? appointment.getDesign().getTitle() : "Personalizado",
+                appointment.getTattooSize(),
+                appointment.getBodyPart());
+
+        sendEmail(appointment.getCustomerEmail(), subject, content);
+    }
+
+    public void sendAppointmentUpdateNotification(Appointment appointment) {
+        String subject = "Actualización de Cita - Kuntur Tattoo";
+        String content = """
+                Hola %s,
+
+                Los detalles de tu cita han sido actualizados:
+
+                Nueva fecha: %s
+                Nueva hora: %s
+                Diseño: %s
+
+                Si tienes alguna pregunta, contáctanos.
+                """.formatted(
+                appointment.getCustomerName(),
+                appointment.getDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+                appointment.getTime(),
+                appointment.getDesign() != null ? appointment.getDesign().getTitle() : "Personalizado");
+
+        sendEmail(appointment.getCustomerEmail(), subject, content);
+    }
+
+    public void sendAppointmentCancellation(Appointment appointment) {
+        String subject = "Cancelación de Cita - Kuntur Tattoo";
+        String content = """
+                Hola %s,
+
+                Tu cita programada para el %s a las %s ha sido cancelada.
+
+                Si esto fue un error o deseas reprogramar, por favor contáctanos.
+
+                ¡Lamentamos cualquier inconveniente!
+                """.formatted(
+                appointment.getCustomerName(),
+                appointment.getDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+                appointment.getTime());
+
+        sendEmail(appointment.getCustomerEmail(), subject, content);
+    }
+
+    private void sendEmail(String to, String subject, String content) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(to);
+        message.setSubject(subject);
+        message.setText(content);
 
         try {
-            javaMailSender.send(messagePreparator);
-            log.info("Recordatorio de citas enviado correctamente");
+            javaMailSender.send(message);
+            log.info("Email enviado a {}", to);
         } catch (MailException e) {
-            log.error("Error al enviar recordatorio de citas", e);
+            log.error("Error al enviar email a {}", to, e);
         }
     }
 
@@ -134,55 +183,5 @@ public class ContactServiceImpl implements IContactService {
                 request.getBody(),
                 request.getLinksReference(),
                 request.getMessage());
-    }
-
-    private String buildReminderEmailHtml(List<Appointment> appointments) {
-        StringBuilder sb = new StringBuilder("""
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <style>
-                        body { font-family: Arial, sans-serif; }
-                        .container { max-width: 600px; margin: 0 auto; }
-                        .header { color: #333; border-bottom: 1px solid #eee; }
-                        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-                        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
-                        th { background-color: #f5f5f5; }
-                    </style>
-                </head>
-                <body>
-                    <div class="container">
-                        <div class="header">
-                            <h2>Recordatorio de Citas</h2>
-                            <p>Tienes %d citas programadas para hoy:</p>
-                        </div>
-
-                        <table>
-                            <tr>
-                                <th>Hora</th>
-                                <th>Email</th>
-                                <th>Diseño</th>
-                            </tr>
-                """.formatted(appointments.size()));
-
-        appointments.forEach(appt -> sb.append("""
-                            <tr>
-                                <td>%s</td>
-                                <td>%s</td>
-                                <td>%s</td>
-                            </tr>
-                """.formatted(
-                appt.getTime(),
-                appt.getCustomerEmail(),
-                appt.getDesign() != null ? appt.getDesign() : "Sin diseño especificado")));
-
-        sb.append("""
-                        </table>
-                    </div>
-                </body>
-                </html>
-                """);
-
-        return sb.toString();
     }
 }
