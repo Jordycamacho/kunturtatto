@@ -1,25 +1,13 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
-<head th:fragment="header">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!--=============== FAVICON ===============-->
-    <link rel="shortcut icon" href="assets/img/favicon.png" type="image/x-icon">
-
-    <!--=============== REMIXICONS ===============-->
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.2.0/fonts/remixicon.css" rel="stylesheet">
-
-    <!--=============== CSS ===============-->
-    <link rel="stylesheet" th:href="@{/css/styles.css}">
-    <link rel="stylesheet" th:href="@{/css/contact.css}">
-
-    <title>KunturTattoo</title>
+<head th:insert="~{user/templateUser.html :: header}">
+    <title th:text="${pageTitle} + ' - KunturTattoo'">KunturTattoo</title>
 </head>
 
 <body>
     <div th:insert="~{user/templateUser.html::nav_user}"></div>
+
     <section class="home section" id="home">
         <img src="../images/tatto-banner.png" alt="home image" class="home__bg">
         <div class="home__shadow"></div>
@@ -29,46 +17,66 @@
                 <h3 class="home__subtitle">
                     KunturTattoo
                 </h3>
-                <h1 class="home__title">
-                    Explora <br>
-                    Nuestro diseño
+                <h1 class="home__title" th:text="${pageTitle}">
+                    Explora Nuestro diseño
                 </h1>
             </div>
 
+            <!-- Menú principal de categorías -->
             <div class="wrapper">
                 <nav>
                     <div class="items">
-                        <!-- Enlace para mostrar todos los diseños -->
-                        <a th:href="@{/KunturTattoo/diseños}" class="item" th:classappend="${selectedCategoryId == null} ? 'active' : ''">Todos</a>
-                        <!-- Itera sobre las categorías para mostrar dinámicamente -->
-                        <a th:each="category : ${categories}" 
-                           th:href="@{/KunturTattoo/diseños(categoryId=${category.id})}" 
-                           th:text="${category.name}" 
-                           class="item"
-                           th:classappend="${selectedCategoryId == category.id} ? 'active' : ''"></a>
+                        <a th:href="@{/KunturTattoo/diseños}" class="item"
+                            th:classappend="${selectedCategoryId == null} ? 'active' : ''">
+                            Todos
+                        </a>
+
+                        <a th:each="category : ${categories}"
+                            th:href="@{/KunturTattoo/diseños(categoryId=${category.id})}" th:text="${category.name}"
+                            class="item" th:classappend="${selectedCategoryId == category.id} ? 'active' : ''">
+                        </a>
                     </div>
                 </nav>
             </div>
-            <div class="space"></div>
+
+            <div th:if="${selectedCategoryId != null}" class="wrapper mt-3">
+                <nav>
+                    <div class="items">
+                        <a th:href="@{/KunturTattoo/diseños(categoryId=${selectedCategoryId})}" class="item"
+                            th:classappend="${selectedSubCategoryId == null} ? 'active' : ''">
+                            Todas
+                        </a>
+
+                        <a th:each="subcategory : ${currentSubCategories}"
+                            th:href="@{/KunturTattoo/diseños(categoryId=${selectedCategoryId}, subCategoryId=${subcategory.id})}"
+                            th:text="${subcategory.name}" class="item"
+                            th:classappend="${selectedSubCategoryId == subcategory.id} ? 'active' : ''">
+                        </a>
+                    </div>
+                </nav>
+            </div>
         </div>
     </section>
 
-    <!-- Filter images -->
+    <!-- Gallery -->
     <div class="gallery">
-        <!-- Itera sobre los diseños y muestra las imágenes correspondientes -->
+        <div th:if="${designs.empty}">
+            <div class="alert alert-info text-center">
+                No se encontraron diseños para esta categoría.
+            </div>
+        </div>
+
         <div class="image" th:each="design : ${designs}">
-            <span>
-                <img th:src="@{/images/{imageName}(imageName=${design.image})}" th:alt="${design.title}" class="design-image">
-            </span>
+            <a th:href="@{/KunturTattoo/diseno/{id}(id=${design.id})}">
+                <span>
+                    <img th:src="@{/images/{imageName}(imageName=${design.image})}" th:alt="${design.title}"
+                        class="design-image">
+                </span>
+            </a>
         </div>
     </div>
 
-    <div class="spacefooter"></div>
-    <div class="space"></div>
-    <div class="spacefooter"></div>
-
     <div th:insert="~{user/templateUser.html::footer}"></div>
-
     <div th:insert="~{user/templateUser.html::script}"></div>
 </body>
 

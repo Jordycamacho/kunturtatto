@@ -47,13 +47,14 @@
                 </div>
 
                 <div class="home__cards grid">
-                    <!-- Itera sobre las categorías -->
-                    <div th:each="category : ${categories}">
-                        <article class="home__card">
-                            <img th:src="@{'/images/' + ${category.image}}" alt="home image" class="home__card-img">
-                            <h3 class="home__card-title" th:text="${category.name}">Categoría</h3>
-                            <div class="home__card-shadow"></div>
-                        </article>
+                    <div th:each="subcategory : ${tattooSubcategories}">
+                        <a th:href="@{/KunturTattoo/diseños(subCategoryId=${subcategory.id})}" class="home__card-link">
+                            <article class="home__card">
+                                <img th:src="@{'/images/' + ${subcategory.image}}" alt="subcategory image" class="home__card-img">
+                                <h3 class="home__card-title" th:text="${subcategory.name}">Subcategoría</h3>
+                                <div class="home__card-shadow"></div>
+                            </article>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -91,42 +92,19 @@
             <h2 class="section__title">
                 Diseños Propios
             </h2>
-
+        
             <div class="popular__container container grid">
-                <article class="popular__card">
-                    <div class="popular__image">
-                        <img src="./images/desings-tribal.jpg" alt="pupularv image" class="popular__img">
-                        <div class="popular__shadow"></div>
-                    </div>
-
-                    <h2 class="popular__title">
-                        Diseños tribal
-                    </h2>
-
-                </article>
-
-                <article class="popular__card">
-                    <div class="popular__image">
-                        <img src="./images/desings-realista.jpg" alt="pupularv image" class="popular__img">
-                        <div class="popular__shadow"></div>
-                    </div>
-
-                    <h2 class="popular__title">
-                        Diseños Realistas
-                    </h2>
-
-                </article>
-
-                <article class="popular__card">
-                    <div class="popular__image">
-                        <img src="./images/desings-oldschool.jpg" alt="pupularv image" class="popular__img">
-                        <div class="popular__shadow"></div>
-                    </div>
-
-                    <h2 class="popular__title">
-                        Diseños Old School
-                    </h2>
-                </article>
+                <div th:each="subcategory : ${designSubcategories}">
+                    <a th:href="@{/KunturTattoo/diseños(subCategoryId=${subcategory.id})}" class="popular__card-link">
+                        <article class="popular__card">
+                            <div class="popular__image">
+                                <img th:src="@{'/images/' + ${subcategory.image}}" alt="subcategory image" class="popular__img">
+                                <div class="popular__shadow"></div>
+                            </div>
+                            <h2 class="popular__title" th:text="${subcategory.name}">Nombre Subcategoría</h2>
+                        </article>
+                    </a>
+                </div>
             </div>
         </section>
 
