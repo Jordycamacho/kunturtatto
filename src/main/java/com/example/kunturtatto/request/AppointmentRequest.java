@@ -1,25 +1,14 @@
-package com.example.kunturtatto.model;
+package com.example.kunturtatto.request;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.validator.constraints.URL;
 
-import com.example.kunturtatto.model.enums.AppointmentStatus;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -27,24 +16,18 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity
-@Table(name = "appointments")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Appointment {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+public class AppointmentRequest {
     @NotBlank
     private String customerName;
     
     @NotBlank @Email
     private String customerEmail;
     
-    @NotBlank
+    @NotBlank @Pattern(regexp = "^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\\s\\./0-9]*$")
     private String customerPhone;
     
     @NotNull @FutureOrPresent
@@ -56,11 +39,7 @@ public class Appointment {
     @NotNull @Positive
     private Double price;
     
-    @Enumerated(EnumType.STRING)
-    private AppointmentStatus status;
-    
-    @ManyToOne
-    private Design design;
+    private Long designId;
     
     @Positive
     private Double tattooSize;
@@ -68,14 +47,9 @@ public class Appointment {
     @NotBlank
     private String bodyPart;
     
+    @URL
     private String referenceLinks;
     
     @Size(max = 1000)
     private String customDescription;
-    
-    @CreationTimestamp
-    private LocalDateTime createdAt;
-    
-    @UpdateTimestamp
-    private LocalDateTime updatedAt;
 }
