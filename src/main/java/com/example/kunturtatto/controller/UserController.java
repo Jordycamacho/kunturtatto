@@ -13,8 +13,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.kunturtatto.dto.CategoryDto;
+import com.example.kunturtatto.dto.DesignDto;
+import com.example.kunturtatto.dto.SubCategoryDto;
 import com.example.kunturtatto.model.User;
 import com.example.kunturtatto.service.CategoryService;
+import com.example.kunturtatto.service.DesignService;
+import com.example.kunturtatto.service.SubCategoryService;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -26,7 +30,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 public class UserController {
 
     @Autowired
-    private  CategoryService categoryService;
+    private CategoryService categoryService;
+    @Autowired
+    private SubCategoryService subCategoryService;
+    @Autowired
+    private DesignService designService;
 
     @ModelAttribute("categories")
     public List<CategoryDto> categories() {
@@ -35,11 +43,19 @@ public class UserController {
 
     @GetMapping("")
     public String home(Model model) {
+
+        List<SubCategoryDto> tattooSubcategories = subCategoryService.getSubCategoriesByCategory(1L);
+        List<SubCategoryDto> tattooCategories = subCategoryService.getSubCategoriesByCategory(2L);
+
+        model.addAttribute("tattooSubcategories", tattooSubcategories);
+        model.addAttribute("designSubcategories", tattooCategories);
+
         return "user/index";
     }
 
     @GetMapping("/ingresar")
     public String showLogin(Model model) {
+
         return "user/login";
     }
 
@@ -49,9 +65,41 @@ public class UserController {
     }
 
     @GetMapping("/diseños")
-    public String showDesigns(@RequestParam(required = false) Long categoryId, Model model) {
+    public String showDesigns(@RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) Long subCategoryId,
+            Model model) {
 
-        model.addAttribute("selectedCategoryId", categoryId);
+        List<DesignDto> designs;
+        Long effectiveCategoryId = categoryId;
+
+        if (subCategoryId != null && categoryId == null) {
+            SubCategoryDto subCategory = subCategoryService.getSubCategoryById(subCategoryId);
+            effectiveCategoryId = subCategory.getCategoryId();
+        }
+
+        if (subCategoryId != null) {
+            designs = designService.getDesignsBySubCategory(subCategoryId);
+            SubCategoryDto subCategory = subCategoryService.getSubCategoryById(subCategoryId);
+            model.addAttribute("pageTitle", subCategory.getName());
+        } else if (effectiveCategoryId != null) {
+            designs = designService.getDesignsByCategory(effectiveCategoryId);
+            CategoryDto category = categoryService.getCategoryById(effectiveCategoryId);
+            model.addAttribute("pageTitle", category.getName());
+        } else {
+            designs = designService.getAllDesigns();
+            model.addAttribute("pageTitle", "Todos los diseños");
+        }
+
+        model.addAttribute("selectedCategoryId", effectiveCategoryId);
+        model.addAttribute("selectedSubCategoryId", subCategoryId);
+        model.addAttribute("designs", designs);
+        model.addAttribute("categories", categoryService.getAllCategories());
+
+        // Agregar subcategorías de la categoría seleccionada
+        if (effectiveCategoryId != null) {
+            model.addAttribute("currentSubCategories",
+                    subCategoryService.getSubCategoriesByCategory(effectiveCategoryId));
+        }
 
         return "user/designs";
     }
@@ -95,5 +143,4 @@ public class UserController {
         return "redirect:/KunturTattoo/ingresar";
     }
 
-    
 }
