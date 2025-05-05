@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:insert="~{admin/templateAdmin.html::header}">
+    <title>Gestión de Citas</title>
+    <style>
+        .badge {
+            font-size: 0.9em;
+            padding: 0.35em 0.65em;
+        }
+    </style>
+</head>
+<body>
+    <div th:insert="~{admin/templateAdmin.html::nav_user}"></div>
+    <div th:insert="~{admin/templateAdmin.html::nav_admin}"></div>
+
+    <div class="container mt-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="mb-0">Gestión de Citas</h1>
+            <div>
+                <a th:href="@{/admin/appointments/calendar}" class="btn btn-outline-primary me-2">
+                    <i class="fas fa-calendar-alt"></i> Vista Calendario
+                </a>
+                <a th:href="@{/admin/appointments/create}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Nueva Cita
+                </a>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Hora</th>
+                                <th>Cliente</th>
+                                <th>Contacto</th>
+                                <th>Diseño</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="appointment : ${appointments}">
+                                <td th:text="${#temporals.format(appointment.date, 'dd/MM/yyyy')}"></td>
+                                <td th:text="${appointment.time}"></td>
+                                <td th:text="${appointment.customerName}"></td>
+                                <td>
+                                    <span th:text="${appointment.customerEmail}"></span><br>
+                                    <small th:text="${appointment.customerPhone}"></small>
+                                </td>
+                                <td>
+                                    <span th:text="${appointment.designTitle ?: 'Personalizado'}"></span>
+                                    <small class="d-block" th:if="${appointment.tattooSize != null}">
+                                        (<span th:text="${#numbers.formatDecimal(appointment.tattooSize, 1, 2)}"></span> cm)
+                                    </small>
+                                </td>
+                                <td>
+                                    <span th:text="${appointment.status}" class="badge text-dark"></span>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a th:href="@{/admin/appointments/{id}(id=${appointment.id})}" 
+                                           class="btn btn-info" title="Ver detalles">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a th:href="@{/admin/appointments/{id}/edit(id=${appointment.id})}" 
+                                           class="btn btn-warning" title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <form th:action="@{/admin/appointments/{id}/cancel(id=${appointment.id})}" 
+                                              method="post" class="d-inline">
+                                            <button type="submit" class="btn btn-danger" title="Cancelar"
+                                                    th:disabled="${appointment.status == 'CANCELLED'}">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:insert="~{admin/templateAdmin.html::script}"></div>
+</body>
+</html>

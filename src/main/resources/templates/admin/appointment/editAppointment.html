@@ -1,77 +1,105 @@
 <!DOCTYPE html>
-<html lang="en">
-<head th:insert="~{admin/templateAdmin.html::header}"></head>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:insert="~{admin/templateAdmin.html::header}">
+    <title>Editar Cita</title>
+</head>
 <body>
     <div th:insert="~{admin/templateAdmin.html::nav_user}"></div>
     <div th:insert="~{admin/templateAdmin.html::nav_admin}"></div>
 
-    <div class="container mt-5">
-        <h1 class="text-center">Editar Cita</h1>
+    <div class="container mt-4">
+        <h1 class="mb-4">Editar Cita</h1>
 
-        <form th:action="@{/admin/citas/editar/guardar/{id}(id=${appointment.idAppointment})}" method="post" class="mt-4">
-            <!-- Campo oculto para ID -->
-            <input type="hidden" name="id" th:value="${appointment.idAppointment}" />
-
-            <h3>Datos Usuario</h3>
-            <div class="form-group">
-                <label for="customerEmail">Correo del Cliente:</label>
-                <input type="email" class="form-control" id="customerEmail" name="customerEmail" th:value="${appointment.customerEmail}" />
-            </div>
-            <br>
-            <h3>Datos de la cita</h3>
-            <div class="form-group">
-                <label for="date">Fecha:</label>
-                <input type="date" class="form-control" id="date" name="date" th:value="${#dates.format(appointment.date, 'yyyy-MM-dd')}" required />
-            </div>
-            <br>
-            <div class="form-group">
-                <label for="time">Hora:</label>
-                <input type="time" class="form-control" id="time" name="time" th:value="${appointment.time}" required />
-            </div>
-            <br>
-            <div class="form-group">
-                <label for="price">Precio acordado:</label>
-                <input type="text" class="form-control" id="price" name="price" th:value="${appointment.price}" />
-            </div>
-            <br>
-            <h3>Datos Diseño</h3>
-
-            <div class="form-group">
-                <label for="design">Diseño (opcional):</label>
-                <select id="design" class="form-control" name="design">
-                    <option value="" th:selected="${appointment.design == null}">Seleccionar</option>
-                    <option th:each="design : ${designs}" th:value="${design.title}" th:text="${design.title}" th:selected="${design.title == appointment.design}"></option>
-                </select>
-            </div>
-            <br>
+        <form th:action="@{/admin/appointments/{id}/edit(id=${appointmentRequest.id})}" 
+              th:object="${appointmentRequest}" method="post">
             
-            <div class="form-group">
-                <label for="tattooSize">Tamaño del Tatuaje:</label>
-                <input type="text" class="form-control" id="tattooSize" name="tattooCm" th:value="${appointment.tattooCm}" required/>
+            <!-- Datos del Cliente -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Datos del Cliente</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Nombre Completo</label>
+                            <input type="text" class="form-control" th:field="*{customerName}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Correo Electrónico</label>
+                            <input type="email" class="form-control" th:field="*{customerEmail}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Teléfono</label>
+                            <input type="tel" class="form-control" th:field="*{customerPhone}" required>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <br>
-            <div class="col-md-12 py-3 py-md-0">
-                <select class="form-control" name="body" required>
-                    <option value="" disabled selected>Selecciona la zona del cuerpo*</option>
-                    <option value="Brazo" th:selected="${appointment.body == 'Brazo'}">Brazo</option>
-                    <option value="Pierna" th:selected="${appointment.body == 'Pierna'}">Pierna</option>
-                    <option value="Espalda" th:selected="${appointment.body == 'Espalda'}">Espalda</option>
-                    <option value="Pecho" th:selected="${appointment.body == 'Pecho'}">Pecho</option>
-                    <option value="Otro" th:selected="${appointment.body == 'Otro'}">Otro</option>
-                </select>
+
+            <!-- Detalles de la Cita -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Detalles de la Cita</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Fecha</label>
+                            <input type="date" class="form-control" th:field="*{date}" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Hora</label>
+                            <input type="time" class="form-control" th:field="*{time}" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Precio ($)</label>
+                            <input type="number" step="0.01" class="form-control" th:field="*{price}" required>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <br>
-            <div class="form-group">
-                <label for="linkReference">Links de referencia (opcional):</label>
-                <input type="text" class="form-control" id="linkReference" name="linkReference" th:value="${appointment.linkReference}" />
+
+            <!-- Detalles del Tatuaje -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Detalles del Tatuaje</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Tamaño (cm)</label>
+                            <input type="number" step="0.1" class="form-control" th:field="*{tattooSize}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Parte del Cuerpo</label>
+                            <select class="form-select" th:field="*{bodyPart}" required>
+                                <option value="Brazo">Brazo</option>
+                                <option value="Pierna">Pierna</option>
+                                <option value="Espalda">Espalda</option>
+                                <option value="Pecho">Pecho</option>
+                                <option value="Otro">Otro</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Enlaces de Referencia</label>
+                            <input type="url" class="form-control" th:field="*{referenceLinks}">
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label class="form-label">Descripción Adicional</label>
+                            <textarea class="form-control" th:field="*{customDescription}" rows="4"></textarea>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <br>
-            <div class="form-group">
-                <label for="customDesignDescription">Descripción del Diseño Personalizado:</label>
-                <textarea id="customDesignDescription" class="form-control" name="message" rows="3" th:text="${appointment.message}"></textarea>
+
+            <div class="d-flex justify-content-between">
+                <a th:href="@{/admin/appointments}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancelar
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Guardar Cambios
+                </button>
             </div>
-            <br>
-            <button type="submit" class="btn btn-primary btn-block">Actualizar Cita</button>
         </form>
     </div>
 
