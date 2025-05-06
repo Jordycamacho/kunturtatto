@@ -69,9 +69,40 @@
         <div class="image" th:each="design : ${designs}"
             th:attr="onclick=|showModal('@{/images/{imageName}(imageName=${design.image})}')|">
             <span>
-                <img th:src="@{/images/{imageName}(imageName=${design.image})}" th:alt="${design.title}" class="design-image">
+                <img th:src="@{/images/{imageName}(imageName=${design.image})}" th:alt="${design.title}"
+                    class="design-image">
             </span>
         </div>
+    </div>
+
+    <!-- Paginación -->
+    <div th:if="${totalPages > 1}" class="pagination">
+        <a th:if="${currentPage > 0}"
+            th:href="@{/KunturTattoo/diseños(categoryId=${selectedCategoryId}, subCategoryId=${selectedSubCategoryId}, page=0, size=${pageSize})}">
+            &laquo; Primera
+        </a>
+
+        <a th:if="${currentPage > 0}"
+            th:href="@{/KunturTattoo/diseños(categoryId=${selectedCategoryId}, subCategoryId=${selectedSubCategoryId}, page=${currentPage - 1}, size=${pageSize})}">
+            &lsaquo; Anterior
+        </a>
+
+        <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+            <a th:if="${i == currentPage}" class="active" th:text="${i + 1}"></a>
+            <a th:unless="${i == currentPage}"
+                th:href="@{/KunturTattoo/diseños(categoryId=${selectedCategoryId}, subCategoryId=${selectedSubCategoryId}, page=${i}, size=${pageSize})}"
+                th:text="${i + 1}"></a>
+        </span>
+
+        <a th:if="${currentPage < totalPages - 1}"
+            th:href="@{/KunturTattoo/diseños(categoryId=${selectedCategoryId}, subCategoryId=${selectedSubCategoryId}, page=${currentPage + 1}, size=${pageSize})}">
+            Siguiente &rsaquo;
+        </a>
+
+        <a th:if="${currentPage < totalPages - 1}"
+            th:href="@{/KunturTattoo/diseños(categoryId=${selectedCategoryId}, subCategoryId=${selectedSubCategoryId}, page=${totalPages - 1}, size=${pageSize})}">
+            Última &raquo;
+        </a>
     </div>
 
     <div id="imageModal" class="modal-overlay">
