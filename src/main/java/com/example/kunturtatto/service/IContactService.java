@@ -5,8 +5,9 @@ import com.example.kunturtatto.request.ContactRequest;
 
 public interface IContactService {
     
-    void sendContactEmail(ContactRequest request); 
     void sendAppointmentUpdateNotification(Appointment updatedAppointment);
     void sendAppointmentConfirmation(Appointment appointment);
     void sendAppointmentCancellation(Appointment appointment);
+    void sendAppointmentCompletion(Appointment appointment);
+    void sendContactEmail(ContactRequest request); 
 }
