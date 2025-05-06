@@ -1049,21 +1049,21 @@ button[type="submit"] {
 
 
 /*============Gallery============*/
-
 .gallery {
   display: flex;
   flex-wrap: wrap;
   margin-top: 30px;
-  gap: 15px; /* Reemplaza el padding de los items */
-  justify-content: center; /* Centra las tarjetas */
+  margin-bottom: 100px;
+  gap: 15px;
+  justify-content: center;
 }
 
 .gallery .image {
-  width: calc(25% - 15px); /* 4 columnas con gap incluido */
-  aspect-ratio: 1/1; /* Mantiene relación cuadrada */
+  width: calc(25% - 15px);
+  aspect-ratio: 1/1;
   overflow: hidden;
   border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
   position: relative;
 }
@@ -1077,12 +1077,12 @@ button[type="submit"] {
 .gallery .image img {
   width: 100%;
   height: 100%;
-  object-fit: cover; /* Asegura que la imagen cubra el espacio manteniendo proporciones */
+  object-fit: cover;
   transition: transform 0.5s ease;
 }
 
 .gallery .image:hover {
-  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
 .gallery .image:hover img {
@@ -1096,27 +1096,62 @@ button[type="submit"] {
 .gallery .image.wide img {
   object-position: center center;
 }
-/* Responsive */
+
+/* Estilos para el modal */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.9);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  max-width: 90%;
+  max-height: 90%;
+}
+
+.modal-content img {
+  width: 100%;
+  height: auto;
+  max-height: 80vh;
+  object-fit: contain;
+}
+
+.close-modal {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  color: white;
+  font-size: 40px;
+  cursor: pointer;
+}
+
 @media (max-width: 1200px) {
   .gallery .image {
-    width: calc(33.333% - 15px); /* 3 columnas */
+    width: calc(33.333% - 15px);
   }
 }
 
 @media (max-width: 768px) {
   .gallery .image {
-    width: calc(50% - 15px); /* 2 columnas */
+    width: calc(50% - 15px);
   }
 }
 
 @media (max-width: 480px) {
   .gallery .image {
-    width: 100%; /* 1 columna */
-    max-width: 350px; /* Limita el ancho máximo */
-    margin: 0 auto 15px; /* Centrado con margen inferior */
+    width: 100%;
+    max-width: 350px;
+    margin: 0 auto 15px;
   }
-  
+
   .gallery {
-    gap: 15px 0; /* Gap vertical solamente */
+    gap: 15px 0;
   }
 }

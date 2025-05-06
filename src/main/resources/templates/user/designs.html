@@ -66,17 +66,52 @@
             </div>
         </div>
 
-        <div class="image" th:each="design : ${designs}">
-            <a th:href="@{/KunturTattoo/diseno/{id}(id=${design.id})}">
-                <span>
-                    <img th:src="@{/images/{imageName}(imageName=${design.image})}" th:alt="${design.title}"
-                        class="design-image">
-                </span>
-            </a>
+        <div class="image" th:each="design : ${designs}"
+            th:attr="onclick=|showModal('@{/images/{imageName}(imageName=${design.image})}')|">
+            <span>
+                <img th:src="@{/images/{imageName}(imageName=${design.image})}" th:alt="${design.title}" class="design-image">
+            </span>
+        </div>
+    </div>
+
+    <div id="imageModal" class="modal-overlay">
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <div class="modal-content">
+            <img id="expandedImage" src="" alt="Imagen ampliada">
         </div>
     </div>
 
     <div th:insert="~{user/templateUser.html::footer}"></div>
+    <script th:inline="javascript">
+        function showModal(imageUrl) {
+            const modal = document.getElementById('imageModal');
+            const expandedImg = document.getElementById('expandedImage');
+
+            expandedImg.src = imageUrl;
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden'; // Evitar scroll
+        }
+
+        function closeModal() {
+            document.getElementById('imageModal').style.display = 'none';
+            document.body.style.overflow = 'auto'; // Restaurar scroll
+        }
+
+        // Cerrar modal al hacer clic fuera de la imagen
+        window.onclick = function (event) {
+            const modal = document.getElementById('imageModal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+
+        // Cerrar con tecla ESC
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
     <div th:insert="~{user/templateUser.html::script}"></div>
 </body>
 
