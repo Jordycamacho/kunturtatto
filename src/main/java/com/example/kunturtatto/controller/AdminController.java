@@ -11,6 +11,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.kunturtatto.dto.CategoryDto;
 import com.example.kunturtatto.dto.DesignDto;
+import com.example.kunturtatto.dto.UserDto;
 import com.example.kunturtatto.exception.ResourceNotFoundException;
 import com.example.kunturtatto.request.CategoryRequest;
 import com.example.kunturtatto.request.DesignRequest;
@@ -18,6 +19,7 @@ import com.example.kunturtatto.request.SubCategoryRequest;
 import com.example.kunturtatto.service.CategoryService;
 import com.example.kunturtatto.service.DesignService;
 import com.example.kunturtatto.service.SubCategoryService;
+import com.example.kunturtatto.service.UserService;
 
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -35,6 +37,7 @@ public class AdminController {
     private final SubCategoryService subCategoryService;
     private final CategoryService categoryService;
     private final DesignService designService;
+    private final UserService userService;
 
     @ModelAttribute("categories")
     public List<CategoryDto> categories() {
@@ -189,106 +192,10 @@ public class AdminController {
     @GetMapping("/usuarios")
     public String showUsers(Model model) {
 
+        List<UserDto> user = userService.getAllUsers();
+        model.addAttribute("users", user);
+
         return "/admin/users/showUser";
     }
 
-    @PostMapping("/usuarios/eliminar/{id}")
-    public String deleteUser(@PathVariable Long id, RedirectAttributes redirectAttributes) {
-
-        return "redirect:/usuarios";
-    }
-
-    /* Administracion citas *//*
-                               * @GetMapping("/citas")
-                               * 
-                               * @PreAuthorize("hasAuthority('CREATE')")
-                               * public String showAppointments(Model model) {
-                               * 
-                               * List<Appointment> appointments = appointmentService.findAll().stream()
-                               * .sorted((a1, a2) -> {
-                               * int dateCompare = a1.getDate().compareTo(a2.getDate());
-                               * if (dateCompare == 0) {
-                               * return a1.getTime().compareTo(a2.getTime());
-                               * }
-                               * return dateCompare;
-                               * })
-                               * .collect(Collectors.toList());
-                               * 
-                               * model.addAttribute("appointments", appointments);
-                               * 
-                               * return "/admin/appointment/showAppointment";
-                               * }
-                               * 
-                               * @GetMapping("/crear-citas")
-                               * 
-                               * @PreAuthorize("hasAuthority('CREATE')")
-                               * public String createAppointments(Model model) {
-                               * List<CategoryDesign> categoryDesigns = categoryDesignService.findAll();
-                               * List<Design> designs = designService.findAll();
-                               * 
-                               * model.addAttribute("designs", designs);
-                               * model.addAttribute("categories", categoryDesigns);
-                               * 
-                               * return "/admin/appointment/createAppointment";
-                               * }
-                               * 
-                               * @GetMapping("/citas/editar/{id}")
-                               * 
-                               * @PreAuthorize("hasAuthority('UPDATE')")
-                               * public String editAppointmentForm(@PathVariable Long id, Model model) {
-                               * List<CategoryDesign> categoryDesigns = categoryDesignService.findAll();
-                               * model.addAttribute("categories", categoryDesigns);
-                               * 
-                               * List<Design> designs = designService.findAll();
-                               * model.addAttribute("design", designs);
-                               * Appointment appointment = appointmentService.findById(id);
-                               * model.addAttribute("appointment", appointment);
-                               * 
-                               * return "/admin/appointment/editAppointment";
-                               * }
-                               * 
-                               * @GetMapping("/citas/verDetalles/{id}")
-                               * 
-                               * @PreAuthorize("hasAuthority('CREATE')")
-                               * public String showAppointmentDetails(@PathVariable Long id, Model model) {
-                               * List<CategoryDesign> categoryDesigns = categoryDesignService.findAll();
-                               * model.addAttribute("categories", categoryDesigns);
-                               * 
-                               * Appointment appointment = appointmentService.findById(id);
-                               * model.addAttribute("appointment", appointment);
-                               * return "/admin/appointment/showAppointmentDetails";
-                               * }
-                               * 
-                               * @PostMapping("/crear-citas/crear")
-                               * 
-                               * @PreAuthorize("hasAuthority('CREATE')")
-                               * public String createAppointment(Appointment appointment) {
-                               * appointmentService.save(appointment);
-                               * return "redirect:/admin/citas";
-                               * }
-                               * 
-                               * @PostMapping("/citas/editar/guardar/{id}")
-                               * 
-                               * @PreAuthorize("hasAuthority('UPDATE')")
-                               * public String editAppointment(@PathVariable Long id, @ModelAttribute
-                               * Appointment appointment,
-                               * RedirectAttributes redirectAttributes) {
-                               * appointment.setIdAppointment(id);
-                               * appointmentService.save(appointment);
-                               * redirectAttributes.addFlashAttribute("message",
-                               * "Cita actualizada exitosamente.");
-                               * return "redirect:/admin/citas";
-                               * }
-                               * 
-                               * @PostMapping("/citas/eliminar/{id}")
-                               * 
-                               * @PreAuthorize("hasAuthority('DELETE')")
-                               * public String deleteAppointment(@PathVariable Long id, RedirectAttributes
-                               * redirectAttributes) {
-                               * appointmentService.deleteById(id);
-                               * redirectAttributes.addFlashAttribute("message",
-                               * "Cita eliminada exitosamente.");
-                               * return "redirect:/admin/citas";
-                               * }
-                               */
 }

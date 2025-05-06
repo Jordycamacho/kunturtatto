@@ -59,7 +59,8 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     @Override
-    public AppointmentResponse updateAppointment(Long id, AppointmentRequest request) throws InvalidAppointmentTimeException {
+    public AppointmentResponse updateAppointment(Long id, AppointmentRequest request)
+            throws InvalidAppointmentTimeException {
         log.info("Updating appointment with ID: {}", id);
 
         Appointment appointment = appointmentRepository.findById(id)
@@ -96,6 +97,19 @@ public class AppointmentServiceImpl implements AppointmentService {
                     log.error("Appointment not found with ID: {}", id);
                     return new ResourceNotFoundException("Appointment not found");
                 });
+    }
+
+    @Override
+    public void deleteAppointment(Long id) {
+        log.info("Deleting appointment with ID: {}", id);
+        Appointment appointment = appointmentRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.error("Appointment not found with ID: {}", id);
+                    return new ResourceNotFoundException("Appointment not found");
+                });
+
+        appointmentRepository.delete(appointment);
+        log.debug("Appointment deleted with ID: {}", id);
     }
 
     @Override
@@ -164,6 +178,40 @@ public class AppointmentServiceImpl implements AppointmentService {
         appointmentRepository.save(appointment);
     }
 
+    @Override
+    public AppointmentResponse changeAppointmentStatus(Long id, AppointmentStatus newStatus) {
+        log.info("Changing status of appointment ID: {} to {}", id, newStatus);
+
+        Appointment appointment = appointmentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Appointment not found"));
+
+        if (appointment.getStatus() == AppointmentStatus.COMPLETED && newStatus != AppointmentStatus.COMPLETED) {
+            throw new IllegalStateException("No se puede modificar una cita completada");
+        }
+
+        appointment.setStatus(newStatus);
+        Appointment updatedAppointment = appointmentRepository.save(appointment);
+
+        switch (newStatus) {
+            case CONFIRMED:
+                contactService.sendAppointmentConfirmation(updatedAppointment);
+                break;
+            case CANCELLED:
+                contactService.sendAppointmentCancellation(updatedAppointment);
+                break;
+            case COMPLETED:
+                contactService.sendAppointmentCompletion(updatedAppointment);
+                break;
+            case PENDING:
+                contactService.sendAppointmentUpdateNotification(updatedAppointment);
+                break;
+            default:
+                break;
+        }
+
+        return appointmentMapper.toResponse(updatedAppointment);
+    }
+
     private void validateAppointmentTime(LocalDate date, String time) throws InvalidAppointmentTimeException {
         if (date.isEqual(LocalDate.now())) {
             LocalTime appointmentTime = LocalTime.parse(time);
@@ -172,7 +220,7 @@ public class AppointmentServiceImpl implements AppointmentService {
                 throw new InvalidAppointmentTimeException(" is not a valid appointment time");
             }
         }
-        
+
         LocalTime appointmentTime = LocalTime.parse(time);
         if (appointmentTime.isBefore(LocalTime.of(9, 0))) {
             throw new InvalidAppointmentTimeException("Appointments cannot be before 9:00 AM");
@@ -180,5 +228,5 @@ public class AppointmentServiceImpl implements AppointmentService {
         if (appointmentTime.isAfter(LocalTime.of(18, 0))) {
             throw new InvalidAppointmentTimeException("Appointments cannot be after 6:00 PM");
         }
-    } 
+    }
 }

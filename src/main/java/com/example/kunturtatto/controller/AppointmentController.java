@@ -7,8 +7,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.example.kunturtatto.model.enums.AppointmentStatus;
 import com.example.kunturtatto.request.AppointmentRequest;
 import com.example.kunturtatto.service.AppointmentService;
 import com.example.kunturtatto.service.CategoryService;
@@ -66,13 +68,13 @@ public class AppointmentController {
             BindingResult bindingResult,
             RedirectAttributes redirectAttributes,
             Model model) {
-        
+
         if (bindingResult.hasErrors()) {
             model.addAttribute("designs", designService.getAllDesigns());
             model.addAttribute("categories", categoryService.getAllCategories());
             return "admin/appointments/create";
         }
-        
+
         try {
             appointmentService.createAppointment(request);
             redirectAttributes.addFlashAttribute("success", "Cita creada exitosamente");
@@ -80,7 +82,7 @@ public class AppointmentController {
             redirectAttributes.addFlashAttribute("error", "Error al crear cita: " + e.getMessage());
             return "redirect:/admin/appointments/create";
         }
-        
+
         return "redirect:/admin/appointments";
     }
 
@@ -91,13 +93,13 @@ public class AppointmentController {
             BindingResult bindingResult,
             RedirectAttributes redirectAttributes,
             Model model) {
-        
+
         if (bindingResult.hasErrors()) {
             model.addAttribute("designs", designService.getAllDesigns());
             model.addAttribute("categories", categoryService.getAllCategories());
             return "admin/appointments/edit";
         }
-        
+
         try {
             appointmentService.updateAppointment(id, request);
             redirectAttributes.addFlashAttribute("success", "Cita actualizada exitosamente");
@@ -105,8 +107,23 @@ public class AppointmentController {
             redirectAttributes.addFlashAttribute("error", "Error al actualizar cita: " + e.getMessage());
             return "redirect:/admin/appointments/" + id + "/edit";
         }
-        
+
         return "redirect:/admin/appointments/" + id;
+    }
+
+    @PostMapping("/{id}/delete")
+    public String deleteAppointment(
+            @PathVariable Long id,
+            RedirectAttributes redirectAttributes) {
+
+        try {
+            appointmentService.deleteAppointment(id);
+            redirectAttributes.addFlashAttribute("success", "Cita eliminada exitosamente");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Error al eliminar cita: " + e.getMessage());
+        }
+
+        return "redirect:/admin/appointments";
     }
 
     @PostMapping("/{id}/cancel")
@@ -142,4 +159,19 @@ public class AppointmentController {
         return "redirect:/admin/appointments/" + id;
     }
 
+    @PostMapping("/{id}/status")
+    public String changeStatus(
+            @PathVariable Long id,
+            @RequestParam AppointmentStatus status,
+            RedirectAttributes redirectAttributes) {
+
+        try {
+            appointmentService.changeAppointmentStatus(id, status);
+            redirectAttributes.addFlashAttribute("success", "Estado de cita actualizado exitosamente");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Error al actualizar estado: " + e.getMessage());
+        }
+
+        return "redirect:/admin/appointments/" + id;
+    }
 }
