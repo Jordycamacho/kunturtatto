@@ -21,7 +21,7 @@
                     <td th:text="${user.email}">Email del Usuario</td>
                     <td th:text="${#dates.format(user.registrationDate, 'yyyy-MM-dd HH:mm:ss')}">Fecha de Registro</td>
                     <td>
-                        <form th:action="@{'/admin/usuarios/eliminar/' + ${user.idUser}}" method="post" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este usuario?');">
+                        <form th:action="@{'/admin/usuarios/eliminar/' + ${user.id}}" method="post" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este usuario?');">
                             <button type="submit" class="btn btn-danger">Eliminar</button>
                         </form>
                     </td>
