@@ -5,6 +5,10 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -67,9 +71,11 @@ public class UserController {
     @GetMapping("/diseños")
     public String showDesigns(@RequestParam(required = false) Long categoryId,
             @RequestParam(required = false) Long subCategoryId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "7") int size,
             Model model) {
 
-        List<DesignDto> designs;
+        Page<DesignDto> designsPage;
         Long effectiveCategoryId = categoryId;
 
         if (subCategoryId != null && categoryId == null) {
@@ -77,25 +83,30 @@ public class UserController {
             effectiveCategoryId = subCategory.getCategoryId();
         }
 
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
+
         if (subCategoryId != null) {
-            designs = designService.getDesignsBySubCategory(subCategoryId);
+            designsPage = designService.getDesignsBySubCategory(subCategoryId, pageable);
             SubCategoryDto subCategory = subCategoryService.getSubCategoryById(subCategoryId);
             model.addAttribute("pageTitle", subCategory.getName());
         } else if (effectiveCategoryId != null) {
-            designs = designService.getDesignsByCategory(effectiveCategoryId);
+            designsPage = designService.getDesignsByCategory(effectiveCategoryId, pageable);
             CategoryDto category = categoryService.getCategoryById(effectiveCategoryId);
             model.addAttribute("pageTitle", category.getName());
         } else {
-            designs = designService.getAllDesigns();
+            designsPage = designService.getAllDesignspPageable(pageable);
             model.addAttribute("pageTitle", "Todos los diseños");
         }
 
+        model.addAttribute("designs", designsPage.getContent());
+        model.addAttribute("currentPage", designsPage.getNumber());
+        model.addAttribute("totalPages", designsPage.getTotalPages());
+        model.addAttribute("totalItems", designsPage.getTotalElements());
+        model.addAttribute("pageSize", size);
         model.addAttribute("selectedCategoryId", effectiveCategoryId);
         model.addAttribute("selectedSubCategoryId", subCategoryId);
-        model.addAttribute("designs", designs);
         model.addAttribute("categories", categoryService.getAllCategories());
 
-        // Agregar subcategorías de la categoría seleccionada
         if (effectiveCategoryId != null) {
             model.addAttribute("currentSubCategories",
                     subCategoryService.getSubCategoriesByCategory(effectiveCategoryId));

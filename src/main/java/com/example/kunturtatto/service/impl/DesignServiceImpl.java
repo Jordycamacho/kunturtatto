@@ -12,6 +12,9 @@ import com.example.kunturtatto.service.DesignService;
 import com.example.kunturtatto.service.ImageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -120,22 +123,26 @@ public class DesignServiceImpl implements DesignService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<DesignDto> getDesignsBySubCategory(Long subCategoryId) {
-        log.debug("Fetching designs for subcategory ID: {}", subCategoryId);
-        
-        return designRepository.findBySubCategoryId(subCategoryId).stream()
-                .map(designMapper::toDesignDto)
-                .collect(Collectors.toList());
+    public Page<DesignDto> getAllDesignspPageable(Pageable pageable) {
+        log.debug("Fetching all designs paginated");
+        return designRepository.findAllWithRelationsPageable(pageable)
+                .map(designMapper::toDesignDto);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<DesignDto> getDesignsByCategory(Long categoryId) {
-        log.debug("Fetching designs for category ID: {}", categoryId);
-        
-        return designRepository.findBySubCategoryCategoryId(categoryId).stream()
-                .map(designMapper::toDesignDto)
-                .collect(Collectors.toList());
+    public Page<DesignDto> getDesignsBySubCategory(Long subCategoryId, Pageable pageable) {
+        log.debug("Fetching designs for subcategory ID: {} paginated", subCategoryId);
+        return designRepository.findBySubCategoryId(subCategoryId, pageable)
+                .map(designMapper::toDesignDto);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<DesignDto> getDesignsByCategory(Long categoryId, Pageable pageable) {
+        log.debug("Fetching designs for category ID: {} paginated", categoryId);
+        return designRepository.findBySubCategoryCategoryId(categoryId, pageable)
+                .map(designMapper::toDesignDto);
     }
 
     @Override
