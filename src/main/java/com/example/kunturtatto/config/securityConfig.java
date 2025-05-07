@@ -25,11 +25,11 @@ public class securityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/admin/**").permitAll()
-                        .requestMatchers("/mail/**").permitAll()
-                        .requestMatchers("/admin/appointments/**").permitAll()
+                        .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
+                        .requestMatchers("/admin/appointments/**").authenticated()
                         .requestMatchers("/KunturTattoo/**").permitAll()
-                        .requestMatchers("/", "/KunturTattoo/ingresar", "/register", "/css/**", "/js/**", "/images/**").permitAll()
+                        .requestMatchers("/admin/**").authenticated()
+                        .requestMatchers("/mail/**").permitAll()
                         .anyRequest().authenticated())
                 .formLogin(form -> form
                         .loginPage("/KunturTattoo/ingresar")
