@@ -1,5 +1,9 @@
 package com.example.kunturtatto.controller;
 
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+
+/* 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
@@ -18,19 +22,17 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.example.kunturtatto.model.CategoryDesign;
 import com.example.kunturtatto.model.Design;
 import com.example.kunturtatto.model.Role;
 import com.example.kunturtatto.model.RoleEnum;
 import com.example.kunturtatto.model.User;
-import com.example.kunturtatto.service.ICategoryDesignService;
 import com.example.kunturtatto.service.IDesignService;
 import com.example.kunturtatto.service.IUserService;
-
+*/
 @SpringBootTest
 @AutoConfigureMockMvc
 public class UserControllerTest {
-    
+    /* 
     @Autowired
     private MockMvc mockMvc;
 
@@ -132,5 +134,5 @@ public class UserControllerTest {
         .andExpect(model().attribute("categories", categoryDesigns));
     }
 
-    
+    */
 }

@@ -4,7 +4,7 @@
 
     <!--=============== FAVICON ===============-->
     <link rel="shortcut icon" href="assets/img/favicon.png" type="image/x-icon">
-
+    <link rel="icon" th:href="@{/images/logo.svg}" type="image/png">
     <!--=============== REMIXICONS ===============-->
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.2.0/fonts/remixicon.css" rel="stylesheet">
 
@@ -16,10 +16,13 @@
 </head>
 
 <header class="header" id="header" th:fragment="nav_user">
-    
+
     <nav class="nav container">
         <a th:href="@{/KunturTattoo}" class="nav__logo">
-            KunturTattoo
+            <svg width="150" height="40" viewBox="0 0 150 40" xmlns="http://www.w3.org/2000/svg">
+                
+                <path d="M..." fill="#000" />
+            </svg>
         </a>
 
         <div class="nav__menu" id="nav-menu">
@@ -50,40 +53,6 @@
         </div>
 
     </nav>
-    <!--
-    <nav class="nav container">
-
-        <div class="nav__menu" id="nav-menu">
-            <ul class="nav__list">
-                <li class="nav__item">
-                    <a th:href="@{/admin}" class="nav__link">Diseños</a>
-                </li>
-
-                <li class="nav__item">
-                    <a th:href="@{/admin/categorias}" class="nav__link">Categorias diseños</a>
-                </li>
-
-                <li class="nav__item">
-                    <a th:href="@{/admin/usuarios}" class="nav__link">Usuarios</a>
-                </li>
-
-                <li class="nav__item">
-                    <a th:href="@{/admin/citas}" class="nav__link">Citas</a>
-                </li>
-            </ul>
-
-
-            <div class="nav__close" id="nav-close">
-                <i class="ri-close-line"></i>
-            </div>
-        </div>
-        
-        <div class="nav__toggle" id="nav-toggle">
-            <i class="ri-menu-fill"></i>
-        </div>
-
-    </nav>
--->
 </header>
 
 <!--==================== FOOTER ====================-->
@@ -195,4 +164,3 @@
     <script th:src="@{/js/scrollreveal.min.js}"></script>
     <script th:src="@{/js/main.js}"></script>
 </div>
-

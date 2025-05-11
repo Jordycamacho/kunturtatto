@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  kuntur:
+    build: .
+    mem_limit: 512m
+    ports:
+      - "8081:8081"
+    env_file: .env
+    environment:
+      - DB_URL=${DB_URL}
+      - DB_USER_NAME=${DB_USER_NAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - EMAIL_USER=${EMAIL_USER}
+      - EMAIL_PASS=${EMAIL_PASS}
+      - APP_UPLOAD_DIR=${APP_UPLOAD_DIR}
+    volumes:
+      - ./images:/app/images
+      - ./logs:/app/logs
+    restart: always
+    depends_on:
+      gast_shop:
+        condition: service_healthy
+
+volumes:
+  kuntur_images:
