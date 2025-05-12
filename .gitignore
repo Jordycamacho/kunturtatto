@@ -37,5 +37,5 @@ build/
 src/main/resources/application-secrets.properties
 
 /images/**
-.env
+.env-kuntur
 /logs
