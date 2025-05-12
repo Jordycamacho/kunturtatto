@@ -5,22 +5,45 @@ services:
     build: .
     mem_limit: 512m
     ports:
-      - "8081:8081"
+      - "8081:8080"
     env_file: .env
     environment:
-      - DB_URL=${DB_URL}
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD} 
+      - DB_URL_KUNTUR=${DB_URL_KUNTUR}
       - DB_USER_NAME=${DB_USER_NAME}
       - DB_PASSWORD=${DB_PASSWORD}
       - EMAIL_USER=${EMAIL_USER}
       - EMAIL_PASS=${EMAIL_PASS}
       - APP_UPLOAD_DIR=${APP_UPLOAD_DIR}
     volumes:
-      - ./images:/app/images
-      - ./logs:/app/logs
+      - kuntur_images:/app/images
+      - kuntur_logs:/app/logs
     restart: always
     depends_on:
-      gast_shop:
+      kuntur_db:
         condition: service_healthy
 
+  kuntur_db:
+    image: mysql:8.0.33 
+    ports:
+      - "3308:3306"
+    env_file: .env
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${DB_USER_NAME}
+      - MYSQL_ROOT_HOST=%
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - kuntur_db_data:/var/lib/mysql
+    restart: always
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 10s
+      retries: 10
+
 volumes:
+  kuntur_db_data:
   kuntur_images:
+  kuntur_logs:
