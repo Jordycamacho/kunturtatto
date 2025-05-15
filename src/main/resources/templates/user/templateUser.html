@@ -2,6 +2,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1RQQVKEJ4T"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-1RQQVKEJ4T');
+    </script>
+
     <!--=============== FAVICON ===============-->
     <link rel="shortcut icon" href="assets/img/favicon.png" type="image/x-icon">
     <link rel="icon" th:href="@{/images/logo.svg}" type="image/png">
@@ -62,72 +72,36 @@
                         <img th:src="@{/images/logo-kuntur.png}" alt="" style="width: 150px; height: auto;">
                     </a>
                     <p class="footer__description">
-                        Suscribete para recibir noticioas acerca <br>
-                        de tatuajes y ofertas. 
+                        <span class="slogan curvo">Tu historia, mi tinta.</span>
                     </p>
                 </div>
 
                 <div class="footer__data grid">
                     <div>
-                        <h3 class="footer__title">Sobre Nosotros</h3>
+                        <h3 class="footer__title">Enlaces cortos</h3>
 
                         <ul class="footer__links">
                             <li>
-                                <a href="#" class="footer__link">Agregar</a>
+                                <a th:href="@{/KunturTattoo}" class="footer__link">inicio</a>
                             </li>
                             <li>
-                                <a href="#" class="footer__link">Contenido</a>
+                                <a th:href="@{/KunturTattoo/diseños}" class="footer__link">galeria</a>
                             </li>
                             <li>
-                                <a href="#" class="footer__link">Aquí</a>
+                                <a th:href="@{/KunturTattoo/contacto}" class="footer__link">Contacto</a>
                             </li>
                         </ul>
                     </div>
 
                     <div>
-                        <h3 class="footer__title">Preguntas</h3>
+                        <h3 class="footer__title">Información</h3>
 
                         <li>
-                            <a href="#" class="footer__link">Agregar</a>
+                            <a href="#" class="footer__link">Terminos y Condiciones</a>
                         </li>
                         <li>
-                            <a href="#" class="footer__link">Contenido</a>
+                            <a href="#" class="footer__link">Pólitica de Privacidad</a>
                         </li>
-                        <li>
-                            <a href="#" class="footer__link">Aquí</a>
-                        </li>
-                    </div>
-
-                    <div>
-                        <h3 class="footer__title">Contacto</h3>
-
-                        <ul class="footer__links">
-                            <li>
-                                <a href="#" class="footer__link">Agregar</a>
-                            </li>
-                            <li>
-                                <a href="#" class="footer__link">Contenido</a>
-                            </li>
-                            <li>
-                                <a href="#" class="footer__link">Aquí</a>
-                            </li>
-                        </ul>
-                    </div>
-
-                    <div>
-                        <h3 class="footer__title">Soporte</h3>
-
-                        <ul class="footer__links">
-                            <li>
-                                <a href="#" class="footer__link">Agregar</a>
-                            </li>
-                            <li>
-                                <a href="#" class="footer__link">Contenido</a>
-                            </li>
-                            <li>
-                                <a href="#" class="footer__link">Aquí</a>
-                            </li>
-                        </ul>
                     </div>
                 </div>
             </div>
@@ -138,7 +112,7 @@
                         <i class="ri-facebook-line"></i>
                     </a>
 
-                    <a href="#" target="_blank" class="footer__social-link">
+                    <a href="https://www.instagram.com/crys_tattoo.ink?igsh=MXQzOHJ6cHFvaDBzcQ==" target="_blank" class="footer__social-link">
                         <i class="ri-instagram-line"></i>
                     </a>
 
