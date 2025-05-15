@@ -1,0 +1,5 @@
+com\example\kunturtatto\controller\AdminControllerTest.class
+com\example\kunturtatto\controller\UserControllerTest.class
+com\example\kunturtatto\KunturtattoApplicationTests.class
+com\example\kunturtatto\config\TestSecurityConfig.class
+com\example\kunturtatto\controller\MailControllerTest.class

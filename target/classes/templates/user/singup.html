@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:insert="~{user/templateUser.html::header}"></head>
+
+<body>
+    <div th:insert="~{user/templateUser.html::nav_top}"></div>
+    <div th:insert="~{user/templateUser.html::nav_user}"></div>
+    <div th:insert="~{user/templateUser.html::nav_admin}"></div>
+    
+    
+    <!-- Logig-->
+    <div class="container login">
+        <div class="row">
+            <div class="col-md-4" id="side1">
+                <h3>Bienvenido</h3>
+                <p>¿Ya tienes una cuenta?</p>
+                <div id="btn"><a th:href="@{/KunturTattoo/ingresar}">Ingresar</a></div>
+            </div>
+            <div class="col-md-8" id="side2">
+                <h3>Crear Cuenta</h3>
+                <div class="inp">
+                    <form th:action="@{/KunturTattoo/registro/guardar}" method="post">
+                        <input type="email" placeholder="Email" id="email" name="email" required>
+                        <input type="password" placeholder="Contraseña" id="password" name="password" required>
+                        <div id="login">
+                            <button type="submit">Crear</button>
+                        </div>
+                    </form>
+                    
+                </div>
+                <a href="#">¿Olvidaste tu contraseña?</a>
+                
+            </div>
+        </div>
+    </div>
+
+
+    <div th:insert="~{user/templateUser.html::script}"></div>
+</body>
+</html>

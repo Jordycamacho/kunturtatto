@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:fragment="header">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" th:href="@{/images/logo.svg}" type="image/png">
+    <!--=============== FAVICON ===============-->
+    <link rel="shortcut icon" href="assets/img/favicon.png" type="image/x-icon">
+
+    <!--=============== REMIXICONS ===============-->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.2.0/fonts/remixicon.css" rel="stylesheet">
+
+    <!--=============== CSS ===============-->
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/contact.css}">
+
+    <title>KunturTattoo</title>
+</head>
+
+<body class="contact-page">
+    <div th:insert="~{user/templateUser.html::nav_user}"></div>
+
+    <div class="container-contact" id="contact">
+        <h1 class="text-center">CONTACTANOS</h1>
+        
+
+        <form class="contact-form" th:action="@{/mail/contacto/guardar}" method="post">
+            <div class="form-row">
+                <input type="email" name="email" placeholder="Email*" required>
+                <input type="text" name="subject" placeholder="Asunto*" required>
+                <input type="text" name="tattooCm" placeholder="Tamaño en CM(aprox.)*">
+            </div>
+            <div class="form-row">
+                <select name="body" required>
+                    <option value="" disabled selected>Selecciona la zona del cuerpo*</option>
+                    <option value="Brazo">Brazo</option>
+                    <option value="Pierna">Pierna</option>
+                    <option value="Espalda">Espalda</option>
+                    <option value="Pecho">Pecho</option>
+                    <option value="Otro">Otro</option>
+                </select>
+            </div>
+            <div class="form-row">
+                <textarea cols="30" rows="2" name="linksReference" placeholder="Links de referencia"></textarea>
+            </div>
+            <div class="form-row">
+                <textarea cols="30" rows="5" name="message" placeholder="Mensaje*" required></textarea>
+            </div>
+            <div class="form-row">
+                <button type="submit">Enviar Mensaje</button>
+            </div>
+        </form>
+        <div th:if="${mensajeEnviado}">
+            <p class="message-success">¡Gracias por tu mensaje! Nos pondremos en contacto contigo pronto.</p>
+        </div>
+    </div>
+
+    <div th:insert="~{user/templateUser.html::footer}"></div>
+
+    <div th:insert="~{user/templateUser.html::script}"></div>
+</body>
+
+</html>

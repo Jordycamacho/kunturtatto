@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DataInitializer.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">kunturtatto</a> &gt; <a href="index.source.html" class="el_package">com.example.kunturtatto.config</a> &gt; <span class="el_source">DataInitializer.java</span></div><h1>DataInitializer.java</h1><pre class="source lang-java linenums">package com.example.kunturtatto.config;
+
+import com.example.kunturtatto.model.*;
+import com.example.kunturtatto.repository.*;
+
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
+
+import java.util.Date;
+import java.util.Set;
+
+<span class="fc" id="L17">@Slf4j</span>
+@Component
+@RequiredArgsConstructor
+@Profile(&quot;!test&quot;)
+public class DataInitializer implements CommandLineRunner {
+
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final PermissionRepository permissionRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    @Transactional
+    @Override
+    public void run(String... args) {
+        try {
+<span class="fc" id="L32">            initializeData();</span>
+<span class="nc" id="L33">        } catch (Exception e) {</span>
+<span class="nc" id="L34">            log.error(&quot;Error inicializando datos&quot;, e);</span>
+<span class="fc" id="L35">        }</span>
+<span class="fc" id="L36">    }</span>
+
+    private void initializeData() {
+<span class="fc" id="L39">        Permission readPerm = createPermissionIfNotExists(&quot;READ&quot;, &quot;Permiso de lectura&quot;);</span>
+<span class="fc" id="L40">        Permission createPerm = createPermissionIfNotExists(&quot;CREATE&quot;, &quot;Permiso de creación&quot;);</span>
+<span class="fc" id="L41">        Permission updatePerm = createPermissionIfNotExists(&quot;UPDATE&quot;, &quot;Permiso de actualización&quot;);</span>
+<span class="fc" id="L42">        Permission deletePerm = createPermissionIfNotExists(&quot;DELETE&quot;, &quot;Permiso de eliminación&quot;);</span>
+
+<span class="fc" id="L44">        Role adminRole = createRoleIfNotExists(</span>
+            RoleEnum.ROLE_ADMIN, 
+<span class="fc" id="L46">            Set.of(readPerm, createPerm, updatePerm, deletePerm)</span>
+        );
+        
+<span class="fc" id="L49">        Role userRole = createRoleIfNotExists(</span>
+            RoleEnum.ROLE_USER, 
+<span class="fc" id="L51">            Set.of(readPerm)</span>
+        );
+
+        // 3. Crear usuarios iniciales
+<span class="fc" id="L55">        createUserIfNotExists(</span>
+            &quot;kunturtattoo@gmail.com&quot;, 
+            &quot;kunturtattoo012890.&quot;, 
+            adminRole
+        );
+        
+<span class="fc" id="L61">        createUserIfNotExists(</span>
+            &quot;jordycamacho225@gmail.com&quot;, 
+            &quot;012890&quot;, 
+            userRole
+        );
+<span class="fc" id="L66">    }</span>
+
+    private Permission createPermissionIfNotExists(String name, String description) {
+<span class="fc" id="L69">        return permissionRepository.findByName(name)</span>
+<span class="fc" id="L70">            .orElseGet(() -&gt; {</span>
+<span class="nc" id="L71">                Permission newPerm = Permission.builder()</span>
+<span class="nc" id="L72">                    .name(name)</span>
+<span class="nc" id="L73">                    .description(description)</span>
+<span class="nc" id="L74">                    .build();</span>
+<span class="nc" id="L75">                return permissionRepository.save(newPerm);</span>
+            });
+    }
+
+    private Role createRoleIfNotExists(RoleEnum roleEnum, Set&lt;Permission&gt; permissions) {
+<span class="fc" id="L80">        return roleRepository.findByRoleEnum(roleEnum)</span>
+<span class="fc" id="L81">            .orElseGet(() -&gt; {</span>
+<span class="nc" id="L82">                Role newRole = Role.builder()</span>
+<span class="nc" id="L83">                    .roleEnum(roleEnum)</span>
+<span class="nc" id="L84">                    .Permission(permissions)</span>
+<span class="nc" id="L85">                    .build();</span>
+<span class="nc" id="L86">                return roleRepository.save(newRole);</span>
+            });
+    }
+
+    private void createUserIfNotExists(String email, String password, Role role) {
+<span class="pc bpc" id="L91" title="1 of 2 branches missed.">        if (userRepository.findUserByEmail(email).isEmpty()) {</span>
+<span class="nc" id="L92">            User newUser = User.builder()</span>
+<span class="nc" id="L93">                .email(email)</span>
+<span class="nc" id="L94">                .password(passwordEncoder.encode(password))</span>
+<span class="nc" id="L95">                .registrationDate(new Date())</span>
+<span class="nc" id="L96">                .isEnabled(true)</span>
+<span class="nc" id="L97">                .accountNoExpired(true)</span>
+<span class="nc" id="L98">                .accountNoLocked(true)</span>
+<span class="nc" id="L99">                .credentialNoExpired(true)</span>
+<span class="nc" id="L100">                .roles(Set.of(role))</span>
+<span class="nc" id="L101">                .build();</span>
+            
+<span class="nc" id="L103">            userRepository.save(newUser);</span>
+<span class="nc" id="L104">            log.info(&quot;Usuario creado: {}&quot;, email);</span>
+        }
+<span class="fc" id="L106">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

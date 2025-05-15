@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DesignMapperImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">kunturtatto</a> &gt; <a href="index.source.html" class="el_package">com.example.kunturtatto.mapper</a> &gt; <span class="el_source">DesignMapperImpl.java</span></div><h1>DesignMapperImpl.java</h1><pre class="source lang-java linenums">package com.example.kunturtatto.mapper;
+
+import com.example.kunturtatto.dto.CategoryDto;
+import com.example.kunturtatto.dto.DesignDto;
+import com.example.kunturtatto.dto.SubCategoryDto;
+import com.example.kunturtatto.model.Category;
+import com.example.kunturtatto.model.Design;
+import com.example.kunturtatto.model.SubCategory;
+import com.example.kunturtatto.request.CategoryRequest;
+import com.example.kunturtatto.request.DesignRequest;
+import com.example.kunturtatto.request.SubCategoryRequest;
+import java.util.ArrayList;
+import java.util.List;
+import javax.annotation.processing.Generated;
+import org.springframework.stereotype.Component;
+
+@Generated(
+    value = &quot;org.mapstruct.ap.MappingProcessor&quot;,
+    date = &quot;2025-05-15T16:08:09+0200&quot;,
+    comments = &quot;version: 1.5.5.Final, compiler: javac, environment: Java 17.0.7 (Oracle Corporation)&quot;
+)
+@Component
+<span class="fc" id="L23">public class DesignMapperImpl implements DesignMapper {</span>
+
+    @Override
+    public CategoryDto toCategoryDto(Category category) {
+<span class="nc bnc" id="L27" title="All 2 branches missed.">        if ( category == null ) {</span>
+<span class="nc" id="L28">            return null;</span>
+        }
+
+<span class="nc" id="L31">        CategoryDto.CategoryDtoBuilder categoryDto = CategoryDto.builder();</span>
+
+<span class="nc" id="L33">        categoryDto.id( category.getId() );</span>
+<span class="nc" id="L34">        categoryDto.name( category.getName() );</span>
+<span class="nc" id="L35">        categoryDto.image( category.getImage() );</span>
+<span class="nc" id="L36">        categoryDto.subCategories( subCategoryListToSubCategoryDtoList( category.getSubCategories() ) );</span>
+
+<span class="nc" id="L38">        return categoryDto.build();</span>
+    }
+
+    @Override
+    public Category toCategory(CategoryRequest request) {
+<span class="nc bnc" id="L43" title="All 2 branches missed.">        if ( request == null ) {</span>
+<span class="nc" id="L44">            return null;</span>
+        }
+
+<span class="nc" id="L47">        Category.CategoryBuilder category = Category.builder();</span>
+
+<span class="nc" id="L49">        category.name( request.getName() );</span>
+<span class="nc" id="L50">        category.image( request.getImage() );</span>
+
+<span class="nc" id="L52">        return category.build();</span>
+    }
+
+    @Override
+    public SubCategoryDto toSubCategoryDto(SubCategory subCategory) {
+<span class="nc bnc" id="L57" title="All 2 branches missed.">        if ( subCategory == null ) {</span>
+<span class="nc" id="L58">            return null;</span>
+        }
+
+<span class="nc" id="L61">        SubCategoryDto.SubCategoryDtoBuilder subCategoryDto = SubCategoryDto.builder();</span>
+
+<span class="nc" id="L63">        subCategoryDto.id( subCategory.getId() );</span>
+<span class="nc" id="L64">        subCategoryDto.name( subCategory.getName() );</span>
+<span class="nc" id="L65">        subCategoryDto.image( subCategory.getImage() );</span>
+
+<span class="nc" id="L67">        return subCategoryDto.build();</span>
+    }
+
+    @Override
+    public SubCategory toSubCategory(SubCategoryRequest request) {
+<span class="nc bnc" id="L72" title="All 2 branches missed.">        if ( request == null ) {</span>
+<span class="nc" id="L73">            return null;</span>
+        }
+
+<span class="nc" id="L76">        SubCategory.SubCategoryBuilder subCategory = SubCategory.builder();</span>
+
+<span class="nc" id="L78">        subCategory.name( request.getName() );</span>
+<span class="nc" id="L79">        subCategory.image( request.getImage() );</span>
+
+<span class="nc" id="L81">        return subCategory.build();</span>
+    }
+
+    @Override
+    public DesignDto toDesignDto(Design design) {
+<span class="nc bnc" id="L86" title="All 2 branches missed.">        if ( design == null ) {</span>
+<span class="nc" id="L87">            return null;</span>
+        }
+
+<span class="nc" id="L90">        DesignDto.DesignDtoBuilder designDto = DesignDto.builder();</span>
+
+<span class="nc" id="L92">        designDto.subCategoryId( designSubCategoryId( design ) );</span>
+<span class="nc" id="L93">        designDto.subCategoryName( designSubCategoryName( design ) );</span>
+<span class="nc" id="L94">        designDto.categoryId( designSubCategoryCategoryId( design ) );</span>
+<span class="nc" id="L95">        designDto.categoryName( designSubCategoryCategoryName( design ) );</span>
+<span class="nc" id="L96">        designDto.id( design.getId() );</span>
+<span class="nc" id="L97">        designDto.title( design.getTitle() );</span>
+<span class="nc" id="L98">        designDto.description( design.getDescription() );</span>
+<span class="nc" id="L99">        designDto.image( design.getImage() );</span>
+
+<span class="nc" id="L101">        return designDto.build();</span>
+    }
+
+    @Override
+    public Design toDesign(DesignRequest request) {
+<span class="nc bnc" id="L106" title="All 2 branches missed.">        if ( request == null ) {</span>
+<span class="nc" id="L107">            return null;</span>
+        }
+
+<span class="nc" id="L110">        Design.DesignBuilder design = Design.builder();</span>
+
+<span class="nc" id="L112">        design.title( request.getTitle() );</span>
+<span class="nc" id="L113">        design.description( request.getDescription() );</span>
+<span class="nc" id="L114">        design.image( request.getImage() );</span>
+
+<span class="nc" id="L116">        return design.build();</span>
+    }
+
+    protected CategoryDto.SubCategoryDto subCategoryToSubCategoryDto(SubCategory subCategory) {
+<span class="nc bnc" id="L120" title="All 2 branches missed.">        if ( subCategory == null ) {</span>
+<span class="nc" id="L121">            return null;</span>
+        }
+
+<span class="nc" id="L124">        CategoryDto.SubCategoryDto.SubCategoryDtoBuilder subCategoryDto = CategoryDto.SubCategoryDto.builder();</span>
+
+<span class="nc" id="L126">        subCategoryDto.id( subCategory.getId() );</span>
+<span class="nc" id="L127">        subCategoryDto.name( subCategory.getName() );</span>
+<span class="nc" id="L128">        subCategoryDto.image( subCategory.getImage() );</span>
+
+<span class="nc" id="L130">        return subCategoryDto.build();</span>
+    }
+
+    protected List&lt;CategoryDto.SubCategoryDto&gt; subCategoryListToSubCategoryDtoList(List&lt;SubCategory&gt; list) {
+<span class="nc bnc" id="L134" title="All 2 branches missed.">        if ( list == null ) {</span>
+<span class="nc" id="L135">            return null;</span>
+        }
+
+<span class="nc" id="L138">        List&lt;CategoryDto.SubCategoryDto&gt; list1 = new ArrayList&lt;CategoryDto.SubCategoryDto&gt;( list.size() );</span>
+<span class="nc bnc" id="L139" title="All 2 branches missed.">        for ( SubCategory subCategory : list ) {</span>
+<span class="nc" id="L140">            list1.add( subCategoryToSubCategoryDto( subCategory ) );</span>
+<span class="nc" id="L141">        }</span>
+
+<span class="nc" id="L143">        return list1;</span>
+    }
+
+    private Long designSubCategoryId(Design design) {
+<span class="nc bnc" id="L147" title="All 2 branches missed.">        if ( design == null ) {</span>
+<span class="nc" id="L148">            return null;</span>
+        }
+<span class="nc" id="L150">        SubCategory subCategory = design.getSubCategory();</span>
+<span class="nc bnc" id="L151" title="All 2 branches missed.">        if ( subCategory == null ) {</span>
+<span class="nc" id="L152">            return null;</span>
+        }
+<span class="nc" id="L154">        Long id = subCategory.getId();</span>
+<span class="nc bnc" id="L155" title="All 2 branches missed.">        if ( id == null ) {</span>
+<span class="nc" id="L156">            return null;</span>
+        }
+<span class="nc" id="L158">        return id;</span>
+    }
+
+    private String designSubCategoryName(Design design) {
+<span class="nc bnc" id="L162" title="All 2 branches missed.">        if ( design == null ) {</span>
+<span class="nc" id="L163">            return null;</span>
+        }
+<span class="nc" id="L165">        SubCategory subCategory = design.getSubCategory();</span>
+<span class="nc bnc" id="L166" title="All 2 branches missed.">        if ( subCategory == null ) {</span>
+<span class="nc" id="L167">            return null;</span>
+        }
+<span class="nc" id="L169">        String name = subCategory.getName();</span>
+<span class="nc bnc" id="L170" title="All 2 branches missed.">        if ( name == null ) {</span>
+<span class="nc" id="L171">            return null;</span>
+        }
+<span class="nc" id="L173">        return name;</span>
+    }
+
+    private Long designSubCategoryCategoryId(Design design) {
+<span class="nc bnc" id="L177" title="All 2 branches missed.">        if ( design == null ) {</span>
+<span class="nc" id="L178">            return null;</span>
+        }
+<span class="nc" id="L180">        SubCategory subCategory = design.getSubCategory();</span>
+<span class="nc bnc" id="L181" title="All 2 branches missed.">        if ( subCategory == null ) {</span>
+<span class="nc" id="L182">            return null;</span>
+        }
+<span class="nc" id="L184">        Category category = subCategory.getCategory();</span>
+<span class="nc bnc" id="L185" title="All 2 branches missed.">        if ( category == null ) {</span>
+<span class="nc" id="L186">            return null;</span>
+        }
+<span class="nc" id="L188">        Long id = category.getId();</span>
+<span class="nc bnc" id="L189" title="All 2 branches missed.">        if ( id == null ) {</span>
+<span class="nc" id="L190">            return null;</span>
+        }
+<span class="nc" id="L192">        return id;</span>
+    }
+
+    private String designSubCategoryCategoryName(Design design) {
+<span class="nc bnc" id="L196" title="All 2 branches missed.">        if ( design == null ) {</span>
+<span class="nc" id="L197">            return null;</span>
+        }
+<span class="nc" id="L199">        SubCategory subCategory = design.getSubCategory();</span>
+<span class="nc bnc" id="L200" title="All 2 branches missed.">        if ( subCategory == null ) {</span>
+<span class="nc" id="L201">            return null;</span>
+        }
+<span class="nc" id="L203">        Category category = subCategory.getCategory();</span>
+<span class="nc bnc" id="L204" title="All 2 branches missed.">        if ( category == null ) {</span>
+<span class="nc" id="L205">            return null;</span>
+        }
+<span class="nc" id="L207">        String name = category.getName();</span>
+<span class="nc bnc" id="L208" title="All 2 branches missed.">        if ( name == null ) {</span>
+<span class="nc" id="L209">            return null;</span>
+        }
+<span class="nc" id="L211">        return name;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

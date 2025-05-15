@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:insert="~{admin/templateAdmin.html::header}"></head>
+<body>
+    <div th:insert="~{admin/templateAdmin.html::nav_user}"></div>
+    <div th:insert="~{admin/templateAdmin.html::nav_admin}"></div>
+
+    <div class="container mt-5">
+        <h1>Crear Nueva Subcategoría</h1>
+        
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+        
+        <form th:action="@{/admin/subcategorias/crear/guardar}" method="post" enctype="multipart/form-data" class="row g-3">
+            <div class="col-md-6">
+                <label for="name" class="form-label">Nombre de la Subcategoría</label>
+                <input type="text" class="form-control" id="name" 
+                       th:field="*{subCategoryRequest.name}" required>
+            </div>
+
+            <div class="col-md-6">
+                <label for="categoryId" class="form-label">Categoría Padre</label>
+                <select class="form-select" id="categoryId" 
+                        th:field="*{subCategoryRequest.categoryId}" required>
+                    <option value="">Seleccione una categoría</option>
+                    <option th:each="category : ${categories}" 
+                            th:value="${category.id}" 
+                            th:text="${category.name}"></option>
+                </select>
+            </div>
+
+            <div class="col-md-12">
+                <label for="imageFile" class="form-label">Imagen</label>
+                <input type="file" class="form-control" id="imageFile" 
+                       name="imageFile" accept="image/*">
+            </div>
+            
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary">Guardar</button>
+                <a th:href="@{/admin/subcategorias}" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+
+    <div th:insert="~{admin/templateAdmin.html::script}"></div>
+</body>
+</html>

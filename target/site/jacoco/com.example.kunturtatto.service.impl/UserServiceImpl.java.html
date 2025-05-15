@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">kunturtatto</a> &gt; <a href="index.source.html" class="el_package">com.example.kunturtatto.service.impl</a> &gt; <span class="el_source">UserServiceImpl.java</span></div><h1>UserServiceImpl.java</h1><pre class="source lang-java linenums">package com.example.kunturtatto.service.impl;
+
+import com.example.kunturtatto.dto.UserDto;
+import com.example.kunturtatto.exception.EmailAlreadyExistsException;
+import com.example.kunturtatto.exception.ResourceNotFoundException;
+import com.example.kunturtatto.mapper.UserMapper;
+import com.example.kunturtatto.model.Role;
+import com.example.kunturtatto.model.User;
+import com.example.kunturtatto.repository.RoleRepository;
+import com.example.kunturtatto.repository.UserRepository;
+import com.example.kunturtatto.request.UserRequest;
+import com.example.kunturtatto.service.UserService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+<span class="fc" id="L25">@Slf4j</span>
+@Service
+@RequiredArgsConstructor
+public class UserServiceImpl implements UserService {
+
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
+    private final AuthenticationFacade authenticationFacade;
+
+    @Override
+    @Transactional
+    public UserDto createUser(UserRequest request) throws EmailAlreadyExistsException {
+<span class="nc bnc" id="L39" title="All 2 branches missed.">        if (userRepository.findUserByEmail(request.getEmail()).isPresent()) {</span>
+<span class="nc" id="L40">            throw new EmailAlreadyExistsException(&quot;El email ya está registrado&quot;);</span>
+        }
+
+<span class="nc" id="L43">        User user = userMapper.toUser(request);</span>
+<span class="nc" id="L44">        user.setPassword(passwordEncoder.encode(request.getPassword()));</span>
+<span class="nc" id="L45">        user.setRegistrationDate(new Date());</span>
+<span class="nc" id="L46">        user.setEnabled(true);</span>
+<span class="nc" id="L47">        user.setAccountNoExpired(true);</span>
+<span class="nc" id="L48">        user.setAccountNoLocked(true);</span>
+<span class="nc" id="L49">        user.setCredentialNoExpired(true);</span>
+
+<span class="nc bnc" id="L51" title="All 4 branches missed.">        if (request.getRoleIds() != null &amp;&amp; !request.getRoleIds().isEmpty()) {</span>
+<span class="nc" id="L52">            Set&lt;Role&gt; roles = new HashSet&lt;&gt;(roleRepository.findAllById(request.getRoleIds()));</span>
+<span class="nc" id="L53">            user.setRoles(roles);</span>
+        }
+
+<span class="nc" id="L56">        User savedUser = userRepository.save(user);</span>
+<span class="nc" id="L57">        log.info(&quot;Usuario creado con ID: {}&quot;, savedUser.getIdUser());</span>
+<span class="nc" id="L58">        return userMapper.toUserDto(savedUser);</span>
+    }
+
+    @Override
+    @Transactional
+    public UserDto updateUser(Long id, UserRequest request) throws ResourceNotFoundException, EmailAlreadyExistsException {
+<span class="nc" id="L64">        User user = userRepository.findById(id)</span>
+<span class="nc" id="L65">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Usuario no encontrado&quot;));</span>
+
+<span class="nc bnc" id="L67" title="All 2 branches missed.">                if (!user.getEmail().equals(request.getEmail())) {</span>
+<span class="nc bnc" id="L68" title="All 2 branches missed.">                    if (userRepository.findUserByEmail(request.getEmail()).isPresent()) {</span>
+<span class="nc" id="L69">                        throw new EmailAlreadyExistsException(&quot;El email ya está registrado&quot;);</span>
+                    }
+<span class="nc" id="L71">                    user.setEmail(request.getEmail());</span>
+                }
+
+<span class="nc bnc" id="L74" title="All 4 branches missed.">        if (request.getPassword() != null &amp;&amp; !request.getPassword().isEmpty()) {</span>
+<span class="nc" id="L75">            user.setPassword(passwordEncoder.encode(request.getPassword()));</span>
+        }
+
+<span class="nc bnc" id="L78" title="All 2 branches missed.">        if (request.getRoleIds() != null) {</span>
+<span class="nc" id="L79">            Set&lt;Role&gt; roles = new HashSet&lt;&gt;(roleRepository.findAllById(request.getRoleIds()));</span>
+<span class="nc" id="L80">            user.setRoles(roles);</span>
+        }
+
+<span class="nc" id="L83">        User updatedUser = userRepository.save(user);</span>
+<span class="nc" id="L84">        log.info(&quot;Usuario actualizado con ID: {}&quot;, id);</span>
+<span class="nc" id="L85">        return userMapper.toUserDto(updatedUser);</span>
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public UserDto getUserById(Long id) throws ResourceNotFoundException {
+<span class="nc" id="L91">        User user = userRepository.findById(id)</span>
+<span class="nc" id="L92">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Usuario no encontrado&quot;));</span>
+<span class="nc" id="L93">        return userMapper.toUserDto(user);</span>
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public UserDto getUserByEmail(String email) throws ResourceNotFoundException {
+<span class="nc" id="L99">        User user = userRepository.findUserByEmail(email)</span>
+<span class="nc" id="L100">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Usuario no encontrado&quot;));</span>
+<span class="nc" id="L101">        return userMapper.toUserDto(user);</span>
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List&lt;UserDto&gt; getAllUsers() {
+<span class="nc" id="L107">        return userRepository.findAll().stream()</span>
+<span class="nc" id="L108">                .map(userMapper::toUserDto)</span>
+<span class="nc" id="L109">                .collect(Collectors.toList());</span>
+    }
+
+    @Override
+    @Transactional
+    public void deleteUser(Long id) throws ResourceNotFoundException {
+<span class="nc bnc" id="L115" title="All 2 branches missed.">        if (!userRepository.existsById(id)) {</span>
+<span class="nc" id="L116">            throw new ResourceNotFoundException(&quot;Usuario no encontrado&quot;);</span>
+        }
+<span class="nc" id="L118">        userRepository.deleteById(id);</span>
+<span class="nc" id="L119">        log.info(&quot;Usuario eliminado con ID: {}&quot;, id);</span>
+<span class="nc" id="L120">    }</span>
+
+    @Override
+    @Transactional
+    public UserDto enableUser(Long id) throws ResourceNotFoundException {
+<span class="nc" id="L125">        User user = userRepository.findById(id)</span>
+<span class="nc" id="L126">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Usuario no encontrado&quot;));</span>
+<span class="nc" id="L127">        user.setEnabled(true);</span>
+<span class="nc" id="L128">        User updatedUser = userRepository.save(user);</span>
+<span class="nc" id="L129">        log.info(&quot;Usuario habilitado con ID: {}&quot;, id);</span>
+<span class="nc" id="L130">        return userMapper.toUserDto(updatedUser);</span>
+    }
+
+    @Override
+    @Transactional
+    public UserDto disableUser(Long id) throws ResourceNotFoundException {
+<span class="nc" id="L136">        User user = userRepository.findById(id)</span>
+<span class="nc" id="L137">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Usuario no encontrado&quot;));</span>
+<span class="nc" id="L138">        user.setEnabled(false);</span>
+<span class="nc" id="L139">        User updatedUser = userRepository.save(user);</span>
+<span class="nc" id="L140">        log.info(&quot;Usuario deshabilitado con ID: {}&quot;, id);</span>
+<span class="nc" id="L141">        return userMapper.toUserDto(updatedUser);</span>
+    }
+
+    @Override
+    public UserDto getAuthenticatedUser() {
+<span class="nc" id="L146">        User user = authenticationFacade.getAuthenticatedUser();</span>
+<span class="nc" id="L147">        return userMapper.toUserDto(user);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:insert="~{admin/templateAdmin.html::header}"></head>
+<body>
+    <div th:insert="~{admin/templateAdmin.html::nav_user}"></div>
+    <div th:insert="~{admin/templateAdmin.html::nav_admin}"></div>
+
+    <div class="container mt-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="mb-0">Crear Nueva Cita</h1>
+            <a th:href="@{/admin/appointments}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Volver
+            </a>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <form th:action="@{/admin/appointments/create}" th:object="${appointmentRequest}" method="post">
+                    <div th:if="${#fields.hasErrors('*')}" class="alert alert-danger">
+                        <ul>
+                            <li th:each="err : ${#fields.errors('*')}" th:text="${err}"></li>
+                        </ul>
+                    </div>
+
+                    <h4 class="mb-3">Datos del Cliente</h4>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="customerName" class="form-label">Nombre Completo*</label>
+                            <input type="text" class="form-control" id="customerName" 
+                                   th:field="*{customerName}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="customerEmail" class="form-label">Correo Electrónico*</label>
+                            <input type="email" class="form-control" id="customerEmail" 
+                                   th:field="*{customerEmail}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="customerPhone" class="form-label">Teléfono*</label>
+                            <input type="tel" class="form-control" id="customerPhone" 
+                                   th:field="*{customerPhone}" required>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+                    <h4 class="mb-3">Detalles de la Cita</h4>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label for="date" class="form-label">Fecha*</label>
+                            <input type="date" class="form-control" id="date" 
+                                   th:field="*{date}" min="${T(java.time.LocalDate).now()}" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="time" class="form-label">Hora*</label>
+                            <input type="time" class="form-control" id="time" 
+                                   th:field="*{time}" min="09:00" max="18:00" required>
+                            <small class="text-muted">Horario: 9:00 AM - 6:00 PM</small>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="price" class="form-label">Precio Estimado*</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" id="price" 
+                                       th:field="*{price}" min="0" step="0.01" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+                    <h4 class="mb-3">Detalles del Tatuaje</h4>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="designId" class="form-label">Diseño (opcional)</label>
+                            <select class="form-select" id="designId" th:field="*{designId}">
+                                <option value="">Seleccionar diseño...</option>
+                                <option th:each="design : ${designs}" 
+                                        th:value="${design.id}" 
+                                        th:text="${design.title}"></option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="tattooSize" class="form-label">Tamaño (cm)*</label>
+                            <input type="number" class="form-control" id="tattooSize" 
+                                   th:field="*{tattooSize}" min="1" step="0.1" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="bodyPart" class="form-label">Parte del Cuerpo*</label>
+                            <select class="form-select" id="bodyPart" th:field="*{bodyPart}" required>
+                                <option value="">Seleccionar...</option>
+                                <option value="Brazo">Brazo</option>
+                                <option value="Pierna">Pierna</option>
+                                <option value="Espalda">Espalda</option>
+                                <option value="Pecho">Pecho</option>
+                                <option value="Otro">Otra zona</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="referenceLinks" class="form-label">Enlaces de Referencia (opcional)</label>
+                            <input type="url" class="form-control" id="referenceLinks" 
+                                   th:field="*{referenceLinks}" placeholder="https://...">
+                        </div>
+                        <div class="col-12">
+                            <label for="customDescription" class="form-label">Descripción Personalizada</label>
+                            <textarea class="form-control" id="customDescription" 
+                                      th:field="*{customDescription}" rows="4"></textarea>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <button type="reset" class="btn btn-outline-secondary me-md-2">
+                            <i class="fas fa-undo"></i> Limpiar
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Guardar Cita
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div th:insert="~{admin/templateAdmin.html::script}"></div>
+</body>
+</html>

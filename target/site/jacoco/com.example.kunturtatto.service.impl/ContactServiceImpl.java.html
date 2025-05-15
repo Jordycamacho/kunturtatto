@@ -1,0 +1,403 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ContactServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">kunturtatto</a> &gt; <a href="index.source.html" class="el_package">com.example.kunturtatto.service.impl</a> &gt; <span class="el_source">ContactServiceImpl.java</span></div><h1>ContactServiceImpl.java</h1><pre class="source lang-java linenums">package com.example.kunturtatto.service.impl;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.MailException;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.mail.javamail.MimeMessagePreparator;
+import org.springframework.stereotype.Service;
+
+import com.example.kunturtatto.exception.EmailException;
+import com.example.kunturtatto.model.Appointment;
+import com.example.kunturtatto.request.ContactRequest;
+import com.example.kunturtatto.service.IContactService;
+
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Service
+@RequiredArgsConstructor
+<span class="fc" id="L24">@Slf4j</span>
+public class ContactServiceImpl implements IContactService {
+
+    @Value(&quot;${email.sender}&quot;)
+    private String myEmail;
+
+    private final JavaMailSender javaMailSender;
+
+    @Override
+    @Transactional
+    public void sendContactEmail(ContactRequest request) {
+<span class="nc" id="L35">        MimeMessagePreparator messagePreparator = mimeMessage -&gt; {</span>
+<span class="nc" id="L36">            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);</span>
+
+<span class="nc" id="L38">            helper.setFrom(myEmail);</span>
+<span class="nc" id="L39">            helper.setTo(myEmail);</span>
+<span class="nc" id="L40">            helper.setSubject(&quot;Nuevo mensaje de contacto: &quot; + request.getSubject());</span>
+
+<span class="nc" id="L42">            String htmlContent = buildContactEmailHtml(request);</span>
+<span class="nc" id="L43">            helper.setText(htmlContent, true);</span>
+<span class="nc" id="L44">        };</span>
+
+        try {
+<span class="nc" id="L47">            javaMailSender.send(messagePreparator);</span>
+<span class="nc" id="L48">            log.info(&quot;Email de contacto enviado correctamente a {}&quot;, myEmail);</span>
+<span class="nc" id="L49">        } catch (MailException e) {</span>
+<span class="nc" id="L50">            log.error(&quot;Error al enviar email de contacto&quot;, e);</span>
+<span class="nc" id="L51">            throw new EmailException(&quot;Error al enviar el email de contacto&quot;);</span>
+<span class="nc" id="L52">        }</span>
+<span class="nc" id="L53">    }</span>
+
+    @Override
+    public void sendAppointmentCompletion(Appointment appointment) {
+<span class="nc" id="L57">        String subject = &quot;¡Gracias por tu visita! - Kuntur Tattoo&quot;;</span>
+<span class="nc" id="L58">        sendHtmlEmail(</span>
+<span class="nc" id="L59">                appointment.getCustomerEmail(),</span>
+                subject,
+<span class="nc" id="L61">                buildAppointmentCompletionHtml(appointment));</span>
+<span class="nc" id="L62">    }</span>
+
+    public void sendAppointmentConfirmation(Appointment appointment) {
+<span class="nc" id="L65">        String subject = &quot;Confirmación de Cita - Kuntur Tattoo&quot;;</span>
+<span class="nc" id="L66">        sendHtmlEmail(</span>
+<span class="nc" id="L67">                appointment.getCustomerEmail(),</span>
+                subject,
+<span class="nc" id="L69">                buildAppointmentConfirmationHtml(appointment));</span>
+<span class="nc" id="L70">    }</span>
+
+    @Override
+    public void sendAppointmentUpdateNotification(Appointment appointment) {
+<span class="nc" id="L74">        String subject = &quot;Actualización de Cita - Kuntur Tattoo&quot;;</span>
+<span class="nc" id="L75">        sendHtmlEmail(</span>
+<span class="nc" id="L76">                appointment.getCustomerEmail(),</span>
+                subject,
+<span class="nc" id="L78">                buildAppointmentUpdateHtml(appointment));</span>
+<span class="nc" id="L79">    }</span>
+
+    @Override
+    public void sendAppointmentCancellation(Appointment appointment) {
+<span class="nc" id="L83">        String subject = &quot;Cancelación de Cita - Kuntur Tattoo&quot;;</span>
+<span class="nc" id="L84">        sendHtmlEmail(</span>
+<span class="nc" id="L85">                appointment.getCustomerEmail(),</span>
+                subject,
+<span class="nc" id="L87">                buildAppointmentCancellationHtml(appointment));</span>
+<span class="nc" id="L88">    }</span>
+
+    /* format Mails */
+    private void sendHtmlEmail(String to, String subject, String htmlContent) {
+<span class="nc" id="L92">        MimeMessagePreparator messagePreparator = mimeMessage -&gt; {</span>
+<span class="nc" id="L93">            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, &quot;UTF-8&quot;);</span>
+<span class="nc" id="L94">            helper.setFrom(myEmail);</span>
+<span class="nc" id="L95">            helper.setTo(to);</span>
+<span class="nc" id="L96">            helper.setSubject(subject);</span>
+<span class="nc" id="L97">            helper.setText(htmlContent, true);</span>
+<span class="nc" id="L98">        };</span>
+
+        try {
+<span class="nc" id="L101">            javaMailSender.send(messagePreparator);</span>
+<span class="nc" id="L102">            log.info(&quot;Email enviado a {}&quot;, to);</span>
+<span class="nc" id="L103">        } catch (MailException e) {</span>
+<span class="nc" id="L104">            log.error(&quot;Error al enviar email a {}&quot;, to, e);</span>
+<span class="nc" id="L105">            throw new EmailException(&quot;Error al enviar el email&quot;);</span>
+<span class="nc" id="L106">        }</span>
+<span class="nc" id="L107">    }</span>
+
+    /* Views html */
+    private String buildContactEmailHtml(ContactRequest request) {
+<span class="nc" id="L111">        return &quot;&quot;&quot;</span>
+                &lt;!DOCTYPE html&gt;
+                &lt;html&gt;
+                &lt;head&gt;
+                    &lt;style&gt;
+                        body { font-family: Arial, sans-serif; line-height: 1.6; }
+                        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                        .header { color: #333; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+                        .detail { margin: 15px 0; }
+                        .label { font-weight: bold; color: #555; }
+                    &lt;/style&gt;
+                &lt;/head&gt;
+                &lt;body&gt;
+                    &lt;div class=&quot;container&quot;&gt;
+                        &lt;div class=&quot;header&quot;&gt;
+                            &lt;h2&gt;Nuevo mensaje de contacto&lt;/h2&gt;
+                        &lt;/div&gt;
+
+                        &lt;div class=&quot;detail&quot;&gt;
+                            &lt;span class=&quot;label&quot;&gt;De:&lt;/span&gt; %s
+                        &lt;/div&gt;
+
+                        &lt;div class=&quot;detail&quot;&gt;
+                            &lt;span class=&quot;label&quot;&gt;Asunto:&lt;/span&gt; %s
+                        &lt;/div&gt;
+
+                        &lt;div class=&quot;detail&quot;&gt;
+                            &lt;span class=&quot;label&quot;&gt;Tamaño del tatuaje:&lt;/span&gt; %s cm
+                        &lt;/div&gt;
+
+                        &lt;div class=&quot;detail&quot;&gt;
+                            &lt;span class=&quot;label&quot;&gt;Parte del cuerpo:&lt;/span&gt; %s
+                        &lt;/div&gt;
+
+                        &lt;div class=&quot;detail&quot;&gt;
+                            &lt;span class=&quot;label&quot;&gt;Referencias:&lt;/span&gt; %s
+                        &lt;/div&gt;
+
+                        &lt;div class=&quot;detail&quot;&gt;
+                            &lt;span class=&quot;label&quot;&gt;Mensaje:&lt;/span&gt;
+                            &lt;p&gt;%s&lt;/p&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/body&gt;
+                &lt;/html&gt;
+<span class="nc" id="L156">                &quot;&quot;&quot;.formatted(</span>
+<span class="nc" id="L157">                request.getEmail(),</span>
+<span class="nc" id="L158">                request.getSubject(),</span>
+<span class="nc" id="L159">                request.getTattooCm(),</span>
+<span class="nc" id="L160">                request.getBody(),</span>
+<span class="nc" id="L161">                request.getLinksReference(),</span>
+<span class="nc" id="L162">                request.getMessage());</span>
+    }
+
+    private String buildAppointmentConfirmationHtml(Appointment appointment) {
+<span class="nc" id="L166">        return &quot;&quot;&quot;</span>
+                &lt;!DOCTYPE html&gt;
+                &lt;html&gt;
+                &lt;head&gt;
+                    &lt;style&gt;
+                        body { font-family: 'Arial', sans-serif; line-height: 1.6; color: #333; }
+                        .container { max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #e1e1e1; border-radius: 5px; }
+                        .header { text-align: center; padding-bottom: 20px; border-bottom: 1px solid #eee; }
+                        .logo { max-width: 150px; }
+                        .content { padding: 20px 0; }
+                        .appointment-details { background: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0; }
+                        .detail { margin-bottom: 10px; }
+                        .label { font-weight: bold; color: #555; }
+                        .footer { text-align: center; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #777; }
+                        .button { display: inline-block; padding: 10px 20px; background: #4CAF50; color: white; text-decoration: none; border-radius: 5px; }
+                    &lt;/style&gt;
+                &lt;/head&gt;
+                &lt;body&gt;
+                    &lt;div class=&quot;container&quot;&gt;
+                        &lt;div class=&quot;header&quot;&gt;
+                            &lt;h2&gt;Confirmación de Cita&lt;/h2&gt;
+                            &lt;p&gt;¡Tu cita ha sido confirmada!&lt;/p&gt;
+                        &lt;/div&gt;
+                        &lt;div class=&quot;content&quot;&gt;
+                            &lt;p&gt;Hola %s,&lt;/p&gt;
+                            &lt;p&gt;Gracias por reservar con nosotros. Aquí están los detalles de tu cita:&lt;/p&gt;
+
+                            &lt;div class=&quot;appointment-details&quot;&gt;
+                                &lt;div class=&quot;detail&quot;&gt;&lt;span class=&quot;label&quot;&gt;Fecha:&lt;/span&gt; %s&lt;/div&gt;
+                                &lt;div class=&quot;detail&quot;&gt;&lt;span class=&quot;label&quot;&gt;Hora:&lt;/span&gt; %s&lt;/div&gt;
+                                &lt;div class=&quot;detail&quot;&gt;&lt;span class=&quot;label&quot;&gt;Diseño:&lt;/span&gt; %s&lt;/div&gt;
+                            &lt;/div&gt;
+
+                            &lt;p&gt;&lt;strong&gt;Por favor, llega 15 minutos antes de tu cita.&lt;/strong&gt;&lt;/p&gt;
+                            &lt;p&gt;Si necesitas modificar o cancelar tu cita, por favor contáctanos con al menos 24 horas de anticipación.&lt;/p&gt;
+
+                            &lt;p style=&quot;text-align: center; margin-top: 30px;&quot;&gt;
+                                &lt;a href=&quot;mailto:%s&quot; class=&quot;button&quot;&gt;Contactar&lt;/a&gt;
+                            &lt;/p&gt;
+                        &lt;/div&gt;
+                        &lt;div class=&quot;footer&quot;&gt;
+                            &lt;p&gt;Kuntur Tattoo Studio&lt;br&gt;%s&lt;/p&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/body&gt;
+                &lt;/html&gt;
+                &quot;&quot;&quot;
+<span class="nc" id="L213">                .formatted(</span>
+<span class="nc" id="L214">                        appointment.getCustomerName(),</span>
+<span class="nc" id="L215">                        appointment.getDate().format(DateTimeFormatter.ofPattern(&quot;dd/MM/yyyy&quot;)),</span>
+<span class="nc" id="L216">                        appointment.getTime(),</span>
+<span class="nc bnc" id="L217" title="All 2 branches missed.">                        appointment.getDesign() != null ? appointment.getDesign().getTitle() : &quot;Personalizado&quot;,</span>
+                        myEmail,
+<span class="nc" id="L219">                        LocalDate.now().getYear());</span>
+    }
+
+    private String buildAppointmentUpdateHtml(Appointment appointment) {
+<span class="nc" id="L223">        return &quot;&quot;&quot;</span>
+                &lt;!DOCTYPE html&gt;
+                &lt;html&gt;
+                &lt;head&gt;
+                    &lt;style&gt;
+                        body { font-family: 'Arial', sans-serif; line-height: 1.6; color: #333; }
+                        .container { max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #e1e1e1; border-radius: 5px; }
+                        .header { text-align: center; padding-bottom: 20px; border-bottom: 1px solid #eee; }
+                        .content { padding: 20px 0; }
+                        .appointment-details { background: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0; }
+                        .detail { margin-bottom: 10px; }
+                        .label { font-weight: bold; color: #555; }
+                        .changes { background: #fff8e1; padding: 15px; border-left: 4px solid #FFC107; margin: 20px 0; }
+                        .footer { text-align: center; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #777; }
+                        .button { display: inline-block; padding: 10px 20px; background: #2196F3; color: white; text-decoration: none; border-radius: 5px; }
+                    &lt;/style&gt;
+                &lt;/head&gt;
+                &lt;body&gt;
+                    &lt;div class=&quot;container&quot;&gt;
+                        &lt;div class=&quot;header&quot;&gt;
+                            &lt;h2&gt;Actualización de Cita&lt;/h2&gt;
+                            &lt;p&gt;Los detalles de tu cita han cambiado&lt;/p&gt;
+                        &lt;/div&gt;
+                        &lt;div class=&quot;content&quot;&gt;
+                            &lt;p&gt;Hola %s,&lt;/p&gt;
+                            &lt;p&gt;Queríamos informarte que los detalles de tu cita han sido actualizados:&lt;/p&gt;
+
+                            &lt;div class=&quot;appointment-details&quot;&gt;
+                                &lt;div class=&quot;detail&quot;&gt;&lt;span class=&quot;label&quot;&gt;Nueva fecha:&lt;/span&gt; %s&lt;/div&gt;
+                                &lt;div class=&quot;detail&quot;&gt;&lt;span class=&quot;label&quot;&gt;Nueva hora:&lt;/span&gt; %s&lt;/div&gt;
+                                &lt;div class=&quot;detail&quot;&gt;&lt;span class=&quot;label&quot;&gt;Diseño:&lt;/span&gt; %s&lt;/div&gt;
+                            &lt;/div&gt;
+
+                            &lt;div class=&quot;changes&quot;&gt;
+                                &lt;p&gt;&lt;strong&gt;Importante:&lt;/strong&gt; Por favor toma nota de los cambios realizados.&lt;/p&gt;
+                                &lt;p&gt;Si estos cambios no te funcionan, contáctanos para reprogramar.&lt;/p&gt;
+                            &lt;/div&gt;
+
+                            &lt;p style=&quot;text-align: center; margin-top: 30px;&quot;&gt;
+                                &lt;a href=&quot;mailto:%s&quot; class=&quot;button&quot;&gt;Confirmar cambios&lt;/a&gt;
+                            &lt;/p&gt;
+
+                            &lt;p&gt;Si no solicitaste este cambio, por favor contáctanos inmediatamente.&lt;/p&gt;
+                        &lt;/div&gt;
+                        &lt;div class=&quot;footer&quot;&gt;
+                            &lt;p&gt;Kuntur Tattoo Studio&lt;br&gt;
+                            © %s Kuntur Tattoo. Todos los derechos reservados.&lt;/p&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/body&gt;
+                &lt;/html&gt;
+                &quot;&quot;&quot;
+<span class="nc" id="L275">                .formatted(</span>
+<span class="nc" id="L276">                        appointment.getCustomerName(),</span>
+<span class="nc" id="L277">                        appointment.getDate().format(DateTimeFormatter.ofPattern(&quot;dd/MM/yyyy&quot;)),</span>
+<span class="nc" id="L278">                        appointment.getTime(),</span>
+<span class="nc bnc" id="L279" title="All 2 branches missed.">                        appointment.getDesign() != null ? appointment.getDesign().getTitle() : &quot;Personalizado&quot;,</span>
+                        myEmail,
+<span class="nc" id="L281">                        LocalDate.now().getYear());</span>
+    }
+
+    private String buildAppointmentCancellationHtml(Appointment appointment) {
+<span class="nc" id="L285">        return &quot;&quot;&quot;</span>
+                &lt;!DOCTYPE html&gt;
+                &lt;html&gt;
+                &lt;head&gt;
+                    &lt;style&gt;
+                        body { font-family: 'Arial', sans-serif; line-height: 1.6; color: #333; }
+                        .container { max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #e1e1e1; border-radius: 5px; }
+                        .header { text-align: center; padding-bottom: 20px; border-bottom: 1px solid #eee; color: #d32f2f; }
+                        .content { padding: 20px 0; }
+                        .appointment-details { background: #ffebee; padding: 15px; border-radius: 5px; margin: 20px 0; }
+                        .detail { margin-bottom: 10px; }
+                        .label { font-weight: bold; color: #555; }
+                        .footer { text-align: center; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #777; }
+                        .button { display: inline-block; padding: 10px 20px; background: #d32f2f; color: white; text-decoration: none; border-radius: 5px; }
+                        .reschedule { background: #e8f5e9; padding: 15px; border-left: 4px solid #4CAF50; margin: 20px 0; }
+                    &lt;/style&gt;
+                &lt;/head&gt;
+                &lt;body&gt;
+                    &lt;div class=&quot;container&quot;&gt;
+                        &lt;div class=&quot;header&quot;&gt;
+                            &lt;h2&gt;Cancelación de Cita&lt;/h2&gt;
+                            &lt;p&gt;Tu cita ha sido cancelada&lt;/p&gt;
+                        &lt;/div&gt;
+                        &lt;div class=&quot;content&quot;&gt;
+                            &lt;p&gt;Hola %s,&lt;/p&gt;
+                            &lt;p&gt;Lamentamos informarte que tu cita ha sido cancelada:&lt;/p&gt;
+
+                            &lt;div class=&quot;appointment-details&quot;&gt;
+                                &lt;div class=&quot;detail&quot;&gt;&lt;span class=&quot;label&quot;&gt;Fecha:&lt;/span&gt; %s&lt;/div&gt;
+                                &lt;div class=&quot;detail&quot;&gt;&lt;span class=&quot;label&quot;&gt;Hora:&lt;/span&gt; %s&lt;/div&gt;
+                                &lt;div class=&quot;detail&quot;&gt;&lt;span class=&quot;label&quot;&gt;Diseño:&lt;/span&gt; %s&lt;/div&gt;
+                            &lt;/div&gt;
+
+                            &lt;div class=&quot;reschedule&quot;&gt;
+                                &lt;p&gt;&lt;strong&gt;¿Fue un error o deseas reprogramar?&lt;/strong&gt;&lt;/p&gt;
+                                &lt;p&gt;Si deseas reagendar tu cita, estamos disponibles para ayudarte.&lt;/p&gt;
+                            &lt;/div&gt;
+
+                            &lt;p style=&quot;text-align: center; margin-top: 30px;&quot;&gt;
+                                &lt;a href=&quot;mailto:%s&quot; class=&quot;button&quot;&gt;Contactar para reprogramar&lt;/a&gt;
+                            &lt;/p&gt;
+
+                            &lt;p&gt;Lamentamos cualquier inconveniente que esto pueda causarte y esperamos poder atenderte en el futuro.&lt;/p&gt;
+                        &lt;/div&gt;
+                        &lt;div class=&quot;footer&quot;&gt;
+                            &lt;p&gt;Kuntur Tattoo Studio&lt;br&gt;
+                            © %s Kuntur Tattoo. Todos los derechos reservados.&lt;/p&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/body&gt;
+                &lt;/html&gt;
+                &quot;&quot;&quot;
+<span class="nc" id="L337">                .formatted(</span>
+<span class="nc" id="L338">                        appointment.getCustomerName(),</span>
+<span class="nc" id="L339">                        appointment.getDate().format(DateTimeFormatter.ofPattern(&quot;dd/MM/yyyy&quot;)),</span>
+<span class="nc" id="L340">                        appointment.getTime(),</span>
+<span class="nc bnc" id="L341" title="All 2 branches missed.">                        appointment.getDesign() != null ? appointment.getDesign().getTitle() : &quot;Personalizado&quot;,</span>
+                        myEmail,
+<span class="nc" id="L343">                        LocalDate.now().getYear());</span>
+    }
+
+    private String buildAppointmentCompletionHtml(Appointment appointment) {
+<span class="nc" id="L347">        return &quot;&quot;&quot;</span>
+                &lt;!DOCTYPE html&gt;
+                &lt;html&gt;
+                &lt;head&gt;
+                    &lt;style&gt;
+                        body { font-family: 'Arial', sans-serif; line-height: 1.6; color: #333; }
+                        .container { max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #e1e1e1; border-radius: 5px; }
+                        .header { text-align: center; padding-bottom: 20px; border-bottom: 1px solid #eee; }
+                        .logo { max-width: 150px; }
+                        .content { padding: 20px 0; }
+                        .thank-you { text-align: center; font-size: 18px; margin: 20px 0; color: #4CAF50; }
+                        .footer { text-align: center; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #777; }
+                        .social { margin: 20px 0; text-align: center; }
+                        .social a { margin: 0 10px; color: #555; text-decoration: none; }
+                        .review-button { display: inline-block; padding: 10px 20px; background: #FF9800; color: white; text-decoration: none; border-radius: 5px; margin-top: 20px; }
+                    &lt;/style&gt;
+                &lt;/head&gt;
+                &lt;body&gt;
+                    &lt;div class=&quot;container&quot;&gt;
+                        &lt;div class=&quot;header&quot;&gt;
+                            &lt;h2&gt;¡Gracias por elegir Kuntur Tattoo!&lt;/h2&gt;
+                        &lt;/div&gt;
+                        &lt;div class=&quot;content&quot;&gt;
+                            &lt;p&gt;Hola %s,&lt;/p&gt;
+
+                            &lt;div class=&quot;thank-you&quot;&gt;
+                                &lt;p&gt;¡Esperamos que hayas tenido una excelente experiencia con nosotros!&lt;/p&gt;
+                            &lt;/div&gt;
+
+                            &lt;p&gt;En Kuntur Tattoo valoramos mucho a nuestros clientes y nos encantaría saber tu opinión sobre tu experiencia.&lt;/p&gt;
+
+                            &lt;p&gt;Aquí tienes algunos detalles de tu visita:&lt;/p&gt;
+                            &lt;ul&gt;
+                                &lt;li&gt;&lt;strong&gt;Fecha:&lt;/strong&gt; %s&lt;/li&gt;
+                                &lt;li&gt;&lt;strong&gt;Diseño:&lt;/strong&gt; %s&lt;/li&gt;
+                            &lt;/ul&gt;
+
+                            &lt;p&gt;Si tienes alguna pregunta sobre el cuidado de tu nuevo tatuaje o necesitas cualquier otra cosa, no dudes en contactarnos.&lt;/p&gt;
+
+                        &lt;/div&gt;
+                        &lt;div class=&quot;footer&quot;&gt;
+                            &lt;p&gt;Kuntur Tattoo Studio&lt;br&gt;
+                            &lt;p&gt;© %s Kuntur Tattoo. Todos los derechos reservados.&lt;/p&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/body&gt;
+                &lt;/html&gt;
+                &quot;&quot;&quot;
+<span class="nc" id="L395">                .formatted(</span>
+<span class="nc" id="L396">                        appointment.getCustomerName(),</span>
+<span class="nc" id="L397">                        appointment.getDate().format(DateTimeFormatter.ofPattern(&quot;dd/MM/yyyy&quot;)),</span>
+<span class="nc bnc" id="L398" title="All 2 branches missed.">                        appointment.getDesign() != null ? appointment.getDesign().getTitle() : &quot;Personalizado&quot;,</span>
+                        myEmail,
+<span class="nc" id="L400">                        LocalDate.now().getYear());</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

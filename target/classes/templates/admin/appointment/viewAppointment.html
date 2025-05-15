@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:insert="~{admin/templateAdmin.html::header}">
+    <title>Detalles de Cita - Kuntur Tattoo</title>
+</head>
+<body>
+    <div th:insert="~{admin/templateAdmin.html::nav_user}"></div>
+    <div th:insert="~{admin/templateAdmin.html::nav_admin}"></div>
+
+    <div class="container mt-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="mb-0">Detalles de Cita</h1>
+            <a th:href="@{/admin/appointments}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Volver
+            </a>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4 class="mb-3">Información del Cliente</h4>
+                        <dl class="row">
+                            <dt class="col-sm-4">Nombre:</dt>
+                            <dd class="col-sm-8" th:text="${appointment.customerName}"></dd>
+
+                            <dt class="col-sm-4">Correo:</dt>
+                            <dd class="col-sm-8" th:text="${appointment.customerEmail}"></dd>
+
+                            <dt class="col-sm-4">Teléfono:</dt>
+                            <dd class="col-sm-8" th:text="${appointment.customerPhone}"></dd>
+                        </dl>
+                    </div>
+                    <div class="col-md-6">
+                        <h4 class="mb-3">Detalles de la Cita</h4>
+                        <dl class="row">
+                            <dt class="col-sm-4">Fecha:</dt>
+                            <dd class="col-sm-8" th:text="${#temporals.format(appointment.date, 'dd/MM/yyyy')}"></dd>
+
+                            <dt class="col-sm-4">Hora:</dt>
+                            <dd class="col-sm-8" th:text="${appointment.time}"></dd>
+
+                            <dt class="col-sm-4">Precio:</dt>
+                            <dd class="col-sm-8" th:text="${'$' + #numbers.formatDecimal(appointment.price, 1, 2)}"></dd>
+
+                            <dt class="col-sm-4">Estado:</dt>
+                            <dd class="col-sm-8">
+                                <span th:text="${appointment.status}" class="badge text-dark"></span>
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+
+                <hr class="my-4">
+                <h4 class="mb-3">Detalles del Tatuaje</h4>
+                <div class="row">
+                    <div class="col-md-6">
+                        <dl class="row">
+                            <dt class="col-sm-4">Diseño:</dt>
+                            <dd class="col-sm-8" th:text="${appointment.designTitle ?: 'Personalizado'}"></dd>
+
+                            <dt class="col-sm-4">Tamaño:</dt>
+                            <dd class="col-sm-8" th:text="${appointment.tattooSize + ' cm'}"></dd>
+
+                            <dt class="col-sm-4">Ubicación:</dt>
+                            <dd class="col-sm-8" th:text="${appointment.bodyPart}"></dd>
+                        </dl>
+                    </div>
+                    <div class="col-md-6">
+                        <dt>Referencias:</dt>
+                        <dd th:if="${appointment.referenceLinks}">
+                            <a th:href="${appointment.referenceLinks}" target="_blank" 
+                               th:text="${appointment.referenceLinks}"></a>
+                        </dd>
+                        <dd th:unless="${appointment.referenceLinks}" class="text-muted">No especificado</dd>
+                    </div>
+
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle" 
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                            Cambiar Estado
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <form th:action="@{/admin/appointments/{id}/status(id=${appointment.id})}" method="post">
+                                    <input type="hidden" name="status" value="PENDING">
+                                    <button class="dropdown-item" type="submit">Marcar como Pendiente</button>
+                                </form>
+                            </li>
+                            <li>
+                                <form th:action="@{/admin/appointments/{id}/status(id=${appointment.id})}" method="post">
+                                    <input type="hidden" name="status" value="CONFIRMED">
+                                    <button class="dropdown-item" type="submit">Confirmar Cita</button>
+                                </form>
+                            </li>
+                            <li>
+                                <form th:action="@{/admin/appointments/{id}/status(id=${appointment.id})}" method="post">
+                                    <input type="hidden" name="status" value="COMPLETED">
+                                    <button class="dropdown-item" type="submit">Marcar como Completada</button>
+                                </form>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form th:action="@{/admin/appointments/{id}/status(id=${appointment.id})}" method="post">
+                                    <input type="hidden" name="status" value="CANCELLED">
+                                    <button class="dropdown-item text-danger" type="submit">Cancelar Cita</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="mt-3">
+                    <dt>Descripción:</dt>
+                    <dd th:if="${appointment.customDescription}" th:text="${appointment.customDescription}"></dd>
+                    <dd th:unless="${appointment.customDescription}" class="text-muted">No especificado</dd>
+                </div>
+
+                <hr class="my-4">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <small class="text-muted">
+                            Creada el: <span th:text="${#temporals.format(appointment.createdAt, 'dd/MM/yyyy HH:mm')}"></span>
+                        </small>
+                        <br>
+                        <small class="text-muted" th:if="${appointment.updatedAt != null}">
+                            Última actualización: <span th:text="${#temporals.format(appointment.updatedAt, 'dd/MM/yyyy HH:mm')}"></span>
+                        </small>
+                    </div>
+                    <div>
+                        <a th:href="@{/admin/appointments/{id}/edit(id=${appointment.id})}" 
+                           class="btn btn-warning me-2">
+                            <i class="fas fa-edit"></i> Editar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div th:insert="~{admin/templateAdmin.html::script}"></div>
+</body>
+</html>

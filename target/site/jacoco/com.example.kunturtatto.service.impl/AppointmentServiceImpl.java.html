@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AppointmentServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">kunturtatto</a> &gt; <a href="index.source.html" class="el_package">com.example.kunturtatto.service.impl</a> &gt; <span class="el_source">AppointmentServiceImpl.java</span></div><h1>AppointmentServiceImpl.java</h1><pre class="source lang-java linenums">package com.example.kunturtatto.service.impl;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.springframework.stereotype.Service;
+
+import com.example.kunturtatto.mapper.AppointmentMapper;
+import com.example.kunturtatto.model.Appointment;
+import com.example.kunturtatto.exception.*;
+import com.example.kunturtatto.model.Design;
+import com.example.kunturtatto.model.enums.AppointmentStatus;
+import com.example.kunturtatto.repository.AppointmentRepository;
+import com.example.kunturtatto.repository.DesignRepository;
+import com.example.kunturtatto.request.AppointmentRequest;
+import com.example.kunturtatto.request.AppointmentResponse;
+import com.example.kunturtatto.service.AppointmentService;
+import com.example.kunturtatto.service.IContactService;
+
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Service
+@RequiredArgsConstructor
+<span class="fc" id="L27">@Slf4j</span>
+@Transactional
+public class AppointmentServiceImpl implements AppointmentService {
+    private final AppointmentRepository appointmentRepository;
+    private final DesignRepository designRepository;
+    private final AppointmentMapper appointmentMapper;
+    private final IContactService contactService;
+
+    @Override
+    public AppointmentResponse createAppointment(AppointmentRequest request) throws InvalidAppointmentTimeException {
+<span class="nc" id="L37">        log.info(&quot;Creating new appointment for customer: {}&quot;, request.getCustomerEmail());</span>
+
+<span class="nc" id="L39">        validateAppointmentTime(request.getDate(), request.getTime());</span>
+
+<span class="nc" id="L41">        Appointment appointment = appointmentMapper.toEntity(request);</span>
+<span class="nc" id="L42">        appointment.setStatus(AppointmentStatus.PENDING);</span>
+
+<span class="nc bnc" id="L44" title="All 2 branches missed.">        if (request.getDesignId() != null) {</span>
+<span class="nc" id="L45">            Design design = designRepository.findById(request.getDesignId())</span>
+<span class="nc" id="L46">                    .orElseThrow(() -&gt; {</span>
+<span class="nc" id="L47">                        log.error(&quot;Design not found with ID: {}&quot;, request.getDesignId());</span>
+<span class="nc" id="L48">                        return new ResourceNotFoundException(&quot;Design not found&quot;);</span>
+                    });
+<span class="nc" id="L50">            appointment.setDesign(design);</span>
+        }
+
+<span class="nc" id="L53">        Appointment savedAppointment = appointmentRepository.save(appointment);</span>
+<span class="nc" id="L54">        log.debug(&quot;Appointment created with ID: {}&quot;, savedAppointment.getId());</span>
+
+<span class="nc" id="L56">        contactService.sendAppointmentConfirmation(savedAppointment);</span>
+
+<span class="nc" id="L58">        return appointmentMapper.toResponse(savedAppointment);</span>
+    }
+
+    @Override
+    public AppointmentResponse updateAppointment(Long id, AppointmentRequest request)
+            throws InvalidAppointmentTimeException {
+<span class="nc" id="L64">        log.info(&quot;Updating appointment with ID: {}&quot;, id);</span>
+
+<span class="nc" id="L66">        Appointment appointment = appointmentRepository.findById(id)</span>
+<span class="nc" id="L67">                .orElseThrow(() -&gt; {</span>
+<span class="nc" id="L68">                    log.error(&quot;Appointment not found with ID: {}&quot;, id);</span>
+<span class="nc" id="L69">                    return new ResourceNotFoundException(&quot;Appointment not found&quot;);</span>
+                });
+
+<span class="nc" id="L72">        validateAppointmentTime(request.getDate(), request.getTime());</span>
+
+<span class="nc" id="L74">        appointment = appointmentMapper.updateFromRequest(request, appointment);</span>
+
+<span class="nc bnc" id="L76" title="All 2 branches missed.">        if (request.getDesignId() != null &amp;&amp;</span>
+<span class="nc bnc" id="L77" title="All 4 branches missed.">                (appointment.getDesign() == null || !appointment.getDesign().getId().equals(request.getDesignId()))) {</span>
+<span class="nc" id="L78">            Design design = designRepository.findById(request.getDesignId())</span>
+<span class="nc" id="L79">                    .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Design not found&quot;));</span>
+<span class="nc" id="L80">            appointment.setDesign(design);</span>
+        }
+
+<span class="nc" id="L83">        Appointment updatedAppointment = appointmentRepository.save(appointment);</span>
+<span class="nc" id="L84">        log.debug(&quot;Appointment updated with ID: {}&quot;, updatedAppointment.getId());</span>
+
+<span class="nc" id="L86">        contactService.sendAppointmentUpdateNotification(updatedAppointment);</span>
+
+<span class="nc" id="L88">        return appointmentMapper.toResponse(updatedAppointment);</span>
+    }
+
+    @Override
+    public AppointmentResponse getAppointmentById(Long id) {
+<span class="nc" id="L93">        log.debug(&quot;Fetching appointment with ID: {}&quot;, id);</span>
+<span class="nc" id="L94">        return appointmentRepository.findById(id)</span>
+<span class="nc" id="L95">                .map(appointmentMapper::toResponse)</span>
+<span class="nc" id="L96">                .orElseThrow(() -&gt; {</span>
+<span class="nc" id="L97">                    log.error(&quot;Appointment not found with ID: {}&quot;, id);</span>
+<span class="nc" id="L98">                    return new ResourceNotFoundException(&quot;Appointment not found&quot;);</span>
+                });
+    }
+
+    @Override
+    public void deleteAppointment(Long id) {
+<span class="nc" id="L104">        log.info(&quot;Deleting appointment with ID: {}&quot;, id);</span>
+<span class="nc" id="L105">        Appointment appointment = appointmentRepository.findById(id)</span>
+<span class="nc" id="L106">                .orElseThrow(() -&gt; {</span>
+<span class="nc" id="L107">                    log.error(&quot;Appointment not found with ID: {}&quot;, id);</span>
+<span class="nc" id="L108">                    return new ResourceNotFoundException(&quot;Appointment not found&quot;);</span>
+                });
+
+<span class="nc" id="L111">        appointmentRepository.delete(appointment);</span>
+<span class="nc" id="L112">        log.debug(&quot;Appointment deleted with ID: {}&quot;, id);</span>
+<span class="nc" id="L113">    }</span>
+
+    @Override
+    public List&lt;AppointmentResponse&gt; getAllAppointments() {
+<span class="nc" id="L117">        log.debug(&quot;Fetching all appointments&quot;);</span>
+<span class="nc" id="L118">        return appointmentRepository.findAllByOrderByDateAscTimeAsc().stream()</span>
+<span class="nc" id="L119">                .map(appointmentMapper::toResponse)</span>
+<span class="nc" id="L120">                .collect(Collectors.toList());</span>
+    }
+
+    @Override
+    public List&lt;AppointmentResponse&gt; getAppointmentsByDate(LocalDate date) {
+<span class="nc" id="L125">        log.debug(&quot;Fetching appointments for date: {}&quot;, date);</span>
+<span class="nc" id="L126">        return appointmentRepository.findByDateOrderByTimeAsc(date).stream()</span>
+<span class="nc" id="L127">                .map(appointmentMapper::toResponse)</span>
+<span class="nc" id="L128">                .collect(Collectors.toList());</span>
+    }
+
+    @Override
+    public List&lt;AppointmentResponse&gt; getTodayAppointments() {
+<span class="nc" id="L133">        LocalDate today = LocalDate.now();</span>
+<span class="nc" id="L134">        log.debug(&quot;Fetching today's appointments&quot;);</span>
+<span class="nc" id="L135">        return getAppointmentsByDate(today);</span>
+    }
+
+    @Override
+    public List&lt;AppointmentResponse&gt; getUpcomingAppointments() {
+<span class="nc" id="L140">        LocalDate today = LocalDate.now();</span>
+<span class="nc" id="L141">        log.debug(&quot;Fetching upcoming appointments&quot;);</span>
+<span class="nc" id="L142">        return appointmentRepository.findByDateGreaterThanEqualOrderByDateAscTimeAsc(today).stream()</span>
+<span class="nc" id="L143">                .map(appointmentMapper::toResponse)</span>
+<span class="nc" id="L144">                .collect(Collectors.toList());</span>
+    }
+
+    @Override
+    public void cancelAppointment(Long id) {
+<span class="nc" id="L149">        log.info(&quot;Cancelling appointment with ID: {}&quot;, id);</span>
+<span class="nc" id="L150">        Appointment appointment = appointmentRepository.findById(id)</span>
+<span class="nc" id="L151">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Appointment not found&quot;));</span>
+
+<span class="nc" id="L153">        appointment.setStatus(AppointmentStatus.CANCELLED);</span>
+<span class="nc" id="L154">        appointmentRepository.save(appointment);</span>
+
+<span class="nc" id="L156">        contactService.sendAppointmentCancellation(appointment);</span>
+<span class="nc" id="L157">    }</span>
+
+    @Override
+    public void confirmAppointment(Long id) {
+<span class="nc" id="L161">        log.info(&quot;Confirming appointment with ID: {}&quot;, id);</span>
+<span class="nc" id="L162">        Appointment appointment = appointmentRepository.findById(id)</span>
+<span class="nc" id="L163">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Appointment not found&quot;));</span>
+
+<span class="nc" id="L165">        appointment.setStatus(AppointmentStatus.CONFIRMED);</span>
+<span class="nc" id="L166">        appointmentRepository.save(appointment);</span>
+
+<span class="nc" id="L168">        contactService.sendAppointmentConfirmation(appointment);</span>
+<span class="nc" id="L169">    }</span>
+
+    @Override
+    public void completeAppointment(Long id) {
+<span class="nc" id="L173">        log.info(&quot;Completing appointment with ID: {}&quot;, id);</span>
+<span class="nc" id="L174">        Appointment appointment = appointmentRepository.findById(id)</span>
+<span class="nc" id="L175">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Appointment not found&quot;));</span>
+
+<span class="nc" id="L177">        appointment.setStatus(AppointmentStatus.COMPLETED);</span>
+<span class="nc" id="L178">        appointmentRepository.save(appointment);</span>
+<span class="nc" id="L179">    }</span>
+
+    @Override
+    public AppointmentResponse changeAppointmentStatus(Long id, AppointmentStatus newStatus) {
+<span class="nc" id="L183">        log.info(&quot;Changing status of appointment ID: {} to {}&quot;, id, newStatus);</span>
+
+<span class="nc" id="L185">        Appointment appointment = appointmentRepository.findById(id)</span>
+<span class="nc" id="L186">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Appointment not found&quot;));</span>
+
+<span class="nc bnc" id="L188" title="All 4 branches missed.">        if (appointment.getStatus() == AppointmentStatus.COMPLETED &amp;&amp; newStatus != AppointmentStatus.COMPLETED) {</span>
+<span class="nc" id="L189">            throw new IllegalStateException(&quot;No se puede modificar una cita completada&quot;);</span>
+        }
+
+<span class="nc" id="L192">        appointment.setStatus(newStatus);</span>
+<span class="nc" id="L193">        Appointment updatedAppointment = appointmentRepository.save(appointment);</span>
+
+<span class="nc bnc" id="L195" title="All 5 branches missed.">        switch (newStatus) {</span>
+            case CONFIRMED:
+<span class="nc" id="L197">                contactService.sendAppointmentConfirmation(updatedAppointment);</span>
+<span class="nc" id="L198">                break;</span>
+            case CANCELLED:
+<span class="nc" id="L200">                contactService.sendAppointmentCancellation(updatedAppointment);</span>
+<span class="nc" id="L201">                break;</span>
+            case COMPLETED:
+<span class="nc" id="L203">                contactService.sendAppointmentCompletion(updatedAppointment);</span>
+<span class="nc" id="L204">                break;</span>
+            case PENDING:
+<span class="nc" id="L206">                contactService.sendAppointmentUpdateNotification(updatedAppointment);</span>
+<span class="nc" id="L207">                break;</span>
+            default:
+                break;
+        }
+
+<span class="nc" id="L212">        return appointmentMapper.toResponse(updatedAppointment);</span>
+    }
+
+    private void validateAppointmentTime(LocalDate date, String time) throws InvalidAppointmentTimeException {
+<span class="nc bnc" id="L216" title="All 2 branches missed.">        if (date.isEqual(LocalDate.now())) {</span>
+<span class="nc" id="L217">            LocalTime appointmentTime = LocalTime.parse(time);</span>
+<span class="nc bnc" id="L218" title="All 2 branches missed.">            if (appointmentTime.isBefore(LocalTime.now().plusHours(1))) {</span>
+<span class="nc" id="L219">                log.error(&quot;Attempt to create appointment with invalid time: {}&quot;, time);</span>
+<span class="nc" id="L220">                throw new InvalidAppointmentTimeException(&quot; is not a valid appointment time&quot;);</span>
+            }
+        }
+
+<span class="nc" id="L224">        LocalTime appointmentTime = LocalTime.parse(time);</span>
+<span class="nc bnc" id="L225" title="All 2 branches missed.">        if (appointmentTime.isBefore(LocalTime.of(9, 0))) {</span>
+<span class="nc" id="L226">            throw new InvalidAppointmentTimeException(&quot;Appointments cannot be before 9:00 AM&quot;);</span>
+        }
+<span class="nc bnc" id="L228" title="All 2 branches missed.">        if (appointmentTime.isAfter(LocalTime.of(18, 0))) {</span>
+<span class="nc" id="L229">            throw new InvalidAppointmentTimeException(&quot;Appointments cannot be after 6:00 PM&quot;);</span>
+        }
+<span class="nc" id="L231">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

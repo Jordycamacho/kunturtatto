@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DesignServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">kunturtatto</a> &gt; <a href="index.source.html" class="el_package">com.example.kunturtatto.service.impl</a> &gt; <span class="el_source">DesignServiceImpl.java</span></div><h1>DesignServiceImpl.java</h1><pre class="source lang-java linenums">package com.example.kunturtatto.service.impl;
+
+import com.example.kunturtatto.dto.DesignDto;
+import com.example.kunturtatto.request.DesignRequest;
+import com.example.kunturtatto.exception.ResourceNotFoundException;
+import com.example.kunturtatto.mapper.DesignMapper;
+import com.example.kunturtatto.model.Design;
+import com.example.kunturtatto.model.SubCategory;
+import com.example.kunturtatto.repository.DesignRepository;
+import com.example.kunturtatto.repository.SubCategoryRepository;
+import com.example.kunturtatto.service.DesignService;
+import com.example.kunturtatto.service.ImageService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+<span class="fc" id="L25">@Slf4j</span>
+@Service
+@RequiredArgsConstructor
+public class DesignServiceImpl implements DesignService {
+
+    private final DesignRepository designRepository;
+    private final SubCategoryRepository subCategoryRepository;
+    private final DesignMapper designMapper;
+    private final ImageService imageService;
+
+    @Override
+    @Transactional
+    public DesignDto createDesign(DesignRequest request, MultipartFile imageFile) {
+<span class="nc" id="L38">        log.info(&quot;Creating new design with title: {}&quot;, request.getTitle());</span>
+        
+<span class="nc" id="L40">        SubCategory subCategory = subCategoryRepository.findById(request.getSubCategoryId())</span>
+<span class="nc" id="L41">                .orElseThrow(() -&gt; {</span>
+<span class="nc" id="L42">                    log.error(&quot;SubCategory not found with ID: {}&quot;, request.getSubCategoryId());</span>
+<span class="nc" id="L43">                    return new ResourceNotFoundException(&quot;SubCategory not found with ID: &quot; + request.getSubCategoryId());</span>
+                });
+
+<span class="nc bnc" id="L46" title="All 4 branches missed.">        String imageName = imageFile != null &amp;&amp; !imageFile.isEmpty() ? </span>
+<span class="nc" id="L47">                imageService.saveImageNormal(imageFile) : </span>
+<span class="nc" id="L48">                imageService.getDefaultImage();</span>
+
+<span class="nc" id="L50">        Design design = Design.builder()</span>
+<span class="nc" id="L51">                .title(request.getTitle())</span>
+<span class="nc" id="L52">                .description(request.getDescription())</span>
+<span class="nc" id="L53">                .image(imageName)</span>
+<span class="nc" id="L54">                .subCategory(subCategory)</span>
+<span class="nc" id="L55">                .build();</span>
+
+<span class="nc" id="L57">        Design savedDesign = designRepository.save(design);</span>
+<span class="nc" id="L58">        log.debug(&quot;Design created successfully with ID: {}&quot;, savedDesign.getId());</span>
+        
+<span class="nc" id="L60">        return designMapper.toDesignDto(savedDesign);</span>
+    }
+
+    @Override
+    @Transactional
+    public DesignDto updateDesign(Long id, DesignRequest request, MultipartFile imageFile) {
+<span class="nc" id="L66">        log.info(&quot;Updating design with ID: {}&quot;, id);</span>
+        
+<span class="nc" id="L68">        Design design = designRepository.findById(id)</span>
+<span class="nc" id="L69">                .orElseThrow(() -&gt; {</span>
+<span class="nc" id="L70">                    log.error(&quot;Design not found with ID: {}&quot;, id);</span>
+<span class="nc" id="L71">                    return new ResourceNotFoundException(&quot;Design not found with ID: &quot; + id);</span>
+                });
+
+<span class="nc bnc" id="L74" title="All 4 branches missed.">        if (imageFile != null &amp;&amp; !imageFile.isEmpty()) {</span>
+<span class="nc" id="L75">            log.debug(&quot;Updating design image for ID: {}&quot;, id);</span>
+<span class="nc" id="L76">            String oldImage = design.getImage();</span>
+<span class="nc" id="L77">            String newImage = imageService.saveImageNormal(imageFile);</span>
+<span class="nc" id="L78">            design.setImage(newImage);</span>
+<span class="nc" id="L79">            imageService.deleteImageNormal(oldImage);</span>
+        }
+
+<span class="nc bnc" id="L82" title="All 2 branches missed.">        if (!design.getSubCategory().getId().equals(request.getSubCategoryId())) {</span>
+<span class="nc" id="L83">            SubCategory newSubCategory = subCategoryRepository.findById(request.getSubCategoryId())</span>
+<span class="nc" id="L84">                    .orElseThrow(() -&gt; {</span>
+<span class="nc" id="L85">                        log.error(&quot;SubCategory not found with ID: {}&quot;, request.getSubCategoryId());</span>
+<span class="nc" id="L86">                        return new ResourceNotFoundException(&quot;SubCategory not found with ID: &quot; + request.getSubCategoryId());</span>
+                    });
+<span class="nc" id="L88">            design.setSubCategory(newSubCategory);</span>
+        }
+
+<span class="nc" id="L91">        design.setTitle(request.getTitle());</span>
+<span class="nc" id="L92">        design.setDescription(request.getDescription());</span>
+        
+<span class="nc" id="L94">        Design updatedDesign = designRepository.save(design);</span>
+<span class="nc" id="L95">        log.info(&quot;Design with ID: {} updated successfully&quot;, id);</span>
+        
+<span class="nc" id="L97">        return designMapper.toDesignDto(updatedDesign);</span>
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public DesignDto getDesignById(Long id) {
+<span class="nc" id="L103">        log.debug(&quot;Fetching design with ID: {}&quot;, id);</span>
+        
+<span class="nc" id="L105">        Design design = designRepository.findById(id)</span>
+<span class="nc" id="L106">                .orElseThrow(() -&gt; {</span>
+<span class="nc" id="L107">                    log.error(&quot;Design not found with ID: {}&quot;, id);</span>
+<span class="nc" id="L108">                    return new ResourceNotFoundException(&quot;Design not found with ID: &quot; + id);</span>
+                });
+        
+<span class="nc" id="L111">        return designMapper.toDesignDto(design);</span>
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List&lt;DesignDto&gt; getAllDesigns() {
+<span class="nc" id="L117">        log.debug(&quot;Fetching all designs&quot;);</span>
+        
+<span class="nc" id="L119">        return designRepository.findAllWithRelations().stream()</span>
+<span class="nc" id="L120">                .map(designMapper::toDesignDto)</span>
+<span class="nc" id="L121">                .collect(Collectors.toList());</span>
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page&lt;DesignDto&gt; getAllDesignspPageable(Pageable pageable) {
+<span class="nc" id="L127">        log.debug(&quot;Fetching all designs paginated&quot;);</span>
+<span class="nc" id="L128">        return designRepository.findAllWithRelationsPageable(pageable)</span>
+<span class="nc" id="L129">                .map(designMapper::toDesignDto);</span>
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page&lt;DesignDto&gt; getDesignsBySubCategory(Long subCategoryId, Pageable pageable) {
+<span class="nc" id="L135">        log.debug(&quot;Fetching designs for subcategory ID: {} paginated&quot;, subCategoryId);</span>
+<span class="nc" id="L136">        return designRepository.findBySubCategoryId(subCategoryId, pageable)</span>
+<span class="nc" id="L137">                .map(designMapper::toDesignDto);</span>
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page&lt;DesignDto&gt; getDesignsByCategory(Long categoryId, Pageable pageable) {
+<span class="nc" id="L143">        log.debug(&quot;Fetching designs for category ID: {} paginated&quot;, categoryId);</span>
+<span class="nc" id="L144">        return designRepository.findBySubCategoryCategoryId(categoryId, pageable)</span>
+<span class="nc" id="L145">                .map(designMapper::toDesignDto);</span>
+    }
+
+    @Override
+    @Transactional
+    public void deleteDesign(Long id) {
+<span class="nc" id="L151">        log.info(&quot;Deleting design with ID: {}&quot;, id);</span>
+        
+<span class="nc" id="L153">        Design design = designRepository.findById(id)</span>
+<span class="nc" id="L154">                .orElseThrow(() -&gt; {</span>
+<span class="nc" id="L155">                    log.error(&quot;Design not found for deletion with ID: {}&quot;, id);</span>
+<span class="nc" id="L156">                    return new ResourceNotFoundException(&quot;Design not found with ID: &quot; + id);</span>
+                });
+
+        // Delete associated image
+<span class="nc bnc" id="L160" title="All 2 branches missed.">        if (!design.getImage().equals(imageService.getDefaultImage())) {</span>
+<span class="nc" id="L161">            imageService.deleteImageNormal(design.getImage());</span>
+        }
+
+<span class="nc" id="L164">        designRepository.delete(design);</span>
+<span class="nc" id="L165">        log.info(&quot;Design with ID: {} deleted successfully&quot;, id);</span>
+<span class="nc" id="L166">    }</span>
+
+    @Override
+    @Transactional
+    public DesignDto updateDesignImage(Long id, MultipartFile imageFile) {
+<span class="nc" id="L171">        log.info(&quot;Updating image for design with ID: {}&quot;, id);</span>
+        
+<span class="nc bnc" id="L173" title="All 4 branches missed.">        if (imageFile == null || imageFile.isEmpty()) {</span>
+<span class="nc" id="L174">            log.warn(&quot;Empty image file provided for design ID: {}&quot;, id);</span>
+<span class="nc" id="L175">            throw new IllegalArgumentException(&quot;Image file cannot be empty&quot;);</span>
+        }
+
+<span class="nc" id="L178">        Design design = designRepository.findById(id)</span>
+<span class="nc" id="L179">                .orElseThrow(() -&gt; {</span>
+<span class="nc" id="L180">                    log.error(&quot;Design not found with ID: {}&quot;, id);</span>
+<span class="nc" id="L181">                    return new ResourceNotFoundException(&quot;Design not found with ID: &quot; + id);</span>
+                });
+
+<span class="nc" id="L184">        String oldImage = design.getImage();</span>
+<span class="nc" id="L185">        String newImage = imageService.saveImageNormal(imageFile);</span>
+<span class="nc" id="L186">        design.setImage(newImage);</span>
+        
+<span class="nc bnc" id="L188" title="All 2 branches missed.">        if (!oldImage.equals(imageService.getDefaultImage())) {</span>
+<span class="nc" id="L189">            imageService.deleteImageNormal(oldImage);</span>
+        }
+
+<span class="nc" id="L192">        Design updatedDesign = designRepository.save(design);</span>
+<span class="nc" id="L193">        log.info(&quot;Image updated successfully for design ID: {}&quot;, id);</span>
+        
+<span class="nc" id="L195">        return designMapper.toDesignDto(updatedDesign);</span>
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List&lt;DesignDto&gt; searchDesigns(String query) {
+<span class="nc" id="L201">        log.debug(&quot;Searching designs with query: {}&quot;, query);</span>
+        
+<span class="nc" id="L203">        return designRepository.findByTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCase(query, query).stream()</span>
+<span class="nc" id="L204">                .map(designMapper::toDesignDto)</span>
+<span class="nc" id="L205">                .collect(Collectors.toList());</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

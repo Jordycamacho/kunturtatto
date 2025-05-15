@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CategoryServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">kunturtatto</a> &gt; <a href="index.source.html" class="el_package">com.example.kunturtatto.service.impl</a> &gt; <span class="el_source">CategoryServiceImpl.java</span></div><h1>CategoryServiceImpl.java</h1><pre class="source lang-java linenums">package com.example.kunturtatto.service.impl;
+
+import com.example.kunturtatto.dto.CategoryDto;
+import com.example.kunturtatto.mapper.CategoryMapper;
+import com.example.kunturtatto.model.Category;
+import com.example.kunturtatto.repository.CategoryRepository;
+import com.example.kunturtatto.request.CategoryRequest;
+import com.example.kunturtatto.service.CategoryService;
+import com.example.kunturtatto.service.ImageService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+<span class="fc" id="L19">@Slf4j</span>
+@Service
+@RequiredArgsConstructor
+public class CategoryServiceImpl implements CategoryService {
+
+    private final CategoryRepository categoryRepository;
+    private final CategoryMapper categoryMapper;
+    private final ImageService imageService;
+
+    @Override
+    @Transactional
+    public CategoryDto createCategory(CategoryRequest request, MultipartFile imageFile) {
+<span class="nc" id="L31">        log.info(&quot;Creating new category with name: {}&quot;, request.getName());</span>
+        
+<span class="nc bnc" id="L33" title="All 4 branches missed.">        String imageName = imageFile != null &amp;&amp; !imageFile.isEmpty() ? </span>
+<span class="nc" id="L34">            imageService.saveImageNormal(imageFile) : </span>
+<span class="nc" id="L35">            imageService.getDefaultImage();</span>
+
+<span class="nc" id="L37">        Category category = Category.builder()</span>
+<span class="nc" id="L38">                .name(request.getName())</span>
+<span class="nc" id="L39">                .image(imageName)</span>
+<span class="nc" id="L40">                .build();</span>
+
+<span class="nc" id="L42">        Category savedCategory = categoryRepository.save(category);</span>
+<span class="nc" id="L43">        log.debug(&quot;Category created successfully with ID: {}&quot;, savedCategory.getId());</span>
+        
+<span class="nc" id="L45">        return categoryMapper.toCategoryDto(savedCategory);</span>
+    }
+
+    @Override
+    @Transactional
+    public CategoryDto updateCategory(Long id, CategoryRequest request, MultipartFile imageFile) {
+<span class="nc" id="L51">        log.info(&quot;Updating category with ID: {}&quot;, id);</span>
+        
+<span class="nc" id="L53">        Category category = categoryRepository.findById(id)</span>
+<span class="nc" id="L54">                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Category not found&quot;));</span>
+
+<span class="nc bnc" id="L56" title="All 4 branches missed.">        if (imageFile != null &amp;&amp; !imageFile.isEmpty()) {</span>
+<span class="nc" id="L57">            log.debug(&quot;Updating category image for ID: {}&quot;, id);</span>
+<span class="nc" id="L58">            String oldImage = category.getImage();</span>
+<span class="nc" id="L59">            String newImage = imageService.saveImageNormal(imageFile);</span>
+<span class="nc" id="L60">            category.setImage(newImage);</span>
+<span class="nc" id="L61">            imageService.deleteImageNormal(oldImage);</span>
+        }
+
+<span class="nc" id="L64">        category.setName(request.getName());</span>
+<span class="nc" id="L65">        Category updatedCategory = categoryRepository.save(category);</span>
+<span class="nc" id="L66">        log.info(&quot;Category with ID: {} updated successfully&quot;, id);</span>
+        
+<span class="nc" id="L68">        return categoryMapper.toCategoryDto(updatedCategory);</span>
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public CategoryDto getCategoryById(Long id) {
+<span class="nc" id="L74">        log.debug(&quot;Fetching category with ID: {}&quot;, id);</span>
+        
+<span class="nc" id="L76">        Category category = categoryRepository.findById(id)</span>
+<span class="nc" id="L77">                .orElseThrow();</span>
+        
+<span class="nc" id="L79">        return categoryMapper.toCategoryDto(category);</span>
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List&lt;CategoryDto&gt; getAllCategories() {
+<span class="nc" id="L85">        log.debug(&quot;Fetching all categories&quot;);</span>
+        
+<span class="nc" id="L87">        return categoryRepository.findAll().stream()</span>
+<span class="nc" id="L88">                .map(categoryMapper::toCategoryDto)</span>
+<span class="nc" id="L89">                .collect(Collectors.toList());</span>
+    }
+
+    @Override
+    @Transactional
+    public void deleteCategory(Long id) {
+<span class="nc" id="L95">        log.info(&quot;Deleting category with ID: {}&quot;, id);</span>
+        
+<span class="nc" id="L97">        Category category = categoryRepository.findById(id)</span>
+<span class="nc" id="L98">                .orElseThrow();</span>
+
+        // Delete associated image
+<span class="nc bnc" id="L101" title="All 2 branches missed.">        if (!category.getImage().equals(imageService.getDefaultImage())) {</span>
+<span class="nc" id="L102">            imageService.deleteImageNormal(category.getImage());</span>
+        }
+
+<span class="nc" id="L105">        categoryRepository.delete(category);</span>
+<span class="nc" id="L106">        log.info(&quot;Category with ID: {} deleted successfully&quot;, id);</span>
+<span class="nc" id="L107">    }</span>
+
+    @Override
+    @Transactional(readOnly = true)
+    public List&lt;CategoryDto&gt; getCategoriesWithSubcategories() {
+<span class="nc" id="L112">        log.debug(&quot;Fetching all categories with their subcategories&quot;);</span>
+        
+<span class="nc" id="L114">        return categoryRepository.findAllWithSubcategories().stream()</span>
+<span class="nc" id="L115">                .map(categoryMapper::toCategoryDto)</span>
+<span class="nc" id="L116">                .collect(Collectors.toList());</span>
+    }
+
+    @Override
+    @Transactional
+    public CategoryDto updateCategoryImage(Long id, MultipartFile imageFile) {
+<span class="nc" id="L122">        log.info(&quot;Updating image for category with ID: {}&quot;, id);</span>
+        
+<span class="nc bnc" id="L124" title="All 4 branches missed.">        if (imageFile == null || imageFile.isEmpty()) {</span>
+<span class="nc" id="L125">            log.warn(&quot;Empty image file provided for category ID: {}&quot;, id);</span>
+<span class="nc" id="L126">            throw new IllegalArgumentException(&quot;Image file cannot be empty&quot;);</span>
+        }
+
+<span class="nc" id="L129">        Category category = categoryRepository.findById(id)</span>
+<span class="nc" id="L130">                .orElseThrow();</span>
+
+<span class="nc" id="L132">        String oldImage = category.getImage();</span>
+<span class="nc" id="L133">        String newImage = imageService.saveImageNormal(imageFile);</span>
+<span class="nc" id="L134">        category.setImage(newImage);</span>
+        
+<span class="nc bnc" id="L136" title="All 2 branches missed.">        if (!oldImage.equals(imageService.getDefaultImage())) {</span>
+<span class="nc" id="L137">            imageService.deleteImageNormal(oldImage);</span>
+        }
+
+<span class="nc" id="L140">        Category updatedCategory = categoryRepository.save(category);</span>
+<span class="nc" id="L141">        log.info(&quot;Image updated successfully for category ID: {}&quot;, id);</span>
+        
+<span class="nc" id="L143">        return categoryMapper.toCategoryDto(updatedCategory);</span>
+    }
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

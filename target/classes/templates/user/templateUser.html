@@ -1,0 +1,139 @@
+<head th:fragment="header">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1RQQVKEJ4T"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-1RQQVKEJ4T');
+    </script>
+
+    <!--=============== FAVICON ===============-->
+    <link rel="shortcut icon" href="assets/img/favicon.png" type="image/x-icon">
+    <link rel="icon" th:href="@{/images/logo.svg}" type="image/png">
+    <!--=============== REMIXICONS ===============-->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.2.0/fonts/remixicon.css" rel="stylesheet">
+
+    <!--=============== CSS ===============-->
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/contact.css}">
+
+    <title>KunturTattoo</title>
+</head>
+
+<header class="header" id="header" th:fragment="nav_user">
+
+    <nav class="nav container">
+        <a th:href="@{/KunturTattoo}" class="nav__logo">
+            <img th:src="@{/images/logo-kuntur.png}" alt="" style="width: 150px; height: auto;">
+        </a>
+
+        <div class="nav__menu" id="nav-menu">
+            <ul class="nav__list">
+                <li class="nav__item">
+                    <a th:href="@{/KunturTattoo}" class="nav__link">Inicio</a>
+                </li>
+
+                <li class="nav__item">
+                    <a th:href="@{/KunturTattoo/diseños}" class="nav__link">Galeria</a>
+                </li>
+
+                <li class="nav__item">
+                    <a th:href="@{/KunturTattoo/contacto}" class="nav__link">Contacto</a>
+                </li>
+            </ul>
+
+
+            <!--Close button-->
+            <div class="nav__close" id="nav-close">
+                <i class="ri-close-line"></i>
+            </div>
+        </div>
+
+        <!-- Toggle button-->
+        <div class="nav__toggle" id="nav-toggle">
+            <i class="ri-menu-fill"></i>
+        </div>
+
+    </nav>
+</header>
+
+<!--==================== FOOTER ====================-->
+<div th:fragment="footer">
+    <footer class="footer">
+        <div class="footer__container container grid">
+            <div class="footer__content grid">
+                <div>
+                    <a th:href="@{/KunturTattoo}" class="nav__logo">
+                        <img th:src="@{/images/logo-kuntur.png}" alt="" style="width: 150px; height: auto;">
+                    </a>
+                    <p class="footer__description">
+                        <span class="slogan curvo">Tu historia, mi tinta.</span>
+                    </p>
+                </div>
+
+                <div class="footer__data grid">
+                    <div>
+                        <h3 class="footer__title">Enlaces cortos</h3>
+
+                        <ul class="footer__links">
+                            <li>
+                                <a th:href="@{/KunturTattoo}" class="footer__link">inicio</a>
+                            </li>
+                            <li>
+                                <a th:href="@{/KunturTattoo/diseños}" class="footer__link">galeria</a>
+                            </li>
+                            <li>
+                                <a th:href="@{/KunturTattoo/contacto}" class="footer__link">Contacto</a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h3 class="footer__title">Información</h3>
+
+                        <li>
+                            <a href="#" class="footer__link">Terminos y Condiciones</a>
+                        </li>
+                        <li>
+                            <a href="#" class="footer__link">Pólitica de Privacidad</a>
+                        </li>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer__group">
+                <div class="footer__social">
+                    <a href="#" target="_blank" class="footer__social-link">
+                        <i class="ri-facebook-line"></i>
+                    </a>
+
+                    <a href="https://www.instagram.com/crys_tattoo.ink?igsh=MXQzOHJ6cHFvaDBzcQ==" target="_blank" class="footer__social-link">
+                        <i class="ri-instagram-line"></i>
+                    </a>
+
+                    <a href="#" target="_blank" class="footer__social-link">
+                        <i class="ri-twitter-line"></i>
+                    </a>
+
+                    <a href="#" target="_blank" class="footer__social-link">
+                        <i class="ri-youtube-line"></i>
+                    </a>
+                </div>
+
+                <span class="footer__copy">
+                    &#169; Copyright Jordi Camacho. All rights reserved
+                </span>
+            </div>
+        </div>
+    </footer>
+</div>
+
+<div th:fragment="script">
+    <script th:src="@{/js/scrollreveal.min.js}"></script>
+    <script th:src="@{/js/main.js}"></script>
+</div>

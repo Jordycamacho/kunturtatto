@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>securityConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">kunturtatto</a> &gt; <a href="index.source.html" class="el_package">com.example.kunturtatto.config</a> &gt; <span class="el_source">securityConfig.java</span></div><h1>securityConfig.java</h1><pre class="source lang-java linenums">package com.example.kunturtatto.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+
+import com.example.kunturtatto.service.impl.IUserDetailServiceImpl;
+
+@Configuration
+@EnableWebSecurity
+@EnableMethodSecurity
+<span class="fc" id="L21">public class securityConfig {</span>
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+<span class="fc" id="L25">        http</span>
+<span class="fc" id="L26">                .csrf(csrf -&gt; csrf.disable())</span>
+<span class="fc" id="L27">                .authorizeHttpRequests(auth -&gt; auth</span>
+<span class="fc" id="L28">                        .requestMatchers(&quot;/css/**&quot;, &quot;/js/**&quot;, &quot;/images/**&quot;,&quot;/robots.txt&quot;).permitAll()</span>
+<span class="fc" id="L29">                        .requestMatchers(&quot;/admin/appointments/**&quot;).authenticated()</span>
+<span class="fc" id="L30">                        .requestMatchers(&quot;/KunturTattoo/**&quot;).permitAll()</span>
+<span class="fc" id="L31">                        .requestMatchers(&quot;/admin/**&quot;).authenticated()</span>
+<span class="fc" id="L32">                        .requestMatchers(&quot;/mail/**&quot;).permitAll()</span>
+<span class="fc" id="L33">                        .anyRequest().authenticated())</span>
+<span class="fc" id="L34">                .formLogin(form -&gt; form</span>
+<span class="fc" id="L35">                        .loginPage(&quot;/KunturTattoo/ingresar&quot;)</span>
+<span class="fc" id="L36">                        .defaultSuccessUrl(&quot;/KunturTattoo&quot;, true)</span>
+<span class="fc" id="L37">                        .permitAll())</span>
+<span class="fc" id="L38">                .logout(logout -&gt; logout</span>
+<span class="fc" id="L39">                        .logoutUrl(&quot;/KunturTattoo/logout&quot;)</span>
+<span class="fc" id="L40">                        .logoutSuccessUrl(&quot;/KunturTattoo&quot;)</span>
+<span class="fc" id="L41">                        .invalidateHttpSession(true)</span>
+<span class="fc" id="L42">                        .permitAll());</span>
+<span class="fc" id="L43">        return http.build();</span>
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
+            throws Exception {
+<span class="fc" id="L49">        return authenticationConfiguration.getAuthenticationManager();</span>
+    }
+
+    @Bean
+    public AuthenticationProvider authenticationProvider(IUserDetailServiceImpl userDetailService) {
+<span class="fc" id="L54">        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();</span>
+<span class="fc" id="L55">        provider.setPasswordEncoder(passwordEncoder());</span>
+<span class="fc" id="L56">        provider.setUserDetailsService(userDetailService);</span>
+<span class="fc" id="L57">        return provider;</span>
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+<span class="fc" id="L62">        return new BCryptPasswordEncoder();</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

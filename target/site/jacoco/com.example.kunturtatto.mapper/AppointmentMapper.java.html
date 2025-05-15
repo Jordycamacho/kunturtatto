@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AppointmentMapper.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">kunturtatto</a> &gt; <a href="index.source.html" class="el_package">com.example.kunturtatto.mapper</a> &gt; <span class="el_source">AppointmentMapper.java</span></div><h1>AppointmentMapper.java</h1><pre class="source lang-java linenums">package com.example.kunturtatto.mapper;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+
+import com.example.kunturtatto.model.Appointment;
+import com.example.kunturtatto.request.AppointmentRequest;
+import com.example.kunturtatto.request.AppointmentResponse;
+
+@Mapper(componentModel = &quot;spring&quot;)
+public interface AppointmentMapper {
+    @Mapping(target = &quot;design&quot;, ignore = true)
+    Appointment toEntity(AppointmentRequest request);
+    
+    @Mapping(target = &quot;designTitle&quot;, source = &quot;design.title&quot;)
+    AppointmentResponse toResponse(Appointment appointment);
+    
+    default Appointment updateFromRequest(AppointmentRequest request, Appointment appointment) {
+<span class="nc" id="L19">        appointment.setCustomerName(request.getCustomerName());</span>
+<span class="nc" id="L20">        appointment.setCustomerEmail(request.getCustomerEmail());</span>
+<span class="nc" id="L21">        appointment.setCustomerPhone(request.getCustomerPhone());</span>
+<span class="nc" id="L22">        appointment.setDate(request.getDate());</span>
+<span class="nc" id="L23">        appointment.setTime(request.getTime());</span>
+<span class="nc" id="L24">        appointment.setPrice(request.getPrice());</span>
+<span class="nc" id="L25">        appointment.setTattooSize(request.getTattooSize());</span>
+<span class="nc" id="L26">        appointment.setBodyPart(request.getBodyPart());</span>
+<span class="nc" id="L27">        appointment.setReferenceLinks(request.getReferenceLinks());</span>
+<span class="nc" id="L28">        appointment.setCustomDescription(request.getCustomDescription());</span>
+<span class="nc" id="L29">        return appointment;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:insert="~{admin/templateAdmin.html::header}"></head>
+<body>
+    <div th:insert="~{admin/templateAdmin.html::nav_user}"></div>
+    <div th:insert="~{admin/templateAdmin.html::nav_admin}"></div>
+
+    <div class="container mt-4">
+        <h1>Usuarios</h1>
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Email</th>
+                    <th>Fecha de Registro</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="user : ${users}">
+                    <td th:text="${user.email}">Email del Usuario</td>
+                    <td th:text="${#dates.format(user.registrationDate, 'yyyy-MM-dd HH:mm:ss')}">Fecha de Registro</td>
+                    <td>
+                        <form th:action="@{'/admin/usuarios/eliminar/' + ${user.id}}" method="post" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este usuario?');">
+                            <button type="submit" class="btn btn-danger">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div th:insert="~{admin/templateAdmin.html::script}"></div>
+</body>
+</html>

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RemainderServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">kunturtatto</a> &gt; <a href="index.source.html" class="el_package">com.example.kunturtatto.service.impl</a> &gt; <span class="el_source">RemainderServiceImpl.java</span></div><h1>RemainderServiceImpl.java</h1><pre class="source lang-java linenums">package com.example.kunturtatto.service.impl;
+
+import org.springframework.stereotype.Service;
+
+import com.example.kunturtatto.service.RemainderService;
+
+@Service
+<span class="fc" id="L8">public class RemainderServiceImpl implements RemainderService {</span>
+
+    @Override
+    public void sendMailRemainder() {
+        // TODO Auto-generated method stub
+<span class="nc" id="L13">        throw new UnsupportedOperationException(&quot;Unimplemented method 'sendMailRemainder'&quot;);</span>
+    }
+    /* 
+    private static final Logger log = LoggerFactory.getLogger(RemainderServiceImpl.class);
+
+    @Value(&quot;${email.sender}&quot;)
+    private String myEmail;
+
+    @Autowired
+    private AppointmentService appointmentService;
+    @Autowired
+    private JavaMailSender javaMailSender;
+
+    @Override
+    @Scheduled(cron = &quot;0 0 9 * * ?&quot;)
+    public void sendMailRemainder() {
+        List&lt;AppointmentResponse&gt; todayAppointments = appointmentService.getAllAppointments();
+        if (todayAppointments.isEmpty()) {
+            return;
+        }
+
+        MimeMessagePreparator messagePreparator = mimeMessage -&gt; {
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
+
+            helper.setFrom(myEmail);
+            helper.setTo(myEmail);
+            helper.setSubject(&quot;Recordatorio de Citas del Día&quot;);
+
+            String htmlContent = buildReminderEmailHtml(todayAppointments);
+            helper.setText(htmlContent, true);
+        };
+
+        try {
+            javaMailSender.send(messagePreparator);
+            log.info(&quot;Recordatorio de citas enviado correctamente&quot;);
+        } catch (MailException e) {
+            log.error(&quot;Error al enviar recordatorio de citas&quot;, e);
+        }
+    }
+
+    private String buildReminderEmailHtml(List&lt;AppointmentResponse&gt; appointments) {
+        StringBuilder sb = new StringBuilder(&quot;&quot;&quot;
+                &lt;!DOCTYPE html&gt;
+                &lt;html&gt;
+                &lt;head&gt;
+                    &lt;style&gt;
+                        body { font-family: Arial, sans-serif; }
+                        .container { max-width: 600px; margin: 0 auto; }
+                        .header { color: #333; border-bottom: 1px solid #eee; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
+                        th { background-color: #f5f5f5; }
+                    &lt;/style&gt;
+                &lt;/head&gt;
+                &lt;body&gt;
+                    &lt;div class=&quot;container&quot;&gt;
+                        &lt;div class=&quot;header&quot;&gt;
+                            &lt;h2&gt;Recordatorio de Citas&lt;/h2&gt;
+                            &lt;p&gt;Tienes %d citas programadas para hoy:&lt;/p&gt;
+                        &lt;/div&gt;
+
+                        &lt;table&gt;
+                            &lt;tr&gt;
+                                &lt;th&gt;Hora&lt;/th&gt;
+                                &lt;th&gt;Email&lt;/th&gt;
+                                &lt;th&gt;Diseño&lt;/th&gt;
+                            &lt;/tr&gt;
+                &quot;&quot;&quot;.formatted(appointments.size()));
+
+        appointments.forEach(appt -&gt; sb.append(&quot;&quot;&quot;
+                            &lt;tr&gt;
+                                &lt;td&gt;%s&lt;/td&gt;
+                                &lt;td&gt;%s&lt;/td&gt;
+                                &lt;td&gt;%s&lt;/td&gt;
+                            &lt;/tr&gt;
+                &quot;&quot;&quot;.formatted(
+                appt.getTime(),
+                appt.getCustomerEmail(),
+                appt.getDesignTitle() != null ? appt.getDesignTitle() : &quot;Sin diseño especificado&quot;)));
+
+        sb.append(&quot;&quot;&quot;
+                        &lt;/table&gt;
+                    &lt;/div&gt;
+                &lt;/body&gt;
+                &lt;/html&gt;
+                &quot;&quot;&quot;);
+
+        return sb.toString();
+    }*/
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

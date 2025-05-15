@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:fragment="header">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" th:href="@{/images/logo.svg}" type="image/png">
+    <!--=============== FAVICON ===============-->
+    <link rel="shortcut icon" href="assets/img/favicon.png" type="image/x-icon">
+
+    <!--=============== REMIXICONS ===============-->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.2.0/fonts/remixicon.css" rel="stylesheet">
+
+    <!--=============== CSS ===============-->
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/contact.css}">
+
+    <title>KunturTattoo</title>
+</head>
+
+<body>
+    <header th:insert="~{user/templateUser.html::nav_user}"></header>
+
+    <main class="main">
+        <!--==================== HOME ====================-->
+        <section class="home section" id="home">
+            <img src="./images/img_inicio.jpg" alt="home image" class="home__bg">
+            <div class="home__shadow"></div>
+
+            <div class="home__container container grid">
+                <div class="home__data">
+                    <h3 class="home__subtitle">
+                        Bienvenido a KunturTattoo
+                    </h3>
+                    <h1 class="home__title">
+                        Explora <br>
+                        Nuestro contenido
+                    </h1>
+
+                    <p class="home__description">
+                        <span class="slogan">Tu historia, mi tinta.</span>
+                    </p>
+
+                    <a th:href="@{/KunturTattoo/diseños}" class="button" >
+                        Ver todas las categorias<i class="ri-arrow-right-line"></i>
+                    </a>
+                </div>
+
+                <div class="home__cards grid">
+                    <div th:each="subcategory : ${tattooSubcategories}">
+                        <a th:href="@{/KunturTattoo/diseños(subCategoryId=${subcategory.id})}" class="home__card-link">
+                            <article class="home__card">
+                                <img th:src="@{'/images/' + ${subcategory.image}}" alt="subcategory image" class="home__card-img">
+                                <h3 class="home__card-title" th:text="${subcategory.name}">Subcategoría</h3>
+                                <div class="home__card-shadow"></div>
+                            </article>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!--==================== ABOUT ====================-->
+        <section class="about section" id="about">
+            <div class="about__container container grid">
+                <div class="about__data">
+                    <h2 class="section__title">
+                        Compromiso con el cliente
+                    </h2>
+
+                    <p class="about__description">
+                        Aquí, el arte se mezcla con calidez humana. Nuestro espacio está diseñado para que te sientas como en casa: 
+                        un ambiente relajado, amistoso y libre de prisas, donde escucho tus ideas con atención y las transformo 
+                        en una pieza única que refleje tu esencia.  
+                        <br>
+                        Ya seas primerizx o unx coleccionista, nuestra prioridad es que vivas un proceso tranquilo y disfrutes cada 
+                        detalle. Porque un gran tatuaje no solo luce bien, sino que también te hace sentir bien.  
+
+                    </p>
+
+                    <a href="#" class="button">
+                        Ver Diseños <i class="ri-arrow-right-line"></i>
+                    </a>
+                </div>
+
+                <div class="about__image">
+                    <img src="./images/img_compromiso.jpg" alt="about image" class="about__img">
+                    <div class="about__shadow"></div>
+                </div>
+            </div>
+        </section>
+
+        <!--==================== POPULAR ====================-->
+        <section class="popular section" id="popular">
+            <h2 class="section__title">
+                Diseños Propios
+            </h2>
+        
+            <div class="popular__container container grid">
+                <div th:each="subcategory : ${designSubcategories}">
+                    <a th:href="@{/KunturTattoo/diseños(subCategoryId=${subcategory.id})}" class="popular__card-link">
+                        <article class="popular__card">
+                            <div class="popular__image">
+                                <img th:src="@{'/images/' + ${subcategory.image}}" alt="subcategory image" class="popular__img">
+                                <div class="popular__shadow"></div>
+                            </div>
+                            <h2 class="popular__title" th:text="${subcategory.name}">Nombre Subcategoría</h2>
+                        </article>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!--==================== EXPLORE ====================-->
+        <section class="explore section" id="explore">
+            <div class="explore__container">
+                <div class="explore__image">
+                    <img src="./images/Tatto-inicio.jpg" alt="" class="explore__img">
+                    <div class="explore__shadow"></div>
+                </div>
+
+                <div class="explore__content container grid">
+                    <div class="explore__data">
+                        <h2 class="section__title">
+                            Nuestra Misión
+                        </h2>
+
+                        <p class="explore__description">
+                            En KunturTattoo, creemos que el arte corporal va más allá de la piel: es un acto de confianza, 
+                            identidad y conexión humana. Nuestra misión es honrar tus historias a través de diseños únicos, 
+                            creados con ética, respeto y dedicación artesanal.
+                        
+                        </p>
+                    </div>
+
+
+                </div>
+            </div>
+        </section>
+
+        <!--==================== JOIN ====================-->
+        <section class="join section">
+            <div class="join__container container grid">
+                <div class="join__data">
+                    <h2 class="section__title">
+                        ¿Quieres <br>
+                        Más Noticias?
+                    </h2>
+
+                    <p class="join__description">
+                        Suscribete para recibir noticioas 
+                        acerca de tatuajes y ofertas.
+                    </p>
+
+                    <form action="" class="join__form">
+                        <input type="email" placeholder="Ingresa tu correo" class="join__input">
+                        <button class="join__button button">
+                            Suscribete para Noticias<i class="ri-arrow-right-line"></i>
+                        </button>
+                    </form>
+                </div>
+
+                <div class="join__image">
+                    <img src="./images/img_noticias.jpg" alt="" class="join__img">
+                    <div class="join__shadow"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div th:insert="~{user/templateUser.html::footer}"></div>
+
+    <div th:insert="~{user/templateUser.html::script}"></div>
+</body>
+
+</html>

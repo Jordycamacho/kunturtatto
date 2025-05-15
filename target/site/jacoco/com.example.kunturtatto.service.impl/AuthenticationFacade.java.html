@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AuthenticationFacade.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">kunturtatto</a> &gt; <a href="index.source.html" class="el_package">com.example.kunturtatto.service.impl</a> &gt; <span class="el_source">AuthenticationFacade.java</span></div><h1>AuthenticationFacade.java</h1><pre class="source lang-java linenums">package com.example.kunturtatto.service.impl;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+
+import com.example.kunturtatto.model.User;
+import com.example.kunturtatto.repository.UserRepository;
+import com.example.kunturtatto.service.IAuthenticationFacade;
+
+@Service
+public class AuthenticationFacade implements IAuthenticationFacade {
+
+    private final UserRepository userRepository;
+    
+<span class="fc" id="L17">    public AuthenticationFacade(UserRepository userRepository) {</span>
+<span class="fc" id="L18">        this.userRepository = userRepository;</span>
+<span class="fc" id="L19">    }</span>
+
+    @Override
+    public User getAuthenticatedUser() {
+<span class="nc" id="L23">        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();</span>
+        
+<span class="nc bnc" id="L25" title="All 4 branches missed.">        if (authentication == null || !authentication.isAuthenticated()) {</span>
+<span class="nc" id="L26">            return null;</span>
+        }
+        
+<span class="nc" id="L29">        String email = authentication.getName();</span>
+<span class="nc" id="L30">        return userRepository.findUserByEmail(email)</span>
+<span class="nc" id="L31">                .orElseThrow(() -&gt; new UsernameNotFoundException(&quot;Usuario no encontrado&quot;));</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
