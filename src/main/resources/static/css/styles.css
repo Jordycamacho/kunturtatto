@@ -1004,6 +1004,300 @@ img {
   background: linear-gradient(45deg, #1a1a1a, #2a2a2a);
 }
 
+/*=============== DECORATIVE CAROUSELS ===============*/
+.decorative-carousels {
+  padding: 6rem 0;
+  background: linear-gradient(180deg, var(--body-color) 0%, var(--container-color) 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.carousels-container {
+  position: relative;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.carousel {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  margin: 3rem 0;
+}
+
+.carousel--top {
+  margin-bottom: 4rem;
+}
+
+.carousel--bottom {
+  margin-top: 4rem;
+}
+
+.carousel__track {
+  display: flex;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  gap: 2rem;
+}
+
+.carousel--top .carousel__track {
+  animation-name: scrollRight;
+  animation-duration: 40s;
+}
+
+.carousel--bottom .carousel__track {
+  animation-name: scrollLeft;
+  animation-duration: 35s;
+}
+
+.carousel__slide {
+  flex: 0 0 300px;
+  height: 200px;
+  border-radius: 15px;
+  overflow: hidden;
+  position: relative;
+  background: var(--container-color);
+  border: 1px solid var(--glass-border);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.carousel__slide:hover {
+  transform: translateY(-5px) scale(1.02);
+  border-color: var(--primary-color);
+  box-shadow: 0 15px 30px rgba(212, 175, 55, 0.2);
+}
+
+.carousel__image {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.carousel__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  filter: grayscale(0.3) contrast(1.1);
+  transition: all 0.4s ease;
+}
+
+.carousel__slide:hover .carousel__image img {
+  filter: grayscale(0) contrast(1.2) brightness(1.1);
+  transform: scale(1.1);
+}
+
+.carousel__image::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, rgba(212, 175, 55, 0.1), transparent);
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.carousel__slide:hover .carousel__image::before {
+  opacity: 1;
+}
+
+.carousels-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg,
+      var(--body-color) 0%,
+      transparent 10%,
+      transparent 90%,
+      var(--body-color) 100%);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Animaciones de scroll infinito */
+@keyframes scrollRight {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(calc(-300px * 6 - 2rem * 6));
+  }
+}
+
+@keyframes scrollLeft {
+  0% {
+    transform: translateX(calc(-300px * 6 - 2rem * 6));
+  }
+
+  100% {
+    transform: translateX(0);
+  }
+}
+
+/* Efectos de pausa al hacer hover */
+.carousel:hover .carousel__track {
+  animation-play-state: paused;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 1024px) {
+  .carousel__slide {
+    flex: 0 0 250px;
+    height: 180px;
+  }
+
+  @keyframes scrollRight {
+    0% {
+      transform: translateX(0);
+    }
+
+    100% {
+      transform: translateX(calc(-250px * 6 - 2rem * 6));
+    }
+  }
+
+  @keyframes scrollLeft {
+    0% {
+      transform: translateX(calc(-250px * 6 - 2rem * 6));
+    }
+
+    100% {
+      transform: translateX(0);
+    }
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .decorative-carousels {
+    padding: 4rem 0;
+  }
+
+  .carousels-container {
+    padding: 0 1rem;
+  }
+
+  .carousel__slide {
+    flex: 0 0 200px;
+    height: 150px;
+    border-radius: 10px;
+  }
+
+  .carousel__track {
+    gap: 1.5rem;
+  }
+
+  @keyframes scrollRight {
+    0% {
+      transform: translateX(0);
+    }
+
+    100% {
+      transform: translateX(calc(-200px * 6 - 1.5rem * 6));
+    }
+  }
+
+  @keyframes scrollLeft {
+    0% {
+      transform: translateX(calc(-200px * 6 - 1.5rem * 6));
+    }
+
+    100% {
+      transform: translateX(0);
+    }
+  }
+
+  .carousel--top {
+    margin-bottom: 3rem;
+  }
+
+  .carousel--bottom {
+    margin-top: 3rem;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .carousel__slide {
+    flex: 0 0 160px;
+    height: 120px;
+  }
+
+  .carousel__track {
+    gap: 1rem;
+  }
+
+  @keyframes scrollRight {
+    0% {
+      transform: translateX(0);
+    }
+
+    100% {
+      transform: translateX(calc(-160px * 6 - 1rem * 6));
+    }
+  }
+
+  @keyframes scrollLeft {
+    0% {
+      transform: translateX(calc(-160px * 6 - 1rem * 6));
+    }
+
+    100% {
+      transform: translateX(0);
+    }
+  }
+}
+
+/* Efecto de brillo sutil en las imágenes */
+.carousel__image::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.1),
+      transparent);
+  transition: left 0.6s ease;
+}
+
+.carousel__slide:hover .carousel__image::after {
+  left: 100%;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /*=============== ABOUT ===============*/
 .about__container {
   row-gap: 3rem;

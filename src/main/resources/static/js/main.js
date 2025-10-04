@@ -212,6 +212,61 @@ class Gallery {
     }
 }
 
+// Carruseles Decorativos
+class DecorativeCarousels {
+    constructor() {
+        this.carousels = document.querySelectorAll('.carousel');
+        this.init();
+    }
+
+    init() {
+        this.setupScrollControl();
+        this.setupHoverEffects();
+    }
+
+    setupScrollControl() {
+        window.addEventListener('scroll', () => {
+            const scrollY = window.scrollY;
+            const carouselsSection = document.querySelector('.decorative-carousels');
+            
+            if (carouselsSection) {
+                const sectionTop = carouselsSection.offsetTop;
+                const sectionHeight = carouselsSection.offsetHeight;
+                const windowHeight = window.innerHeight;
+            
+                if (scrollY > sectionTop - windowHeight && scrollY < sectionTop + sectionHeight) {
+                    const progress = (scrollY - (sectionTop - windowHeight)) / (windowHeight + sectionHeight);
+                    this.adjustAnimationSpeed(progress);
+                }
+            }
+        });
+    }
+
+    adjustAnimationSpeed(progress) {
+        const baseSpeed = 40;
+        const speedMultiplier = 0.5 + progress * 0.5;
+        
+        this.carousels.forEach(carousel => {
+            const track = carousel.querySelector('.carousel__track');
+            if (track) {
+                track.style.animationDuration = `${baseSpeed / speedMultiplier}s`;
+            }
+        });
+    }
+
+    setupHoverEffects() {
+        this.carousels.forEach(carousel => {
+            carousel.addEventListener('mouseenter', () => {
+                carousel.classList.add('carousel--paused');
+            });
+            
+            carousel.addEventListener('mouseleave', () => {
+                carousel.classList.remove('carousel--paused');
+            });
+        });
+    }
+}
+
 // =============== INITIALIZE EVERYTHING ===============
 document.addEventListener('DOMContentLoaded', () => {
     new Navigation();
@@ -222,6 +277,10 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (document.querySelector('.gallery')) {
         new Gallery();
+    }
+
+    if (document.querySelector('.decorative-carousels')) {
+        new DecorativeCarousels();
     }
 });
 
