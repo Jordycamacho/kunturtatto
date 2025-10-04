@@ -6,7 +6,7 @@ class Navigation {
         this.navClose = document.getElementById('nav-close');
         this.navLinks = document.querySelectorAll('.nav__link');
         this.header = document.getElementById('header');
-        
+
         this.init();
     }
 
@@ -43,14 +43,14 @@ class Navigation {
     setupScrollEffects() {
         window.addEventListener('scroll', () => {
             if (this.header) {
-                window.scrollY >= 50 
+                window.scrollY >= 50
                     ? this.header.classList.add('blur-header')
                     : this.header.classList.remove('blur-header');
             }
         });
 
         const sections = document.querySelectorAll('section[id]');
-        
+
         window.addEventListener('scroll', () => {
             const scrollY = window.pageYOffset;
 
@@ -73,7 +73,7 @@ class Navigation {
         const scrollUp = document.getElementById('scroll-up');
         if (scrollUp) {
             window.addEventListener('scroll', () => {
-                window.scrollY >= 350 
+                window.scrollY >= 350
                     ? scrollUp.classList.add('show-scroll')
                     : scrollUp.classList.remove('show-scroll');
             });
@@ -87,7 +87,7 @@ class HomeAnimations {
         this.homeSection = document.querySelector('.home');
         this.video = document.querySelector('.home__video');
         this.titleLines = document.querySelectorAll('.title-line');
-        
+
         this.init();
     }
 
@@ -102,10 +102,10 @@ class HomeAnimations {
                 const { left, top, width, height } = this.homeSection.getBoundingClientRect();
                 const x = (e.clientX - left) / width - 0.5;
                 const y = (e.clientY - top) / height - 0.5;
-                
+
                 this.video.style.transform = `translate(${x * 20}px, ${y * 15}px) scale(1.02)`;
             });
-            
+
             this.homeSection.addEventListener('mouseleave', () => {
                 this.video.style.transform = 'translate(0, 0) scale(1)';
             });
@@ -113,12 +113,12 @@ class HomeAnimations {
     }
 
     setupTitleAnimation() {
- 
+
         this.titleLines.forEach((line, index) => {
             const text = line.textContent;
             line.textContent = '';
             let i = 0;
-            
+
             setTimeout(() => {
                 const typeWriter = setInterval(() => {
                     if (i < text.length) {
@@ -154,10 +154,10 @@ class Gallery {
             button.addEventListener('click', () => {
                 // Remove active class from all buttons
                 this.filterButtons.forEach(btn => btn.classList.remove('active'));
-                
+
                 // Add active class to clicked button
                 button.classList.add('active');
-                
+
                 const filterValue = button.getAttribute('data-filter');
                 this.filterItems(filterValue);
             });
@@ -199,12 +199,12 @@ class Gallery {
 
     setupImageLoading() {
         const images = document.querySelectorAll('.gallery__image');
-        
+
         images.forEach(img => {
             img.addEventListener('load', () => {
                 img.style.opacity = '1';
             });
-            
+
             img.addEventListener('error', () => {
                 console.warn('Error loading image:', img.src);
             });
@@ -228,12 +228,12 @@ class DecorativeCarousels {
         window.addEventListener('scroll', () => {
             const scrollY = window.scrollY;
             const carouselsSection = document.querySelector('.decorative-carousels');
-            
+
             if (carouselsSection) {
                 const sectionTop = carouselsSection.offsetTop;
                 const sectionHeight = carouselsSection.offsetHeight;
                 const windowHeight = window.innerHeight;
-            
+
                 if (scrollY > sectionTop - windowHeight && scrollY < sectionTop + sectionHeight) {
                     const progress = (scrollY - (sectionTop - windowHeight)) / (windowHeight + sectionHeight);
                     this.adjustAnimationSpeed(progress);
@@ -245,7 +245,7 @@ class DecorativeCarousels {
     adjustAnimationSpeed(progress) {
         const baseSpeed = 40;
         const speedMultiplier = 0.5 + progress * 0.5;
-        
+
         this.carousels.forEach(carousel => {
             const track = carousel.querySelector('.carousel__track');
             if (track) {
@@ -259,9 +259,58 @@ class DecorativeCarousels {
             carousel.addEventListener('mouseenter', () => {
                 carousel.classList.add('carousel--paused');
             });
-            
+
             carousel.addEventListener('mouseleave', () => {
                 carousel.classList.remove('carousel--paused');
+            });
+        });
+    }
+}
+
+// Designs Section Interactivity
+class DesignsSection {
+    constructor() {
+        this.designItems = document.querySelectorAll('.designs__item');
+        this.init();
+    }
+
+    init() {
+        this.setupScrollAnimations();
+        this.setupHoverEffects();
+    }
+
+    setupScrollAnimations() {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animationPlayState = 'running';
+                }
+            });
+        }, { threshold: 0.1 });
+
+        this.designItems.forEach(item => {
+            observer.observe(item);
+        });
+    }
+
+    setupHoverEffects() {
+        this.designItems.forEach(item => {
+            const image = item.querySelector('.designs__image');
+
+            item.addEventListener('mousemove', (e) => {
+                const { left, top, width, height } = item.getBoundingClientRect();
+                const x = (e.clientX - left) / width - 0.5;
+                const y = (e.clientY - top) / height - 0.5;
+
+                if (image) {
+                    image.style.transform = `scale(1.08) translate(${x * 10}px, ${y * 10}px)`;
+                }
+            });
+
+            item.addEventListener('mouseleave', () => {
+                if (image) {
+                    image.style.transform = 'scale(1.08) translate(0, 0)';
+                }
             });
         });
     }
@@ -270,17 +319,21 @@ class DecorativeCarousels {
 // =============== INITIALIZE EVERYTHING ===============
 document.addEventListener('DOMContentLoaded', () => {
     new Navigation();
-    
+
     if (document.querySelector('.home')) {
         new HomeAnimations();
     }
-    
+
     if (document.querySelector('.gallery')) {
         new Gallery();
     }
 
     if (document.querySelector('.decorative-carousels')) {
         new DecorativeCarousels();
+    }
+
+    if (document.querySelector('.designs')) {
+        new DesignsSection();
     }
 });
 

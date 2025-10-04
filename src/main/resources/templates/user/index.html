@@ -214,7 +214,126 @@
             </div>
         </section>
 
-        <!--==================== ABOUT ====================-->
+        <!--==================== DESIGNS ====================-->
+        <section class="designs section" id="designs">
+            <div class="designs__container container">
+                <div class="designs__header">
+                    <div class="designs__badge">
+                        <span>Colección Exclusiva</span>
+                    </div>
+                    <h2 class="designs__title">Diseños Propios</h2>
+                    <p class="designs__subtitle">
+                        Creaciones originales donde la imaginación se encuentra con la tinta.
+                        Cada diseño es una pieza única lista para ser transformada en arte corporal.
+                    </p>
+                </div>
+
+                <div class="designs__masonry">
+                    <div th:each="subcategory : ${designSubcategories}" class="designs__item">
+                        <a th:href="@{/KunturTattoo/diseños(subCategoryId=${subcategory.id})}" class="designs__link">
+                            <article class="designs__card">
+                                <div class="designs__image-wrapper">
+                                    <img th:src="@{'/images/' + ${subcategory.image}}" th:alt="${subcategory.name}"
+                                        class="designs__image" loading="lazy"
+                                        onerror="this.src='/images/placeholder.jpg'">
+                                    <div class="designs__overlay">
+                                        <div class="designs__content">
+                                            <h3 class="designs__name" th:text="${subcategory.name}">Diseño</h3>
+                                            <div class="designs__action">
+                                                <span>Explorar</span>
+                                                <i class="ri-arrow-right-up-line"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="designs__border"></div>
+                                </div>
+                            </article>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="designs__footer">
+                    <div class="designs__pattern">
+                        <div class="pattern__line"></div>
+                        <div class="pattern__dot"></div>
+                        <div class="pattern__line"></div>
+                    </div>
+                    <p class="designs__cta-text">¿Buscas algo personalizado? <a
+                            th:href="@{/KunturTattoo/contacto}">Hablemos</a></p>
+                </div>
+            </div>
+        </section>
+
+        <!--==================== INSTAGRAM SECTION ====================-->
+        <section class="instagram-section">
+            <div class="instagram-item">
+                <img src="/images/img_noticias.jpg" alt="Tattoo design">
+                <div class="instagram-overlay">
+                    <a href="https://www.instagram.com/crys_tattoo.ink?igsh=MXQzOHJ6cHFvaDBzcQ==" class="instagram-link"
+                        target="_blank">
+                        <i class="ri-instagram-line instagram-icon"></i>
+                        <span>Síguenos</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="instagram-item">
+                <img src="/images/Tatto-inicio.jpg" alt="Tattoo design">
+                <div class="instagram-overlay">
+                    <a href="https://www.instagram.com/crys_tattoo.ink?igsh=MXQzOHJ6cHFvaDBzcQ==" class="instagram-link"
+                        target="_blank">
+                        <i class="ri-instagram-line instagram-icon"></i>
+                        <span>Síguenos</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="instagram-item">
+                <img src="/images/img_noticias.jpg" alt="Tattoo design">
+                <div class="instagram-overlay">
+                    <a href="https://www.instagram.com/crys_tattoo.ink?igsh=MXQzOHJ6cHFvaDBzcQ==" class="instagram-link"
+                        target="_blank">
+                        <i class="ri-instagram-line instagram-icon"></i>
+                        <span>Síguenos</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="instagram-item">
+                <img src="/images/Tatto-inicio.jpg" alt="Tattoo design">
+                <div class="instagram-overlay">
+                    <a href="https://www.instagram.com/crys_tattoo.ink?igsh=MXQzOHJ6cHFvaDBzcQ==" class="instagram-link"
+                        target="_blank">
+                        <i class="ri-instagram-line instagram-icon"></i>
+                        <span>Síguenos</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="instagram-item">
+                <img src="/images/img_noticias.jpg" alt="Tattoo design">
+                <div class="instagram-overlay">
+                    <a href="https://www.instagram.com/crys_tattoo.ink?igsh=MXQzOHJ6cHFvaDBzcQ==" class="instagram-link"
+                        target="_blank">
+                        <i class="ri-instagram-line instagram-icon"></i>
+                        <span>Síguenos</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="instagram-item">
+                <img src="/images/Tatto-inicio.jpg" alt="Tattoo design">
+                <div class="instagram-overlay">
+                    <a href="https://www.instagram.com/crys_tattoo.ink?igsh=MXQzOHJ6cHFvaDBzcQ==" class="instagram-link"
+                        target="_blank">
+                        <i class="ri-instagram-line instagram-icon"></i>
+                        <span>Síguenos</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!--==================== ABOUT ====================
         <section class="about section" id="about">
             <div class="about__container container grid">
                 <div class="about__data">
@@ -245,31 +364,9 @@
                     <div class="about__shadow"></div>
                 </div>
             </div>
-        </section>
+        </section>-->
 
-        <!--==================== POPULAR ====================-->
-        <section class="popular section" id="popular">
-            <h2 class="section__title">
-                Diseños Propios
-            </h2>
-
-            <div class="popular__container container grid">
-                <div th:each="subcategory : ${designSubcategories}">
-                    <a th:href="@{/KunturTattoo/diseños(subCategoryId=${subcategory.id})}" class="popular__card-link">
-                        <article class="popular__card">
-                            <div class="popular__image">
-                                <img th:src="@{'/images/' + ${subcategory.image}}" alt="subcategory image"
-                                    class="popular__img">
-                                <div class="popular__shadow"></div>
-                            </div>
-                            <h2 class="popular__title" th:text="${subcategory.name}">Nombre Subcategoría</h2>
-                        </article>
-                    </a>
-                </div>
-            </div>
-        </section>
-
-        <!--==================== EXPLORE ====================-->
+        <!--==================== EXPLORE ====================
         <section class="explore section" id="explore">
             <div class="explore__container">
                 <div class="explore__image">
@@ -296,9 +393,9 @@
 
                 </div>
             </div>
-        </section>
+        </section>-->
 
-        <!--==================== JOIN ====================-->
+        <!--==================== JOIN ====================
         <section class="join section">
             <div class="join__container container grid">
                 <div class="join__data">
@@ -325,7 +422,7 @@
                     <div class="join__shadow"></div>
                 </div>
             </div>
-        </section>
+        </section>-->
     </main>
 
     <div th:insert="~{user/templateUser.html::footer}"></div>
