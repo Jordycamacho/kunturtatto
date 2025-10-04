@@ -61,6 +61,57 @@
             </div>
         </section>
 
+        <!--==================== TATTOOS GALLERY ====================-->
+        <section class="gallery section" id="gallery">
+            <div class="gallery__container container">
+                <div class="gallery__header">
+                    <div class="gallery__badge">
+                        <span>Nuestro Trabajo</span>
+                    </div>
+                    <h2 class="gallery__title">Galería de Tatuajes</h2>
+                    <p class="gallery__subtitle">
+                        Explora nuestra colección de trabajos realizados. Cada pieza cuenta una historia única.
+                    </p>
+                </div>
+
+                <div class="gallery__grid">
+
+                    <div class="gallery__items grid">
+                        <div th:each="subcategory : ${tattooSubcategories}" class="gallery__item" data-category="all">
+                            <a th:href="@{/KunturTattoo/diseños(subCategoryId=${subcategory.id})}"
+                                class="gallery__link">
+                                <article class="gallery__card">
+                                    <div class="gallery__image-container">
+                                        <img th:src="@{'/images/' + ${subcategory.image}}" th:alt="${subcategory.name}"
+                                            class="gallery__image" loading="lazy"
+                                            onerror="this.src='/images/placeholder.jpg'">
+                                        <div class="gallery__overlay">
+                                            <div class="gallery__content">
+                                                <h3 class="gallery__item-title" th:text="${subcategory.name}">
+                                                    Subcategoría</h3>
+                                                <p class="gallery__item-desc">Ver trabajos</p>
+                                                <div class="gallery__icon">
+                                                    <i class="ri-arrow-right-up-line"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="gallery__shine"></div>
+                                    </div>
+                                </article>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="gallery__cta">
+                    <a th:href="@{/KunturTattoo/diseños}" class="btn btn-outline">
+                        <span>Ver Galería Completa</span>
+                        <i class="ri-arrow-right-line"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+
         <!--==================== ABOUT ====================-->
         <section class="about section" id="about">
             <div class="about__container container grid">
