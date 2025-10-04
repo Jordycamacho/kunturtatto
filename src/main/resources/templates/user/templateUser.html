@@ -21,44 +21,59 @@
     <!--=============== CSS ===============-->
     <link rel="stylesheet" th:href="@{/css/styles.css}">
     <link rel="stylesheet" th:href="@{/css/contact.css}">
+    <link rel="stylesheet" th:href="@{/css/gallery.css}">
 
     <title>KunturTattoo</title>
 </head>
 
 <header class="header" id="header" th:fragment="nav_user">
-
     <nav class="nav container">
+        <ul class="nav__list nav__list--left">
+            <li class="nav__item">
+                <a th:href="@{/KunturTattoo}" class="nav__link">INICIO</a>
+            </li>
+            <li class="nav__item">
+                <a th:href="@{/KunturTattoo/diseños}" class="nav__link">GALERIA</a>
+            </li>
+        </ul>
+
         <a th:href="@{/KunturTattoo}" class="nav__logo">
-            <img th:src="@{/images/logo-kuntur.png}" alt="" style="width: 150px; height: auto;">
+            <img th:src="@{/images/logo-kuntur.png}" alt="Kuntur Tattoo" style="width: 150px; height: auto;">
         </a>
 
+        <ul class="nav__list nav__list--right">
+            <li class="nav__item">
+                <a th:href="@{/KunturTattoo/tienda}" class="nav__link">TIENDA</a>
+            </li>
+            <li class="nav__item">
+                <a th:href="@{/KunturTattoo/contacto}" class="nav__link">CONTACTO</a>
+            </li>
+        </ul>
+
         <div class="nav__menu" id="nav-menu">
-            <ul class="nav__list">
+            <ul class="nav__list-mobile">
                 <li class="nav__item">
-                    <a th:href="@{/KunturTattoo}" class="nav__link">Inicio</a>
+                    <a th:href="@{/KunturTattoo}" class="nav__link">INICIO</a>
                 </li>
-
                 <li class="nav__item">
-                    <a th:href="@{/KunturTattoo/diseños}" class="nav__link">Galeria</a>
+                    <a th:href="@{/KunturTattoo/diseños}" class="nav__link">GALERIA</a>
                 </li>
-
                 <li class="nav__item">
-                    <a th:href="@{/KunturTattoo/contacto}" class="nav__link">Contacto</a>
+                    <a th:href="@{/KunturTattoo/tienda}" class="nav__link">TIENDA</a>
+                </li>
+                <li class="nav__item">
+                    <a th:href="@{/KunturTattoo/contacto}" class="nav__link">CONTACTO</a>
                 </li>
             </ul>
 
-
-            <!--Close button-->
             <div class="nav__close" id="nav-close">
                 <i class="ri-close-line"></i>
             </div>
         </div>
 
-        <!-- Toggle button-->
         <div class="nav__toggle" id="nav-toggle">
             <i class="ri-menu-fill"></i>
         </div>
-
     </nav>
 </header>
 
@@ -112,7 +127,8 @@
                         <i class="ri-facebook-line"></i>
                     </a>
 
-                    <a href="https://www.instagram.com/crys_tattoo.ink?igsh=MXQzOHJ6cHFvaDBzcQ==" target="_blank" class="footer__social-link">
+                    <a href="https://www.instagram.com/crys_tattoo.ink?igsh=MXQzOHJ6cHFvaDBzcQ==" target="_blank"
+                        class="footer__social-link">
                         <i class="ri-instagram-line"></i>
                     </a>
 

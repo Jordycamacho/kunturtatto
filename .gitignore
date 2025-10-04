@@ -38,3 +38,4 @@ src/main/resources/application-secrets.properties
 /images/**
 .env
 /logs
+/target
