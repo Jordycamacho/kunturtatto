@@ -72,3 +72,51 @@ const scrollUp = () => {
     }
 }
 window.addEventListener('scroll', scrollUp);
+
+
+
+
+
+
+// Animaciones específicas para la sección HOME
+function initHomeAnimations() {
+    // Efecto de parallax sutil en el video
+    const homeSection = document.querySelector('.home');
+    const video = document.querySelector('.home__video');
+    
+    if (homeSection && video) {
+        homeSection.addEventListener('mousemove', (e) => {
+            const { left, top, width, height } = homeSection.getBoundingClientRect();
+            const x = (e.clientX - left) / width - 0.5;
+            const y = (e.clientY - top) / height - 0.5;
+            
+            video.style.transform = `translate(${x * 20}px, ${y * 15}px) scale(1.02)`;
+        });
+        
+        homeSection.addEventListener('mouseleave', () => {
+            video.style.transform = 'translate(0, 0) scale(1)';
+        });
+    }
+    
+    // Efecto de escritura para el título (opcional)
+    const titleLines = document.querySelectorAll('.title-line');
+    titleLines.forEach((line, index) => {
+        const text = line.textContent;
+        line.textContent = '';
+        let i = 0;
+        
+        setTimeout(() => {
+            const typeWriter = setInterval(() => {
+                if (i < text.length) {
+                    line.textContent += text.charAt(i);
+                    i++;
+                } else {
+                    clearInterval(typeWriter);
+                }
+            }, 100);
+        }, 1000 + (index * 200));
+    });
+}
+
+// Inicializar cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', initHomeAnimations);
