@@ -1,4 +1,4 @@
-// GALLERY HERO ANIMATIONS - En archivo separado
+// GALLERY HERO ANIMATIONS
 class GalleryHeroAnimations {
     constructor() {
         this.galleryHero = document.querySelector('.gallery-hero');
@@ -139,15 +139,12 @@ class GalleryFiltersAnimations {
     }
 }
 
-// Inicializar cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', function () {
-    // Pequeño delay para asegurar que el DOM esté completamente listo
     setTimeout(() => {
         new GalleryFiltersAnimations();
     }, 100);
 });
 
-// También inicializar cuando la página termine de cargar
 window.addEventListener('load', function () {
     new GalleryFiltersAnimations();
 });
