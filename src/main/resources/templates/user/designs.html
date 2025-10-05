@@ -153,6 +153,9 @@
     <div id="imageModal" class="modal-overlay">
         <span class="close-modal" onclick="closeModal()">&times;</span>
         <div class="modal-content">
+            <div class="modal-loading">
+                <i class="ri-loader-4-line"></i>
+            </div>
             <img id="expandedImage" src="" alt="Imagen ampliada">
         </div>
     </div>
@@ -166,24 +169,82 @@
         function showModal(imageUrl) {
             const modal = document.getElementById('imageModal');
             const expandedImg = document.getElementById('expandedImage');
-            expandedImg.src = imageUrl;
-            modal.style.display = 'flex';
-            document.body.style.overflow = 'hidden';
+            const modalContent = document.querySelector('.modal-content');
+
+            // Mostrar loading
+            modalContent.classList.add('loading');
+
+            // Preload de imagen
+            const img = new Image();
+            img.onload = function () {
+                expandedImg.src = imageUrl;
+                modalContent.classList.remove('loading');
+                modal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+
+                // Ajustar imagen según su orientación
+                adjustImageSize(expandedImg);
+            };
+
+            img.onerror = function () {
+                // Si hay error, mostrar igualmente
+                expandedImg.src = imageUrl;
+                modalContent.classList.remove('loading');
+                modal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            };
+
+            img.src = imageUrl;
         }
+
+        function adjustImageSize(imgElement) {
+            // Pequeño delay para asegurar que la imagen esté cargada
+            setTimeout(() => {
+                const naturalWidth = imgElement.naturalWidth;
+                const naturalHeight = imgElement.naturalHeight;
+
+                // Si es una imagen muy panorámica o vertical, ajustar clases
+                if (naturalWidth / naturalHeight > 2) {
+                    imgElement.style.maxWidth = '90vw';
+                    imgElement.style.maxHeight = '80vh';
+                } else if (naturalHeight / naturalWidth > 2) {
+                    imgElement.style.maxWidth = 'auto';
+                    imgElement.style.maxHeight = '85vh';
+                } else {
+                    imgElement.style.maxWidth = 'auto';
+                    imgElement.style.maxHeight = '90vh';
+                }
+            }, 100);
+        }
+
         function closeModal() {
-            document.getElementById('imageModal').style.display = 'none';
-            document.body.style.overflow = 'auto';
+            const modal = document.getElementById('imageModal');
+            modal.style.animation = 'modalFadeOut 0.3s ease';
+
+            setTimeout(() => {
+                modal.style.display = 'none';
+                modal.style.animation = '';
+                document.body.style.overflow = 'auto';
+            }, 250);
         }
+
+        // Event listeners mejorados
         window.onclick = function (event) {
             const modal = document.getElementById('imageModal');
-            if (event.target == modal) {
+            if (event.target === modal) {
                 closeModal();
             }
-        }
+        };
+
         document.addEventListener('keydown', function (event) {
             if (event.key === 'Escape') {
                 closeModal();
             }
+        });
+
+        // Prevenir que el clic en la imagen cierre el modal
+        document.querySelector('.modal-content').addEventListener('click', function (event) {
+            event.stopPropagation();
         });
     </script>
     <div th:insert="~{user/templateUser.html::script}"></div>
