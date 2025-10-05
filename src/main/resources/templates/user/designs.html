@@ -36,40 +36,70 @@
         </div>
     </section>
 
-    <section>
-        <!-- Menú principal de categorías -->
-        <div class="wrapper">
-            <nav>
-                <div class="items">
-                    <a th:href="@{/KunturTattoo/diseños}" class="item"
-                        th:classappend="${selectedCategoryId == null} ? 'active' : ''">
-                        Todos
-                    </a>
-
-                    <a th:each="category : ${categories}" th:href="@{/KunturTattoo/diseños(categoryId=${category.id})}"
-                        th:text="${category.name}" class="item"
-                        th:classappend="${selectedCategoryId == category.id} ? 'active' : ''">
-                    </a>
+    <!--==================== GALLERY FILTERS ====================-->
+    <section class="gallery-filters section">
+        <div class="gallery-filters__container container">
+            <!-- Menú principal de categorías -->
+            <div class="gallery-filters__group">
+                <div class="gallery-filters__header">
+                    <h3 class="gallery-filters__title">
+                        <i class="ri-apps-line"></i>
+                        Categorías Principales
+                    </h3>
+                    <div class="gallery-filters__line"></div>
                 </div>
-            </nav>
-        </div>
 
-        <div th:if="${selectedCategoryId != null}" class="wrapper mt-3">
-            <nav>
-                <div class="items">
-                    <a th:href="@{/KunturTattoo/diseños(categoryId=${selectedCategoryId})}" class="item"
-                        th:classappend="${selectedSubCategoryId == null} ? 'active' : ''">
-                        Todas
-                    </a>
+                <nav class="gallery-filters__nav">
+                    <div class="gallery-filters__items">
+                        <a th:href="@{/KunturTattoo/diseños}" class="gallery-filters__item"
+                            th:classappend="${selectedCategoryId == null} ? 'gallery-filters__item--active' : ''">
+                            <i class="ri-grid-fill"></i>
+                            <span class="gallery-filters__text">Todos los Diseños</span>
+                            <div class="gallery-filters__indicator"></div>
+                        </a>
 
-                    <a th:each="subcategory : ${currentSubCategories}"
-                        th:href="@{/KunturTattoo/diseños(categoryId=${selectedCategoryId}, subCategoryId=${subcategory.id})}"
-                        th:text="${subcategory.name}" class="item"
-                        th:classappend="${selectedSubCategoryId == subcategory.id} ? 'active' : ''">
-                    </a>
+                        <a th:each="category : ${categories}"
+                            th:href="@{/KunturTattoo/diseños(categoryId=${category.id})}" class="gallery-filters__item"
+                            th:classappend="${selectedCategoryId == category.id} ? 'gallery-filters__item--active' : ''">
+                            <i class="ri-artboard-line"></i>
+                            <span class="gallery-filters__text" th:text="${category.name}"></span>
+                            <div class="gallery-filters__indicator"></div>
+                        </a>
+                    </div>
+                </nav>
+            </div>
+
+            <!-- Subcategorías -->
+            <div th:if="${selectedCategoryId != null}" class="gallery-filters__group gallery-filters__group--sub">
+                <div class="gallery-filters__header">
+                    <h3 class="gallery-filters__title">
+                        <i class="ri-filter-line"></i>
+                        Filtros Específicos
+                    </h3>
+                    <div class="gallery-filters__line"></div>
                 </div>
-            </nav>
-        </div>
+
+                <nav class="gallery-filters__nav">
+                    <div class="gallery-filters__items">
+                        <a th:href="@{/KunturTattoo/diseños(categoryId=${selectedCategoryId})}"
+                            class="gallery-filters__item"
+                            th:classappend="${selectedSubCategoryId == null} ? 'gallery-filters__item--active' : ''">
+                            <i class="ri-list-check"></i>
+                            <span class="gallery-filters__text">Todas las Subcategorías</span>
+                            <div class="gallery-filters__indicator"></div>
+                        </a>
+
+                        <a th:each="subcategory : ${currentSubCategories}"
+                            th:href="@{/KunturTattoo/diseños(categoryId=${selectedCategoryId}, subCategoryId=${subcategory.id})}"
+                            class="gallery-filters__item"
+                            th:classappend="${selectedSubCategoryId == subcategory.id} ? 'gallery-filters__item--active' : ''">
+                            <i class="ri-checkbox-blank-circle-line"></i>
+                            <span class="gallery-filters__text" th:text="${subcategory.name}"></span>
+                            <div class="gallery-filters__indicator"></div>
+                        </a>
+                    </div>
+                </nav>
+            </div>
         </div>
     </section>
 
@@ -138,7 +168,7 @@
             const expandedImg = document.getElementById('expandedImage');
             expandedImg.src = imageUrl;
             modal.style.display = 'flex';
-            document.body.style.overflow = 'hidden'; 
+            document.body.style.overflow = 'hidden';
         }
         function closeModal() {
             document.getElementById('imageModal').style.display = 'none';
