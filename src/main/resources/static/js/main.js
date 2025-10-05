@@ -316,6 +316,47 @@ class DesignsSection {
     }
 }
 
+class FooterAnimations {
+    constructor() {
+        this.footer = document.querySelector('.footer');
+        this.init();
+    }
+
+    init() {
+        this.setupScrollAnimations();
+    }
+
+    setupScrollAnimations() {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    this.animateElements();
+                }
+            });
+        }, { threshold: 0.3 });
+
+        if (this.footer) {
+            observer.observe(this.footer);
+        }
+    }
+
+    animateElements() {
+        const elements = [
+            ...document.querySelectorAll('.footer__logo'),
+            ...document.querySelectorAll('.footer__description'),
+            ...document.querySelectorAll('.footer__title'),
+            ...document.querySelectorAll('.footer__link'),
+            ...document.querySelectorAll('.footer__social-link'),
+            ...document.querySelectorAll('.footer__copy')
+        ];
+
+        elements.forEach((element, index) => {
+            setTimeout(() => {
+                element.classList.add('animate');
+            }, index * 100);
+        });
+    }
+}
 // =============== INITIALIZE EVERYTHING ===============
 document.addEventListener('DOMContentLoaded', () => {
     new Navigation();
@@ -334,6 +375,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (document.querySelector('.designs')) {
         new DesignsSection();
+    }
+
+    if (document.querySelector('.footer')) {
+        new FooterAnimations();
     }
 });
 

@@ -78,77 +78,77 @@
 </header>
 
 <!--==================== FOOTER ====================-->
-<div th:fragment="footer">
-    <footer class="footer">
-        <div class="footer__container container grid">
-            <div class="footer__content grid">
-                <div>
-                    <a th:href="@{/KunturTattoo}" class="nav__logo">
-                        <img th:src="@{/images/logo-kuntur.png}" alt="" style="width: 150px; height: auto;">
-                    </a>
-                    <p class="footer__description">
-                        <span class="slogan curvo">Tu historia, mi tinta.</span>
-                    </p>
-                </div>
+<footer class="footer">
+    <div class="footer__ornament footer__ornament--1"></div>
+    <div class="footer__ornament footer__ornament--2"></div>
 
-                <div class="footer__data grid">
-                    <div>
-                        <h3 class="footer__title">Enlaces cortos</h3>
-
-                        <ul class="footer__links">
-                            <li>
-                                <a th:href="@{/KunturTattoo}" class="footer__link">inicio</a>
-                            </li>
-                            <li>
-                                <a th:href="@{/KunturTattoo/diseños}" class="footer__link">galeria</a>
-                            </li>
-                            <li>
-                                <a th:href="@{/KunturTattoo/contacto}" class="footer__link">Contacto</a>
-                            </li>
-                        </ul>
-                    </div>
-
-                    <div>
-                        <h3 class="footer__title">Información</h3>
-
-                        <li>
-                            <a href="#" class="footer__link">Terminos y Condiciones</a>
-                        </li>
-                        <li>
-                            <a href="#" class="footer__link">Pólitica de Privacidad</a>
-                        </li>
-                    </div>
-                </div>
+    <div class="footer__container container">
+        <div class="footer__content grid">
+            <div class="footer__brand">
+                <a th:href="@{/KunturTattoo}" class="footer__logo">
+                    <img th:src="@{/images/logo-kuntur.png}" alt="Tattoon Logo">
+                </a>
+                <p class="footer__description">
+                    <span class="slogan curvo">Tu historia, mi tinta.</span>
+                </p>
             </div>
 
-            <div class="footer__group">
-                <div class="footer__social">
-                    <a href="#" target="_blank" class="footer__social-link">
-                        <i class="ri-facebook-line"></i>
-                    </a>
-
-                    <a href="https://www.instagram.com/crys_tattoo.ink?igsh=MXQzOHJ6cHFvaDBzcQ==" target="_blank"
-                        class="footer__social-link">
-                        <i class="ri-instagram-line"></i>
-                    </a>
-
-                    <a href="#" target="_blank" class="footer__social-link">
-                        <i class="ri-twitter-line"></i>
-                    </a>
-
-                    <a href="#" target="_blank" class="footer__social-link">
-                        <i class="ri-youtube-line"></i>
-                    </a>
+            <div class="footer__data grid">
+                <div>
+                    <h3 class="footer__title">Enlaces cortos</h3>
+                    <ul class="footer__links">
+                        <li>
+                            <a th:href="@{/KunturTattoo}" class="footer__link">Inicio</a>
+                        </li>
+                        <li>
+                            <a th:href="@{/KunturTattoo/diseños}" class="footer__link">Galería</a>
+                        </li>
+                        <li>
+                            <a th:href="@{/KunturTattoo/contacto}" class="footer__link">Contacto</a>
+                        </li>
+                    </ul>
                 </div>
 
-                <span class="footer__copy">
-                    &#169; Copyright Jordi Camacho. All rights reserved
-                </span>
+                <div>
+                    <h3 class="footer__title">Información</h3>
+                    <ul class="footer__links">
+                        <li>
+                            <a href="#" class="footer__link">Términos y Condiciones</a>
+                        </li>
+                        <li>
+                            <a href="#" class="footer__link">Política de Privacidad</a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
-    </footer>
-</div>
 
+        <div class="footer__group">
+            <div class="footer__social">
+                <a href="#" target="_blank" class="footer__social-link">
+                    <i class="ri-facebook-line"></i>
+                </a>
+
+                <a href="https://www.instagram.com/crys_tattoo.ink?igsh=MXQzOHJ6cHFvaDBzcQ==" target="_blank"
+                    class="footer__social-link">
+                    <i class="ri-instagram-line"></i>
+                </a>
+
+                <a href="#" target="_blank" class="footer__social-link">
+                    <i class="ri-twitter-line"></i>
+                </a>
+
+                <a href="#" target="_blank" class="footer__social-link">
+                    <i class="ri-youtube-line"></i>
+                </a>
+            </div>
+
+            <span class="footer__copy">
+                &#169; Copyright Jordi Camacho. All rights reserved
+            </span>
+        </div>
+    </div>
+</footer>
 <div th:fragment="script">
     <script th:src="@{/js/scrollreveal.min.js}"></script>
     <script th:src="@{/js/main.js}"></script>
