@@ -8,53 +8,68 @@
 <body>
     <div th:insert="~{user/templateUser.html::nav_user}"></div>
 
-    <section class="home section" id="home">
-        <img src="../images/img_contacto.jpg" alt="home image" class="home__bg">
-        <div class="home__shadow"></div>
+    <!--==================== GALLERY HERO ====================-->
+    <section class="gallery-hero section" id="gallery-hero">
+        <div class="gallery-hero__video-container">
+            <video autoplay muted loop playsinline class="gallery-hero__video">
+                <source th:src="@{/images/video_fondo.mp4}" type="video/mp4">
+                Tu navegador no soporta el video.
+            </video>
+            <div class="gallery-hero__video-overlay"></div>
+        </div>
 
-        <div class="home__container container grid">
-            <div class="home__data">
-                <h3 class="home__subtitle">
-                    KunturTattoo
-                </h3>
-                <h1 class="home__title" th:text="${pageTitle}">
-                    Explora Nuestro diseño
+        <div class="gallery-hero__container container">
+            <div class="gallery-hero__content">
+                <div class="gallery-hero__badge">
+                    <span>Nuestra Galería</span>
+                </div>
+
+                <h1 class="gallery-hero__title" th:text="${pageTitle}">
+                    Explora Nuestro Arte
                 </h1>
+
+                <p class="gallery-hero__description">
+                    Descubre la colección completa de nuestros trabajos.
+                    Cada tatuaje cuenta una historia única y especial.
+                </p>
             </div>
+        </div>
+    </section>
 
-            <!-- Menú principal de categorías -->
-            <div class="wrapper">
-                <nav>
-                    <div class="items">
-                        <a th:href="@{/KunturTattoo/diseños}" class="item"
-                            th:classappend="${selectedCategoryId == null} ? 'active' : ''">
-                            Todos
-                        </a>
+    <section>
+        <!-- Menú principal de categorías -->
+        <div class="wrapper">
+            <nav>
+                <div class="items">
+                    <a th:href="@{/KunturTattoo/diseños}" class="item"
+                        th:classappend="${selectedCategoryId == null} ? 'active' : ''">
+                        Todos
+                    </a>
 
-                        <a th:each="category : ${categories}"
-                            th:href="@{/KunturTattoo/diseños(categoryId=${category.id})}" th:text="${category.name}"
-                            class="item" th:classappend="${selectedCategoryId == category.id} ? 'active' : ''">
-                        </a>
-                    </div>
-                </nav>
-            </div>
+                    <a th:each="category : ${categories}" th:href="@{/KunturTattoo/diseños(categoryId=${category.id})}"
+                        th:text="${category.name}" class="item"
+                        th:classappend="${selectedCategoryId == category.id} ? 'active' : ''">
+                    </a>
+                </div>
+            </nav>
+        </div>
 
-            <div th:if="${selectedCategoryId != null}" class="wrapper mt-3">
-                <nav>
-                    <div class="items">
-                        <a th:href="@{/KunturTattoo/diseños(categoryId=${selectedCategoryId})}" class="item"
-                            th:classappend="${selectedSubCategoryId == null} ? 'active' : ''">
-                            Todas
-                        </a>
+        <div th:if="${selectedCategoryId != null}" class="wrapper mt-3">
+            <nav>
+                <div class="items">
+                    <a th:href="@{/KunturTattoo/diseños(categoryId=${selectedCategoryId})}" class="item"
+                        th:classappend="${selectedSubCategoryId == null} ? 'active' : ''">
+                        Todas
+                    </a>
 
-                        <a th:each="subcategory : ${currentSubCategories}"
-                            th:href="@{/KunturTattoo/diseños(categoryId=${selectedCategoryId}, subCategoryId=${subcategory.id})}"
-                            th:text="${subcategory.name}" class="item"
-                            th:classappend="${selectedSubCategoryId == subcategory.id} ? 'active' : ''">
-                        </a>
-                    </div>
-                </nav>
-            </div>
+                    <a th:each="subcategory : ${currentSubCategories}"
+                        th:href="@{/KunturTattoo/diseños(categoryId=${selectedCategoryId}, subCategoryId=${subcategory.id})}"
+                        th:text="${subcategory.name}" class="item"
+                        th:classappend="${selectedSubCategoryId == subcategory.id} ? 'active' : ''">
+                    </a>
+                </div>
+            </nav>
+        </div>
         </div>
     </section>
 
@@ -113,30 +128,28 @@
     </div>
 
     <div th:insert="~{user/templateUser.html::footer}"></div>
+
+
+
+    <script th:src="@{/js/gallery.js}"></script>
     <script th:inline="javascript">
         function showModal(imageUrl) {
             const modal = document.getElementById('imageModal');
             const expandedImg = document.getElementById('expandedImage');
-
             expandedImg.src = imageUrl;
             modal.style.display = 'flex';
-            document.body.style.overflow = 'hidden'; // Evitar scroll
+            document.body.style.overflow = 'hidden'; 
         }
-
         function closeModal() {
             document.getElementById('imageModal').style.display = 'none';
-            document.body.style.overflow = 'auto'; // Restaurar scroll
+            document.body.style.overflow = 'auto';
         }
-
-        // Cerrar modal al hacer clic fuera de la imagen
         window.onclick = function (event) {
             const modal = document.getElementById('imageModal');
             if (event.target == modal) {
                 closeModal();
             }
         }
-
-        // Cerrar con tecla ESC
         document.addEventListener('keydown', function (event) {
             if (event.key === 'Escape') {
                 closeModal();

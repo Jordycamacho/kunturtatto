@@ -212,7 +212,7 @@ class Gallery {
     }
 }
 
-// Carruseles Decorativos
+// =============== CARRUCEL ===============
 class DecorativeCarousels {
     constructor() {
         this.carousels = document.querySelectorAll('.carousel');
@@ -267,7 +267,7 @@ class DecorativeCarousels {
     }
 }
 
-// Designs Section Interactivity
+// =============== DESINGS ===============
 class DesignsSection {
     constructor() {
         this.designItems = document.querySelectorAll('.designs__item');
@@ -316,6 +316,7 @@ class DesignsSection {
     }
 }
 
+// =============== FOOTER ===============
 class FooterAnimations {
     constructor() {
         this.footer = document.querySelector('.footer');
