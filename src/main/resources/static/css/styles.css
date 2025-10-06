@@ -2,11 +2,8 @@
 
 :root {
   --header-height: 4.5rem;
-  /* Aumentado un poco más */
-  --primary-color: #ddb944;
-  /* Dorado principal */
-  --primary-hover: #F4CF47;
-  /* Dorado más claro para hover */
+  --primary-color: #59183a;
+  --primary-hover: #ac1864;
   --title-color: hsl(0, 0%, 95%);
   --text-color: hsl(0, 0%, 70%);
   --text-color-light: hsl(0, 0%, 60%);
