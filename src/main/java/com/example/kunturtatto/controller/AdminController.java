@@ -45,21 +45,21 @@ public class AdminController {
     }
 
     /* Create Designs */
-    @GetMapping("/diseños")
+    @GetMapping("/disenos")
     public String showDesigns(Model model) {
         List<DesignDto> designs = designService.getAllDesigns();
         model.addAttribute("designs", designs);
         return "admin/design/showDesign";
     }
 
-    @GetMapping("/diseños/crear")
+    @GetMapping("/disenos/crear")
     public String createDesignForm(Model model) {
         model.addAttribute("designRequest", DesignRequest.builder().build());
         model.addAttribute("categories", categoryService.getCategoriesWithSubcategories());
         return "admin/design/createDesign";
     }
 
-    @GetMapping("/diseños/editar/{id}")
+    @GetMapping("/disenos/editar/{id}")
     public String editDesignForm(@PathVariable Long id, Model model) {
         try {
             DesignDto design = designService.getDesignById(id);
@@ -69,11 +69,11 @@ public class AdminController {
             return "admin/design/editDesign";
         } catch (ResourceNotFoundException e) {
             model.addAttribute("error", e.getMessage());
-            return "redirect:/admin/diseños";
+            return "redirect:/admin/disenos";
         }
     }
 
-    @PostMapping("/diseños/crear/guardar")
+    @PostMapping("/disenos/crear/guardar")
     public String saveDesign(@Valid @ModelAttribute("designRequest") DesignRequest request,
             BindingResult bindingResult,
             @RequestParam("imageFile") MultipartFile imageFile,
@@ -86,10 +86,10 @@ public class AdminController {
             redirectAttributes.addFlashAttribute("error", "Error al crear diseño: " + e.getMessage());
             redirectAttributes.addFlashAttribute("designRequest", request);
         }
-        return "redirect:/admin/diseños";
+        return "redirect:/admin/disenos";
     }
 
-    @PostMapping("/diseños/editar/guardar/{id}")
+    @PostMapping("/disenos/editar/guardar/{id}")
     public String updateDesign(@PathVariable Long id,
             @ModelAttribute DesignRequest request,
             @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
@@ -100,10 +100,10 @@ public class AdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Error al actualizar diseño: " + e.getMessage());
         }
-        return "redirect:/admin/diseños";
+        return "redirect:/admin/disenos";
     }
 
-    @PostMapping("/diseños/eliminar/{id}")
+    @PostMapping("/disenos/eliminar/{id}")
     public String deleteDesign(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
             designService.deleteDesign(id);
@@ -111,7 +111,7 @@ public class AdminController {
         } catch (ResourceNotFoundException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
-        return "redirect:/admin/diseños";
+        return "redirect:/admin/disenos";
     }
 
     /* Create Categories */

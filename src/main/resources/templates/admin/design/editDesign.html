@@ -11,7 +11,7 @@
         <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
         <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
         
-        <form th:action="@{/admin/diseños/editar/guardar/{id}(id=${design.id})}" method="post" enctype="multipart/form-data" class="row g-3">
+        <form th:action="@{/admin/disenos/editar/guardar/{id}(id=${design.id})}" method="post" enctype="multipart/form-data" class="row g-3">
             <div class="col-md-6">
                 <label for="title" class="form-label">Título</label>
                 <input type="text" class="form-control" id="title" 
@@ -52,7 +52,7 @@
             
             <div class="col-12">
                 <button type="submit" class="btn btn-primary">Actualizar</button>
-                <a th:href="@{/admin/diseños}" class="btn btn-secondary">Cancelar</a>
+                <a th:href="@{/admin/disenos}" class="btn btn-secondary">Cancelar</a>
             </div>
         </form>
     </div>
