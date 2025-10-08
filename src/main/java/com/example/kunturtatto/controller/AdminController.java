@@ -184,6 +184,11 @@ public class AdminController {
             redirectAttributes.addFlashAttribute("success", "Subcategoría eliminada exitosamente");
         } catch (ResourceNotFoundException e) {
             redirectAttributes.addFlashAttribute("error", "Error: " + e.getMessage());
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error",
+                    "Error inesperado al eliminar subcategoría: " + e.getMessage());
         }
         return "redirect:/admin/subcategorias";
     }
