@@ -44,7 +44,7 @@
 
                     <h1 class="home__title">
                         <span class="title-line">MUTHABARA</span>
-                        
+
                     </h1>
 
                     <p class="home__description">
@@ -260,6 +260,67 @@
                     </div>
                     <p class="designs__cta-text">¿Buscas algo personalizado? <a
                             th:href="@{/KunturTattoo/contacto}">Hablemos</a></p>
+                </div>
+            </div>
+        </section>
+
+        <!--==================== DRAWINGS ====================-->
+        <section class="drawings section" id="drawings">
+            <div class="drawings__container container">
+                <div class="drawings__header">
+                    <div class="drawings__badge">
+                        <span>Arte en Papel</span>
+                    </div>
+                    <h2 class="drawings__title">Colección de Dibujos</h2>
+                    <p class="drawings__subtitle">
+                        Exploramos el arte en su forma más pura. Dibujos originales donde la creatividad
+                        fluye libremente sobre el papel, mostrando el proceso creativo detrás de cada diseño.
+                    </p>
+                </div>
+
+                <div class="drawings__grid">
+                    <div th:each="subcategory : ${drawingSubcategories}" class="drawings__item">
+                        <a th:href="@{/KunturTattoo/diseños(subCategoryId=${subcategory.id})}" class="drawings__link">
+                            <article class="drawings__card">
+                                <div class="drawings__image-wrapper">
+                                    <img th:src="@{'/images/' + ${subcategory.image}}" th:alt="${subcategory.name}"
+                                        class="drawings__image" loading="lazy"
+                                        onerror="this.src='/images/placeholder.jpg'">
+
+                                    <!-- Efecto de papel arrugado -->
+                                    <div class="drawings__paper-texture"></div>
+
+                                    <div class="drawings__overlay">
+                                        <div class="drawings__content">
+                                            <h3 class="drawings__name" th:text="${subcategory.name}">Dibujo</h3>
+                                            <div class="drawings__action">
+                                                <span>Explorar Bocetos</span>
+                                                <i class="ri-pencil-line"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Esquinas dobladas -->
+                                    <div class="drawings__corner drawings__corner--tl"></div>
+                                    <div class="drawings__corner drawings__corner--br"></div>
+                                </div>
+                            </article>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="drawings__footer">
+                    <div class="drawings__pattern">
+                        <div class="drawings__pattern-line"></div>
+                        <div class="drawings__pattern-dot">
+                            <i class="ri-pencil-fill"></i>
+                        </div>
+                        <div class="drawings__pattern-line"></div>
+                    </div>
+                    <p class="drawings__cta-text">
+                        ¿Te gusta nuestro estilo? <a th:href="@{/KunturTattoo/contacto}">Solicita un dibujo
+                            personalizado</a>
+                    </p>
                 </div>
             </div>
         </section>

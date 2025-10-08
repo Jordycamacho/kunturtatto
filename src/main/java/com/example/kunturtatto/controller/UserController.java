@@ -50,9 +50,11 @@ public class UserController {
 
         List<SubCategoryDto> tattooSubcategories = subCategoryService.getSubCategoriesByCategory(1L);
         List<SubCategoryDto> tattooCategories = subCategoryService.getSubCategoriesByCategory(2L);
+        List<SubCategoryDto> drawingSubcategories = subCategoryService.getSubCategoriesByCategory(3L); 
 
         model.addAttribute("tattooSubcategories", tattooSubcategories);
         model.addAttribute("designSubcategories", tattooCategories);
+        model.addAttribute("drawingSubcategories", drawingSubcategories);
 
         return "user/index";
     }
