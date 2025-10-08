@@ -316,6 +316,69 @@ class DesignsSection {
     }
 }
 
+// =============== STORE SECTION ===============
+class StoreSection {
+    constructor() {
+        this.storeSection = document.querySelector('.store');
+        this.productCards = document.querySelectorAll('.store__product-card');
+        this.init();
+    }
+
+    init() {
+        this.setupScrollAnimations();
+        this.setupHoverEffects();
+        this.setupProductCardInteractions();
+    }
+
+    setupScrollAnimations() {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    this.animateOnScroll();
+                }
+            });
+        }, { threshold: 0.3 });
+
+        if (this.storeSection) {
+            observer.observe(this.storeSection);
+        }
+    }
+
+    animateOnScroll() {
+        console.log('Store section in view');
+    }
+
+    setupHoverEffects() {
+        const imageContainer = document.querySelector('.store__image-container');
+
+        if (imageContainer) {
+            imageContainer.addEventListener('mousemove', (e) => {
+                const { left, top, width, height } = imageContainer.getBoundingClientRect();
+                const x = (e.clientX - left) / width - 0.5;
+                const y = (e.clientY - top) / height - 0.5;
+
+                imageContainer.style.transform = `perspective(1000px) rotateY(${x * 5}deg) rotateX(${y * -5}deg)`;
+            });
+
+            imageContainer.addEventListener('mouseleave', () => {
+                imageContainer.style.transform = 'perspective(1000px) rotateY(0) rotateX(0)';
+            });
+        }
+    }
+
+    setupProductCardInteractions() {
+        this.productCards.forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.zIndex = '10';
+            });
+
+            card.addEventListener('mouseleave', () => {
+                card.style.zIndex = '1';
+            });
+        });
+    }
+}
+
 // =============== FOOTER ===============
 class FooterAnimations {
     constructor() {
@@ -376,6 +439,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (document.querySelector('.designs')) {
         new DesignsSection();
+    }
+
+    if (document.querySelector('.store')) {
+        new StoreSection();
     }
 
     if (document.querySelector('.footer')) {
