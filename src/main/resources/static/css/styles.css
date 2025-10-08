@@ -9,7 +9,7 @@
   --text-color-light: hsl(0, 0%, 60%);
   --body-color: hsl(0, 0%, 0%);
   --container-color: hsl(0, 0%, 8%);
-
+  --badge_color: rgb(151, 150, 150);
   /* Fuentes más elegantes */
   --body-font: "Montserrat", sans-serif;
   --accent-font: "Cinzel", serif;
@@ -451,7 +451,7 @@ img {
 
 .home__badge span {
   display: inline-block;
-  background: rgba(212, 175, 55, 0.1);
+  background: var(--badge_color);
   border: 1px solid var(--primary-color);
   color: var(--primary-color);
   padding: 0.8rem 2rem;
@@ -684,7 +684,7 @@ img {
 
 .gallery__badge span {
   display: inline-block;
-  background: rgba(212, 175, 55, 0.1);
+  background: var(--badge_color);
   border: 1px solid var(--primary-color);
   color: var(--primary-color);
   padding: 0.6rem 1.5rem;
@@ -1248,7 +1248,7 @@ img {
 
 .designs__badge span {
   display: inline-block;
-  background: rgba(212, 175, 55, 0.1);
+  background: var(--badge_color);
   border: 1px solid var(--primary-color);
   color: var(--primary-color);
   padding: 0.6rem 1.5rem;

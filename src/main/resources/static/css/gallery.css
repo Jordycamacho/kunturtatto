@@ -61,7 +61,7 @@
 
 .gallery-hero__badge span {
   display: inline-block;
-  background: rgba(221, 185, 68, 0.15);
+  background: var(--badge_color);
   border: 1px solid var(--primary-color);
   color: var(--primary-color);
   padding: 0.7rem 1.8rem;
