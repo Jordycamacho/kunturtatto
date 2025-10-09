@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Política de Privacidad</title>
+    <link rel="icon" th:href="@{/images/Logo_negro.png}" type="image/png">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.2.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <style>
+        .legal-container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 3rem;
+            background: var(--container-color);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .legal-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .legal-header h1 {
+            font-family: var(--accent-font);
+            color: var(--title-color);
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .legal-header .last-updated {
+            color: var(--text-color-light);
+            font-size: 0.9rem;
+        }
+
+        .legal-section {
+            margin-bottom: 2.5rem;
+        }
+
+        .legal-section h2 {
+            font-family: var(--accent-font);
+            color: var(--primary-color);
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .legal-section h2 i {
+            font-size: 1.2rem;
+        }
+
+        .legal-section p,
+        .legal-section ul {
+            color: var(--text-color);
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+
+        .legal-section ul {
+            padding-left: 1.5rem;
+        }
+
+        .legal-section li {
+            margin-bottom: 0.5rem;
+            position: relative;
+        }
+
+        .legal-section li:before {
+            content: "•";
+            color: var(--primary-color);
+            font-weight: bold;
+            position: absolute;
+            left: -1rem;
+        }
+
+        .contact-info {
+            background: rgba(89, 24, 58, 0.1);
+            padding: 1.5rem;
+            border-radius: 10px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .back-home {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .back-home:hover {
+            gap: 0.8rem;
+            color: var(--title-color);
+        }
+
+        @media screen and (max-width: 768px) {
+            .legal-container {
+                padding: 2rem 1.5rem;
+                margin: 1rem;
+            }
+
+            .legal-header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header th:insert="~{user/templateUser.html::nav_user}"></header>
+
+    <main class="main">
+        <section class="legal-section section">
+            <div class="legal-container container">
+                <div class="legal-header">
+                    <h1>Política de Privacidad</h1>
+                    <p class="last-updated">Última actualización: 9 de octubre de 2025
+                    </p>
+                </div>
+
+                <div class="legal-section">
+                    <h2><i class="ri-shield-keyhole-line"></i> Protección de Datos</h2>
+                    <p>En Kuntur Tattoo, valoramos y respetamos tu privacidad. Esta política explica cómo recopilamos,
+                        usamos y protegemos tu información personal.</p>
+                </div>
+
+                <div class="legal-section">
+                    <h2><i class="ri-information-line"></i> Información que Recopilamos</h2>
+                    <p>Podemos recopilar la siguiente información:</p>
+                    <ul>
+                        <li>Información de contacto (nombre, email, teléfono)</li>
+                        <li>Información de citas y preferencias de tatuajes</li>
+                        <li>Datos de navegación a través de Google Analytics</li>
+                        <li>Información de consultas a través de formularios de contacto</li>
+                    </ul>
+                </div>
+
+                <div class="legal-section">
+                    <h2><i class="ri-google-line"></i> Google Analytics</h2>
+                    <p>Utilizamos Google Analytics para analizar el uso de nuestro sitio web. Google Analytics recopila
+                        información sobre:</p>
+                    <ul>
+                        <li>Páginas visitadas y tiempo de permanencia</li>
+                        <li>Dispositivo y navegador utilizado</li>
+                        <li>Ubicación geográfica aproximada</li>
+                        <li>Comportamiento de navegación</li>
+                    </ul>
+                    <p>Esta información es anónima y se utiliza para mejorar la experiencia del usuario.</p>
+                </div>
+
+                <div class="legal-section">
+                    <h2><i class="ri-cookie-line"></i> Cookies</h2>
+                    <p>Nuestro sitio web utiliza cookies para:</p>
+                    <ul>
+                        <li>Mejorar la funcionalidad del sitio</li>
+                        <li>Recordar preferencias del usuario</li>
+                        <li>Analizar el tráfico del sitio web</li>
+                    </ul>
+                    <p>Puedes desactivar las cookies desde la configuración de tu navegador.</p>
+                </div>
+
+                <div class="legal-section">
+                    <h2><i class="ri-shield-check-line"></i> Tus Derechos</h2>
+                    <p>Tienes derecho a:</p>
+                    <ul>
+                        <li>Acceder a tus datos personales</li>
+                        <li>Rectificar información incorrecta</li>
+                        <li>Solicitar la eliminación de tus datos</li>
+                        <li>Oponerte al tratamiento de tus datos</li>
+                        <li>Portabilidad de datos</li>
+                    </ul>
+                </div>
+
+                <div class="legal-section">
+                    <h2><i class="ri-lock-line"></i> Seguridad</h2>
+                    <p>Implementamos medidas de seguridad técnicas y organizativas para proteger tu información contra
+                        accesos no autorizados, pérdida o alteración.</p>
+                </div>
+
+                <div class="legal-section">
+                    <h2><i class="ri-mail-line"></i> Contacto</h2>
+                    <div class="contact-info">
+                        <p>Para ejercer tus derechos o consultas sobre privacidad:</p>
+                        <p><strong>Email:</strong> muthabara_art@outlook.com</p>
+                    </div>
+                </div>
+
+                <a th:href="@{/Muthabara}" class="back-home">
+                    <i class="ri-arrow-left-line"></i> Volver al Inicio
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <div th:insert="~{user/templateUser.html::footer}"></div>
+
+    <div th:insert="~{user/templateUser.html::script}"></div>
+</body>
+
+</html>

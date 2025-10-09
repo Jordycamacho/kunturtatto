@@ -379,6 +379,188 @@ class StoreSection {
     }
 }
 
+// =============== COOKIE BANNER ===============
+class CookieBanner {
+    constructor() {
+        this.banner = document.getElementById('cookie-banner');
+        this.acceptButton = document.getElementById('accept-cookies');
+        this.configureButton = document.getElementById('configure-cookies');
+        this.closeButton = document.getElementById('close-cookies');
+        this.saveButton = document.getElementById('save-preferences');
+        this.settingsPanel = document.querySelector('.cookie-banner__settings');
+        this.analyticsCheckbox = document.getElementById('analytics-cookies');
+        this.marketingCheckbox = document.getElementById('marketing-cookies');
+
+        this.cookieConsent = localStorage.getItem('cookieConsent');
+        this.init();
+    }
+
+    init() {
+        if (!this.cookieConsent) {
+            this.showBanner();
+        }
+
+        this.setupEventListeners();
+        this.setupAnalytics();
+    }
+
+    setupEventListeners() {
+        if (this.acceptButton) {
+            this.acceptButton.addEventListener('click', () => {
+                this.acceptAllCookies();
+            });
+        }
+
+        if (this.configureButton) {
+            this.configureButton.addEventListener('click', () => {
+                this.toggleSettings();
+            });
+        }
+
+        if (this.closeButton) {
+            this.closeButton.addEventListener('click', () => {
+                this.hideBanner();
+            });
+        }
+
+        if (this.saveButton) {
+            this.saveButton.addEventListener('click', () => {
+                this.savePreferences();
+            });
+        }
+
+        document.addEventListener('click', (e) => {
+            if (this.settingsPanel.classList.contains('show') &&
+                !this.banner.contains(e.target)) {
+                this.toggleSettings();
+            }
+        });
+    }
+
+    showBanner() {
+        setTimeout(() => {
+            if (this.banner) {
+                this.banner.classList.add('show');
+                document.body.style.overflow = 'hidden';
+            }
+        }, 2000);
+    }
+
+    hideBanner() {
+        if (this.banner) {
+            this.banner.classList.remove('show');
+            this.banner.classList.add('hide');
+            document.body.style.overflow = '';
+
+            setTimeout(() => {
+                this.banner.style.display = 'none';
+            }, 600);
+        }
+    }
+
+    toggleSettings() {
+        this.settingsPanel.classList.toggle('show');
+
+        if (this.settingsPanel.classList.contains('show')) {
+            this.configureButton.innerHTML = '<i class="ri-close-line"></i> Cerrar';
+            this.configureButton.classList.add('active');
+        } else {
+            this.configureButton.innerHTML = '<i class="ri-settings-3-line"></i> Configurar';
+            this.configureButton.classList.remove('active');
+        }
+    }
+
+    acceptAllCookies() {
+        const consent = {
+            essential: true,
+            analytics: true,
+            marketing: true,
+            timestamp: new Date().toISOString()
+        };
+
+        this.setConsent(consent);
+        this.hideBanner();
+        this.loadAllCookies();
+    }
+
+    savePreferences() {
+        const consent = {
+            essential: true,
+            analytics: this.analyticsCheckbox.checked,
+            marketing: this.marketingCheckbox.checked,
+            timestamp: new Date().toISOString()
+        };
+
+        this.setConsent(consent);
+        this.hideBanner();
+        this.loadSelectedCookies(consent);
+    }
+
+    setConsent(consent) {
+        localStorage.setItem('cookieConsent', JSON.stringify(consent));
+        this.cookieConsent = JSON.stringify(consent);
+
+        document.cookie = `cookieConsent=${JSON.stringify(consent)}; max-age=31536000; path=/; SameSite=Lax`;
+    }
+
+    loadAllCookies() {
+        this.loadGoogleAnalytics();
+        this.loadMarketingCookies();
+    }
+
+    loadSelectedCookies(consent) {
+        if (consent.analytics) {
+            this.loadGoogleAnalytics();
+        }
+
+        if (consent.marketing) {
+            this.loadMarketingCookies();
+        }
+    }
+
+    setupAnalytics() {
+        if (this.cookieConsent) {
+            const consent = JSON.parse(this.cookieConsent);
+            this.loadSelectedCookies(consent);
+        }
+    }
+
+    loadGoogleAnalytics() {
+        const script = document.createElement('script');
+        script.async = true;
+        script.src = 'https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID';
+        document.head.appendChild(script);
+
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'GA_MEASUREMENT_ID');
+
+        console.log('Google Analytics cargado');
+    }
+
+    loadMarketingCookies() {
+        console.log('Cookies de marketing cargadas');
+    }
+
+    hasConsent(cookieType) {
+        if (!this.cookieConsent) return false;
+
+        const consent = JSON.parse(this.cookieConsent);
+        return consent[cookieType] || false;
+    }
+
+    revokeConsent() {
+        localStorage.removeItem('cookieConsent');
+        document.cookie = 'cookieConsent=; max-age=0; path=/';
+        this.cookieConsent = null;
+
+        setTimeout(() => {
+            location.reload();
+        }, 1000);
+    }
+}
+
 // =============== FOOTER ===============
 class FooterAnimations {
     constructor() {
@@ -424,7 +606,8 @@ class FooterAnimations {
 // =============== INITIALIZE EVERYTHING ===============
 document.addEventListener('DOMContentLoaded', () => {
     new Navigation();
-
+    new CookieBanner();
+    
     if (document.querySelector('.home')) {
         new HomeAnimations();
     }

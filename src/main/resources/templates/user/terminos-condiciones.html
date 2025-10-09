@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Términos y Condiciones</title>
+    <link rel="icon" th:href="@{/images/Logo_negro.png}" type="image/png">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.2.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <style>
+        .legal-container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 3rem;
+            background: var(--container-color);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .legal-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .legal-header h1 {
+            font-family: var(--accent-font);
+            color: var(--title-color);
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .legal-header .last-updated {
+            color: var(--text-color-light);
+            font-size: 0.9rem;
+        }
+
+        .legal-section {
+            margin-bottom: 2.5rem;
+        }
+
+        .legal-section h2 {
+            font-family: var(--accent-font);
+            color: var(--primary-color);
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .legal-section h2 i {
+            font-size: 1.2rem;
+        }
+
+        .legal-section p, .legal-section ul {
+            color: var(--text-color);
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+
+        .legal-section ul {
+            padding-left: 1.5rem;
+        }
+
+        .legal-section li {
+            margin-bottom: 0.5rem;
+            position: relative;
+        }
+
+        .legal-section li:before {
+            content: "•";
+            color: var(--primary-color);
+            font-weight: bold;
+            position: absolute;
+            left: -1rem;
+        }
+
+        .warning-box {
+            background: rgba(220, 53, 69, 0.1);
+            padding: 1.5rem;
+            border-radius: 10px;
+            border-left: 4px solid #dc3545;
+            margin: 1.5rem 0;
+        }
+
+        .back-home {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .back-home:hover {
+            gap: 0.8rem;
+            color: var(--title-color);
+        }
+
+        @media screen and (max-width: 768px) {
+            .legal-container {
+                padding: 2rem 1.5rem;
+                margin: 1rem;
+            }
+            
+            .legal-header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header th:insert="~{user/templateUser.html::nav_user}"></header>
+
+    <main class="main">
+        <section class="legal-section section">
+            <div class="legal-container container">
+                <div class="legal-header">
+                    <h1>Términos y Condiciones</h1>
+                    <p class="last-updated">Última actualización: 9 de octubre de 2025</p>
+                </div>
+
+                <div class="legal-section">
+                    <h2><i class="ri-file-text-line"></i> Aceptación de Términos</h2>
+                    <p>Al utilizar nuestro sitio web y servicios, aceptas estos términos y condiciones en su totalidad.</p>
+                </div>
+
+                <div class="legal-section">
+                    <h2><i class="ri-user-line"></i> Servicios de Tatuaje</h2>
+                    <p><strong>Requisitos de edad:</strong> Solo realizamos tatuajes a mayores de 18 años. Se requiere identificación oficial.</p>
+                    <p><strong>Consultas y citas:</strong> Las consultas a través del sitio web no garantizan la disponibilidad de citas inmediatas.</p>
+                </div>
+
+                <div class="legal-section">
+                    <h2><i class="ri-money-dollar-circle-line"></i> Pagos y Depósitos</h2>
+                    <ul>
+                        <li>Se requiere depósito para confirmar citas</li>
+                        <li>Los depósitos no son reembolsables</li>
+                        <li>El pago restante se realiza al finalizar la sesión</li>
+                        <li>Aceptamos efectivo y transferencias bancarias</li>
+                    </ul>
+                </div>
+
+                <div class="warning-box">
+                    <h3><i class="ri-alert-line"></i> Advertencias Importantes</h3>
+                    <p>Los tatuajes son permanentes. Es responsabilidad del cliente:</p>
+                    <ul>
+                        <li>Asegurarse de estar completamente decidido sobre el diseño</li>
+                        <li>Informar sobre alergias o condiciones médicas</li>
+                        <li>Seguir las instrucciones de cuidado posterior</li>
+                        <li>Comprender que los resultados pueden variar</li>
+                    </ul>
+                </div>
+
+                <div class="legal-section">
+                    <h2><i class="ri-camera-line"></i> Propiedad Intelectual</h2>
+                    <p>Todos los diseños son propiedad intelectual de Muthabara y no pueden ser reproducidos sin autorización.</p>
+                </div>
+
+                <div class="legal-section">
+                    <h2><i class="ri-store-2-line"></i> Tienda Online</h2>
+                    <p><strong>Envíos:</strong> Realizamos envíos a toda [país]. Los tiempos de entrega pueden variar.</p>
+                    <p><strong>Devoluciones:</strong> Aceptamos devoluciones dentro de los 15 días posteriores a la compra, siempre que los productos estén en su estado original.</p>
+                </div>
+
+                <div class="legal-section">
+                    <h2><i class="ri-scales-3-line"></i> Limitación de Responsabilidad</h2>
+                    <p>Muthabara no se hace responsable por:</p>
+                    <ul>
+                        <li>Reacciones alérgicas no informadas previamente</li>
+                        <li>Mala cicatrización por no seguir cuidados posteriores</li>
+                        <li>Cambios de opinión sobre el diseño después del tatuaje</li>
+                        <li>Problemas médicos no revelados antes del procedimiento</li>
+                    </ul>
+                </div>
+
+                <div class="legal-section">
+                    <h2><i class="ri-question-line"></i> Consultas</h2>
+                    <p>Para cualquier duda sobre estos términos, contáctanos a través de nuestro formulario de contacto o visita el estudio.</p>
+                </div>
+
+                <a th:href="@{/Muthabara}" class="back-home">
+                    <i class="ri-arrow-left-line"></i> Volver al Inicio
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <div th:insert="~{user/templateUser.html::footer}"></div>
+
+    <div th:insert="~{user/templateUser.html::script}"></div>
+</body>
+</html>

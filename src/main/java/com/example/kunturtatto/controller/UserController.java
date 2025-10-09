@@ -50,7 +50,7 @@ public class UserController {
 
         List<SubCategoryDto> tattooSubcategories = subCategoryService.getSubCategoriesByCategory(1L);
         List<SubCategoryDto> tattooCategories = subCategoryService.getSubCategoriesByCategory(2L);
-        List<SubCategoryDto> drawingSubcategories = subCategoryService.getSubCategoriesByCategory(3L); 
+        List<SubCategoryDto> drawingSubcategories = subCategoryService.getSubCategoriesByCategory(3L);
 
         model.addAttribute("tattooSubcategories", tattooSubcategories);
         model.addAttribute("designSubcategories", tattooCategories);
@@ -156,4 +156,13 @@ public class UserController {
         return "redirect:/Muthabara/ingresar";
     }
 
+    @GetMapping("/politica-privacidad")
+    public String privacyPolicy() {
+        return "user/politica-privacidad";
+    }
+
+    @GetMapping("/terminos-condiciones")
+    public String termsAndConditions() {
+        return "user/terminos-condiciones";
+    }
 }

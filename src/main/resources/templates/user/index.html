@@ -78,8 +78,7 @@
 
                     <div class="gallery__items grid">
                         <div th:each="subcategory : ${tattooSubcategories}" class="gallery__item" data-category="all">
-                            <a th:href="@{/Muthabara/diseños(subCategoryId=${subcategory.id})}"
-                                class="gallery__link">
+                            <a th:href="@{/Muthabara/diseños(subCategoryId=${subcategory.id})}" class="gallery__link">
                                 <article class="gallery__card">
                                     <div class="gallery__image-container">
                                         <img th:src="@{'/images/' + ${subcategory.image}}" th:alt="${subcategory.name}"
@@ -424,8 +423,8 @@
             <div class="instagram-item">
                 <img src="/images/img_noticias.jpg" alt="Tattoo design">
                 <div class="instagram-overlay">
-                    <a href="https://www.instagram.com/muthabara_ink?utm_source=ig_web_button_share_sheet&igsh=YnRleXBpcm56MzN0" class="instagram-link"
-                        target="_blank">
+                    <a href="https://www.instagram.com/muthabara_ink?utm_source=ig_web_button_share_sheet&igsh=YnRleXBpcm56MzN0"
+                        class="instagram-link" target="_blank">
                         <i class="ri-instagram-line instagram-icon"></i>
                         <span>Síguenos</span>
                     </a>
@@ -435,8 +434,8 @@
             <div class="instagram-item">
                 <img src="/images/Tatto-inicio.jpg" alt="Tattoo design">
                 <div class="instagram-overlay">
-                    <a href="https://www.instagram.com/muthabara_ink?utm_source=ig_web_button_share_sheet&igsh=YnRleXBpcm56MzN0" class="instagram-link"
-                        target="_blank">
+                    <a href="https://www.instagram.com/muthabara_ink?utm_source=ig_web_button_share_sheet&igsh=YnRleXBpcm56MzN0"
+                        class="instagram-link" target="_blank">
                         <i class="ri-instagram-line instagram-icon"></i>
                         <span>Síguenos</span>
                     </a>
@@ -446,8 +445,8 @@
             <div class="instagram-item">
                 <img src="/images/img_noticias.jpg" alt="Tattoo design">
                 <div class="instagram-overlay">
-                    <a href="https://www.instagram.com/muthabara_ink?utm_source=ig_web_button_share_sheet&igsh=YnRleXBpcm56MzN0" class="instagram-link"
-                        target="_blank">
+                    <a href="https://www.instagram.com/muthabara_ink?utm_source=ig_web_button_share_sheet&igsh=YnRleXBpcm56MzN0"
+                        class="instagram-link" target="_blank">
                         <i class="ri-instagram-line instagram-icon"></i>
                         <span>Síguenos</span>
                     </a>
@@ -457,8 +456,8 @@
             <div class="instagram-item">
                 <img src="/images/Tatto-inicio.jpg" alt="Tattoo design">
                 <div class="instagram-overlay">
-                    <a href="https://www.instagram.com/muthabara_ink?utm_source=ig_web_button_share_sheet&igsh=YnRleXBpcm56MzN0" class="instagram-link"
-                        target="_blank">
+                    <a href="https://www.instagram.com/muthabara_ink?utm_source=ig_web_button_share_sheet&igsh=YnRleXBpcm56MzN0"
+                        class="instagram-link" target="_blank">
                         <i class="ri-instagram-line instagram-icon"></i>
                         <span>Síguenos</span>
                     </a>
@@ -468,8 +467,8 @@
             <div class="instagram-item">
                 <img src="/images/img_noticias.jpg" alt="Tattoo design">
                 <div class="instagram-overlay">
-                    <a href="https://www.instagram.com/muthabara_ink?utm_source=ig_web_button_share_sheet&igsh=YnRleXBpcm56MzN0" class="instagram-link"
-                        target="_blank">
+                    <a href="https://www.instagram.com/muthabara_ink?utm_source=ig_web_button_share_sheet&igsh=YnRleXBpcm56MzN0"
+                        class="instagram-link" target="_blank">
                         <i class="ri-instagram-line instagram-icon"></i>
                         <span>Síguenos</span>
                     </a>
@@ -479,14 +478,102 @@
             <div class="instagram-item">
                 <img src="/images/Tatto-inicio.jpg" alt="Tattoo design">
                 <div class="instagram-overlay">
-                    <a href="https://www.instagram.com/muthabara_ink?utm_source=ig_web_button_share_sheet&igsh=YnRleXBpcm56MzN0" class="instagram-link"
-                        target="_blank">
+                    <a href="https://www.instagram.com/muthabara_ink?utm_source=ig_web_button_share_sheet&igsh=YnRleXBpcm56MzN0"
+                        class="instagram-link" target="_blank">
                         <i class="ri-instagram-line instagram-icon"></i>
                         <span>Síguenos</span>
                     </a>
                 </div>
             </div>
         </section>
+        
+        
+        <div id="cookie-banner" class="cookie-banner">
+            <div class="cookie-banner__container">
+                <div class="cookie-banner__content">
+                    <div class="cookie-banner__icon">
+                        <i class="ri-cookie-line"></i>
+                    </div>
+
+                    <div class="cookie-banner__text">
+                        <h3 class="cookie-banner__title">Privacidad y Cookies</h3>
+                        <p class="cookie-banner__description">
+                            Utilizamos cookies para mejorar tu experiencia. Al continuar navegando,
+                            aceptas nuestra
+                            <a th:href="@{/KunturTattoo/politica-privacidad}" class="cookie-banner__link">
+                                Política de Privacidad
+                            </a>
+                            y el uso de cookies.
+                        </p>
+                    </div>
+
+                    <div class="cookie-banner__actions">
+                        <button id="configure-cookies" class="cookie-banner__btn cookie-banner__btn--secondary">
+                            <i class="ri-settings-3-line"></i>
+                            Configurar
+                        </button>
+                        <button id="accept-cookies" class="cookie-banner__btn cookie-banner__btn--primary">
+                            <i class="ri-check-line"></i>
+                            Aceptar Todas
+                        </button>
+                    </div>
+
+                    <button id="close-cookies" class="cookie-banner__close">
+                        <i class="ri-close-line"></i>
+                    </button>
+                </div>
+
+                <!-- Panel de configuración avanzada -->
+                <div class="cookie-banner__settings">
+                    <div class="cookie-settings__header">
+                        <h4>Preferencias de Cookies</h4>
+                        <p>Selecciona las cookies que deseas aceptar</p>
+                    </div>
+
+                    <div class="cookie-settings__options">
+                        <div class="cookie-option">
+                            <div class="cookie-option__info">
+                                <h5>Cookies Esenciales</h5>
+                                <p>Necesarias para el funcionamiento básico del sitio</p>
+                            </div>
+                            <label class="cookie-switch">
+                                <input type="checkbox" checked disabled>
+                                <span class="cookie-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="cookie-option">
+                            <div class="cookie-option__info">
+                                <h5>Cookies de Analytics</h5>
+                                <p>Nos ayudan a mejorar el sitio web</p>
+                            </div>
+                            <label class="cookie-switch">
+                                <input type="checkbox" id="analytics-cookies" checked>
+                                <span class="cookie-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="cookie-option">
+                            <div class="cookie-option__info">
+                                <h5>Cookies de Marketing</h5>
+                                <p>Para mostrar contenido personalizado</p>
+                            </div>
+                            <label class="cookie-switch">
+                                <input type="checkbox" id="marketing-cookies">
+                                <span class="cookie-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="cookie-settings__actions">
+                        <button id="save-preferences" class="cookie-banner__btn cookie-banner__btn--primary">
+                            <i class="ri-save-line"></i>
+                            Guardar Preferencias
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
 
     <div th:insert="~{user/templateUser.html::footer}"></div>
