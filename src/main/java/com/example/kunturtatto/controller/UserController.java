@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
-@RequestMapping("/KunturTattoo")
+@RequestMapping("/Muthabara")
 @PreAuthorize("permitAll()")
 public class UserController {
 
@@ -125,13 +125,13 @@ public class UserController {
     @PostMapping("/contacto/guardar")
     public String saveContact() {
 
-        return "redirect:/KunturTattoo/contacto";
+        return "redirect:/Muthabara/contacto";
     }
 
     @PostMapping("/login/guardar")
     public String saveLogIn() {
 
-        return "redirect:KunturTattoo";
+        return "redirect:Muthabara";
     }
 
     @PostMapping("/registro/guardar")
@@ -153,7 +153,7 @@ public class UserController {
         // Guardar el usuario en el servicio
 
         redirectAttributes.addFlashAttribute("message", "Usuario registrado exitosamente.");
-        return "redirect:/KunturTattoo/ingresar";
+        return "redirect:/Muthabara/ingresar";
     }
 
 }

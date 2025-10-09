@@ -51,7 +51,7 @@
 
                 <nav class="gallery-filters__nav">
                     <div class="gallery-filters__items">
-                        <a th:href="@{/KunturTattoo/diseños}" class="gallery-filters__item"
+                        <a th:href="@{/Muthabara/diseños}" class="gallery-filters__item"
                             th:classappend="${selectedCategoryId == null} ? 'gallery-filters__item--active' : ''">
                             <i class="ri-grid-fill"></i>
                             <span class="gallery-filters__text">Todos los Diseños</span>
@@ -59,7 +59,7 @@
                         </a>
 
                         <a th:each="category : ${categories}"
-                            th:href="@{/KunturTattoo/diseños(categoryId=${category.id})}" class="gallery-filters__item"
+                            th:href="@{/Muthabara/diseños(categoryId=${category.id})}" class="gallery-filters__item"
                             th:classappend="${selectedCategoryId == category.id} ? 'gallery-filters__item--active' : ''">
                             <i class="ri-artboard-line"></i>
                             <span class="gallery-filters__text" th:text="${category.name}"></span>
@@ -81,7 +81,7 @@
 
                 <nav class="gallery-filters__nav">
                     <div class="gallery-filters__items">
-                        <a th:href="@{/KunturTattoo/diseños(categoryId=${selectedCategoryId})}"
+                        <a th:href="@{/Muthabara/diseños(categoryId=${selectedCategoryId})}"
                             class="gallery-filters__item"
                             th:classappend="${selectedSubCategoryId == null} ? 'gallery-filters__item--active' : ''">
                             <i class="ri-list-check"></i>
@@ -90,7 +90,7 @@
                         </a>
 
                         <a th:each="subcategory : ${currentSubCategories}"
-                            th:href="@{/KunturTattoo/diseños(categoryId=${selectedCategoryId}, subCategoryId=${subcategory.id})}"
+                            th:href="@{/Muthabara/diseños(categoryId=${selectedCategoryId}, subCategoryId=${subcategory.id})}"
                             class="gallery-filters__item"
                             th:classappend="${selectedSubCategoryId == subcategory.id} ? 'gallery-filters__item--active' : ''">
                             <i class="ri-checkbox-blank-circle-line"></i>
@@ -123,29 +123,29 @@
     <!-- Paginación -->
     <div th:if="${totalPages > 1}" class="pagination">
         <a th:if="${currentPage > 0}"
-            th:href="@{/KunturTattoo/diseños(categoryId=${selectedCategoryId}, subCategoryId=${selectedSubCategoryId}, page=0, size=${pageSize})}">
+            th:href="@{/Muthabara/diseños(categoryId=${selectedCategoryId}, subCategoryId=${selectedSubCategoryId}, page=0, size=${pageSize})}">
             &laquo; Primera
         </a>
 
         <a th:if="${currentPage > 0}"
-            th:href="@{/KunturTattoo/diseños(categoryId=${selectedCategoryId}, subCategoryId=${selectedSubCategoryId}, page=${currentPage - 1}, size=${pageSize})}">
+            th:href="@{/Muthabara/diseños(categoryId=${selectedCategoryId}, subCategoryId=${selectedSubCategoryId}, page=${currentPage - 1}, size=${pageSize})}">
             &lsaquo; Anterior
         </a>
 
         <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
             <a th:if="${i == currentPage}" class="active" th:text="${i + 1}"></a>
             <a th:unless="${i == currentPage}"
-                th:href="@{/KunturTattoo/diseños(categoryId=${selectedCategoryId}, subCategoryId=${selectedSubCategoryId}, page=${i}, size=${pageSize})}"
+                th:href="@{/Muthabara/diseños(categoryId=${selectedCategoryId}, subCategoryId=${selectedSubCategoryId}, page=${i}, size=${pageSize})}"
                 th:text="${i + 1}"></a>
         </span>
 
         <a th:if="${currentPage < totalPages - 1}"
-            th:href="@{/KunturTattoo/diseños(categoryId=${selectedCategoryId}, subCategoryId=${selectedSubCategoryId}, page=${currentPage + 1}, size=${pageSize})}">
+            th:href="@{/Muthabara/diseños(categoryId=${selectedCategoryId}, subCategoryId=${selectedSubCategoryId}, page=${currentPage + 1}, size=${pageSize})}">
             Siguiente &rsaquo;
         </a>
 
         <a th:if="${currentPage < totalPages - 1}"
-            th:href="@{/KunturTattoo/diseños(categoryId=${selectedCategoryId}, subCategoryId=${selectedSubCategoryId}, page=${totalPages - 1}, size=${pageSize})}">
+            th:href="@{/Muthabara/diseños(categoryId=${selectedCategoryId}, subCategoryId=${selectedSubCategoryId}, page=${totalPages - 1}, size=${pageSize})}">
             Última &raquo;
         </a>
     </div>

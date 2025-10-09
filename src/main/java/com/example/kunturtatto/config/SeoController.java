@@ -14,10 +14,10 @@ public class SeoController {
             User-agent: *
             Disallow: /admin/
             Disallow: /admin/appointments/
-            Disallow: /KunturTattoo/ingresar
-            Disallow: /KunturTattoo/logout
+            Disallow: /Muthabara/ingresar
+            Disallow: /Muthabara/logout
             
-            Sitemap: https://www.kunturtattoo.com/sitemap.xml
+            Sitemap: https://www.Muthabara.com/sitemap.xml
             """;
         
         return ResponseEntity.ok()

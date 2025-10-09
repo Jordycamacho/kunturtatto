@@ -26,7 +26,7 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" th:href="@{/KunturTattoo}">Inicio</a>
+                        <a class="nav-link active" aria-current="page" th:href="@{/Muthabara}">Inicio</a>
                     </li>
 
                     <li class="nav-item dropdown">
@@ -35,15 +35,15 @@
                             Categorias
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown" style="background-color: rgb(251, 248, 254)">
-                            <li><a class="dropdown-item" th:href="@{/KunturTattoo/disenos}">Todos</a></li>
+                            <li><a class="dropdown-item" th:href="@{/Muthabara/disenos}">Todos</a></li>
                             <li th:each="category : ${categories}">
-                                <a class="dropdown-item" th:text="${category.name}" th:href="@{'/KunturTattoo/disenos/' + ${category.id}}"></a>
+                                <a class="dropdown-item" th:text="${category.name}" th:href="@{'/Muthabara/disenos/' + ${category.id}}"></a>
                             </li>
                         </ul>
 
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" th:href="@{/KunturTattoo/contacto}">Contactanos</a>
+                        <a class="nav-link" th:href="@{/Muthabara/contacto}">Contactanos</a>
                     </li>
                 </ul>
 

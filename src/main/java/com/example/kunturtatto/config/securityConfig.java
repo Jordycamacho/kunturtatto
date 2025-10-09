@@ -27,17 +27,17 @@ public class securityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/css/**", "/js/**", "/images/**","/robots.txt").permitAll()
                         .requestMatchers("/admin/appointments/**").authenticated()
-                        .requestMatchers("/KunturTattoo/**").permitAll()
+                        .requestMatchers("/Muthabara/**").permitAll()
                         .requestMatchers("/admin/**").authenticated()
                         .requestMatchers("/mail/**").permitAll()
                         .anyRequest().authenticated())
                 .formLogin(form -> form
-                        .loginPage("/KunturTattoo/ingresar")
-                        .defaultSuccessUrl("/KunturTattoo", true)
+                        .loginPage("/Muthabara/ingresar")
+                        .defaultSuccessUrl("/Muthabara", true)
                         .permitAll())
                 .logout(logout -> logout
-                        .logoutUrl("/KunturTattoo/logout")
-                        .logoutSuccessUrl("/KunturTattoo")
+                        .logoutUrl("/Muthabara/logout")
+                        .logoutSuccessUrl("/Muthabara")
                         .invalidateHttpSession(true)
                         .permitAll());
         return http.build();

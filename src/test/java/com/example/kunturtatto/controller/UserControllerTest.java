@@ -111,7 +111,7 @@ public class UserControllerTest {
 
     @Test
     public void testHome() throws Exception  {
-        mockMvc.perform(get("/KunturTattoo"))
+        mockMvc.perform(get("/Muthabara"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("user/index"))
                 .andExpect(model().attribute("categories", categoryDesigns));
@@ -119,7 +119,7 @@ public class UserControllerTest {
 
     @Test
     public void testShowDesigns() throws Exception{
-        mockMvc.perform(get("/KunturTattoo/diseños"))
+        mockMvc.perform(get("/Muthabara/diseños"))
         .andExpect(status().isOk())
         .andExpect(view().name("user/designs")) 
         .andExpect(model().attribute("designs", designs)) 
@@ -128,7 +128,7 @@ public class UserControllerTest {
 
     @Test 
     public void testContact() throws Exception{
-        mockMvc.perform(get("/KunturTattoo/contacto"))
+        mockMvc.perform(get("/Muthabara/contacto"))
         .andExpect(status().isOk())
         .andExpect(view().name("user/contact"))
         .andExpect(model().attribute("categories", categoryDesigns));

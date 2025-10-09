@@ -1,10 +1,10 @@
-### README.md para `KunturTattoo`
+### README.md para `Muthabara`
 
 ```markdown
-# KunturTattoo
+# Muthabara
 
 ## Descripción
-KunturTattoo es una aplicación web para la gestión de un estudio de tatuajes. La aplicación permite a los clientes explorar diseños de tatuajes por categorías, enviar solicitudes de contacto con detalles específicos, y a los administradores gestionar diseños, categorías, usuarios y citas. La aplicación incluye funcionalidades de filtrado por categorías, notificaciones diarias de citas y seguridad con roles y permisos definidos mediante Spring Security.
+Muthabara es una aplicación web para la gestión de un estudio de tatuajes. La aplicación permite a los clientes explorar diseños de tatuajes por categorías, enviar solicitudes de contacto con detalles específicos, y a los administradores gestionar diseños, categorías, usuarios y citas. La aplicación incluye funcionalidades de filtrado por categorías, notificaciones diarias de citas y seguridad con roles y permisos definidos mediante Spring Security.
 
 ## Estado del Proyecto
 El proyecto se encuentra en la fase de desarrollo con funcionalidades clave implementadas. Todavía se están mejorando algunas características y optimizando el rendimiento.
@@ -34,11 +34,11 @@ El proyecto se encuentra en la fase de desarrollo con funcionalidades clave impl
 ### Configuración Local
 1. Clona el repositorio:
    ```bash
-   git clone https://github.com/tu_usuario/KunturTattoo.git
+   git clone https://github.com/tu_usuario/Muthabara.git
    ```
 2. Navega al directorio del proyecto:
    ```bash
-   cd KunturTattoo
+   cd Muthabara
    ```
 3. Configura la base de datos en `src/main/resources/application.properties`:
    ```properties
@@ -74,7 +74,7 @@ El proyecto se encuentra en la fase de desarrollo con funcionalidades clave impl
 ## Estructura del Proyecto
 
 ```bash
-KunturTattoo/
+Muthabara/
 ├── src/
 │   ├── main/
 │   │   ├── java/com/example/kunturtatto/
