@@ -33,7 +33,7 @@ public class securityConfig {
                         .anyRequest().authenticated())
                 .formLogin(form -> form
                         .loginPage("/Muthabara/ingresar")
-                        .defaultSuccessUrl("/Muthabara", true)
+                        .defaultSuccessUrl("/admin/disenos", true)
                         .permitAll())
                 .logout(logout -> logout
                         .logoutUrl("/Muthabara/logout")
