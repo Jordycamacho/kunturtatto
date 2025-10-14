@@ -222,11 +222,11 @@ public class AppointmentServiceImpl implements AppointmentService {
         }
 
         LocalTime appointmentTime = LocalTime.parse(time);
-        if (appointmentTime.isBefore(LocalTime.of(9, 0))) {
-            throw new InvalidAppointmentTimeException("Appointments cannot be before 9:00 AM");
+        if (appointmentTime.isBefore(LocalTime.of(6, 0))) {
+            throw new InvalidAppointmentTimeException("Appointments cannot be before 6:00 AM");
         }
-        if (appointmentTime.isAfter(LocalTime.of(18, 0))) {
-            throw new InvalidAppointmentTimeException("Appointments cannot be after 6:00 PM");
+        if (appointmentTime.isAfter(LocalTime.of(23, 0))) {
+            throw new InvalidAppointmentTimeException("Appointments cannot be after 23:00 PM");
         }
     }
 }

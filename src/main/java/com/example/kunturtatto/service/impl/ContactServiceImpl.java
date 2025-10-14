@@ -54,7 +54,7 @@ public class ContactServiceImpl implements IContactService {
 
     @Override
     public void sendAppointmentCompletion(Appointment appointment) {
-        String subject = "¡Gracias por tu visita! - Kuntur Tattoo";
+        String subject = "¡Gracias por tu visita! - Muthabara";
         sendHtmlEmail(
                 appointment.getCustomerEmail(),
                 subject,
@@ -62,7 +62,7 @@ public class ContactServiceImpl implements IContactService {
     }
 
     public void sendAppointmentConfirmation(Appointment appointment) {
-        String subject = "Confirmación de Cita - Kuntur Tattoo";
+        String subject = "Confirmación de Cita - Muthabara";
         sendHtmlEmail(
                 appointment.getCustomerEmail(),
                 subject,
@@ -71,7 +71,7 @@ public class ContactServiceImpl implements IContactService {
 
     @Override
     public void sendAppointmentUpdateNotification(Appointment appointment) {
-        String subject = "Actualización de Cita - Kuntur Tattoo";
+        String subject = "Actualización de Cita - Muthabara";
         sendHtmlEmail(
                 appointment.getCustomerEmail(),
                 subject,
@@ -80,7 +80,7 @@ public class ContactServiceImpl implements IContactService {
 
     @Override
     public void sendAppointmentCancellation(Appointment appointment) {
-        String subject = "Cancelación de Cita - Kuntur Tattoo";
+        String subject = "Cancelación de Cita - Muthabara";
         sendHtmlEmail(
                 appointment.getCustomerEmail(),
                 subject,
@@ -204,7 +204,7 @@ public class ContactServiceImpl implements IContactService {
                             </p>
                         </div>
                         <div class="footer">
-                            <p>Kuntur Tattoo Studio<br>%s</p>
+                            <p>Muthabara<br>%s</p>
                         </div>
                     </div>
                 </body>
@@ -234,7 +234,6 @@ public class ContactServiceImpl implements IContactService {
                         .label { font-weight: bold; color: #555; }
                         .changes { background: #fff8e1; padding: 15px; border-left: 4px solid #FFC107; margin: 20px 0; }
                         .footer { text-align: center; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #777; }
-                        .button { display: inline-block; padding: 10px 20px; background: #2196F3; color: white; text-decoration: none; border-radius: 5px; }
                     </style>
                 </head>
                 <body>
@@ -258,15 +257,11 @@ public class ContactServiceImpl implements IContactService {
                                 <p>Si estos cambios no te funcionan, contáctanos para reprogramar.</p>
                             </div>
 
-                            <p style="text-align: center; margin-top: 30px;">
-                                <a href="mailto:%s" class="button">Confirmar cambios</a>
-                            </p>
-
                             <p>Si no solicitaste este cambio, por favor contáctanos inmediatamente.</p>
                         </div>
                         <div class="footer">
-                            <p>Kuntur Tattoo Studio<br>
-                            © %s Kuntur Tattoo. Todos los derechos reservados.</p>
+                            <p>Muthabara<br>
+                            © %s Muthabara. Todos los derechos reservados.</p>
                         </div>
                     </div>
                 </body>
@@ -327,8 +322,8 @@ public class ContactServiceImpl implements IContactService {
                             <p>Lamentamos cualquier inconveniente que esto pueda causarte y esperamos poder atenderte en el futuro.</p>
                         </div>
                         <div class="footer">
-                            <p>Kuntur Tattoo Studio<br>
-                            © %s Kuntur Tattoo. Todos los derechos reservados.</p>
+                            <p>Muthabara<br>
+                            © %s Muthabara. Todos los derechos reservados.</p>
                         </div>
                     </div>
                 </body>
@@ -364,7 +359,7 @@ public class ContactServiceImpl implements IContactService {
                 <body>
                     <div class="container">
                         <div class="header">
-                            <h2>¡Gracias por elegir Kuntur Tattoo!</h2>
+                            <h2>¡Gracias por elegirnos</h2>
                         </div>
                         <div class="content">
                             <p>Hola %s,</p>
@@ -373,7 +368,7 @@ public class ContactServiceImpl implements IContactService {
                                 <p>¡Esperamos que hayas tenido una excelente experiencia con nosotros!</p>
                             </div>
 
-                            <p>En Kuntur Tattoo valoramos mucho a nuestros clientes y nos encantaría saber tu opinión sobre tu experiencia.</p>
+                            <p>En Muthabara valoramos mucho a nuestros clientes y nos encantaría saber tu opinión sobre tu experiencia.</p>
 
                             <p>Aquí tienes algunos detalles de tu visita:</p>
                             <ul>
@@ -385,8 +380,8 @@ public class ContactServiceImpl implements IContactService {
 
                         </div>
                         <div class="footer">
-                            <p>Kuntur Tattoo Studio<br>
-                            <p>© %s Kuntur Tattoo. Todos los derechos reservados.</p>
+                            <p>Muthabara<br>
+                            <p>© %s Muthabara. Todos los derechos reservados.</p>
                         </div>
                     </div>
                 </body>
