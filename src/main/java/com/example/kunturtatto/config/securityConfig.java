@@ -25,8 +25,10 @@ public class securityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+                    .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/api-docs/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/css/**", "/js/**", "/images/**","/robots.txt").permitAll()
                         .requestMatchers("/admin/appointments/**").authenticated()
+                        .requestMatchers("/api/cache/**").hasRole("ADMIN")
                         .requestMatchers("/Muthabara/**").permitAll()
                         .requestMatchers("/admin/**").authenticated()
                         .requestMatchers("/mail/**").permitAll()
