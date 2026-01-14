@@ -128,39 +128,121 @@ public class AdminController {
     }
 
     /* Create Categories */
+    @Operation(summary = "Mostrar categorías", description = "Muestra la página de administración con todas las categorías del sistema")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Página cargada exitosamente"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
     @GetMapping("/categorias")
     public String showCategories(Model model) {
-        model.addAttribute("categories", categoryService.getAllCategories());
+        log.info("[GET /admin/categorias] Mostrando página de gestión de categorías");
+
+        try {
+            long startTime = System.currentTimeMillis();
+            List<CategoryDto> categories = categoryService.getAllCategories();
+            long endTime = System.currentTimeMillis();
+
+            log.info("[GET /admin/categorias] Se cargaron {} categorías en {} ms",
+                    categories.size(), (endTime - startTime));
+
+            model.addAttribute("categories", categories);
+        } catch (Exception e) {
+            log.error("[GET /admin/categorias] Error al cargar categorías: {}", e.getMessage(), e);
+            model.addAttribute("error", "Error al cargar las categorías");
+        }
+
         return "admin/category/showCategory";
     }
 
+    @Operation(summary = "Formulario de creación de categoría", description = "Muestra el formulario para crear una nueva categoría")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Formulario cargado exitosamente")
+    })
     @GetMapping("/categorias/crear")
     public String createCategoryForm(Model model) {
+        log.info("[GET /admin/categorias/crear] Mostrando formulario para crear nueva categoría");
         model.addAttribute("categoryRequest", CategoryRequest.builder().build());
         return "admin/category/createCategory";
     }
 
+    @Operation(summary = "Crear nueva categoría", description = "Procesa el formulario y crea una nueva categoría en el sistema")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "302", description = "Redirección exitosa después de crear"),
+            @ApiResponse(responseCode = "400", description = "Datos del formulario inválidos"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
     @PostMapping("/categorias/crear/guardar")
-    public String saveCategory(@ModelAttribute CategoryRequest request,
-            @RequestParam("imageFile") MultipartFile imageFile,
+    public String saveCategory(
+            @Parameter(description = "Datos de la categoría a crear", required = true) @ModelAttribute CategoryRequest request,
+            @Parameter(description = "Archivo de imagen para la categoría", required = true) @RequestParam("imageFile") MultipartFile imageFile,
             RedirectAttributes redirectAttributes) {
+
+        log.info("[POST /admin/categorias/crear/guardar] Procesando creación de categoría: {}", request.getName());
+        log.debug("[POST /admin/categorias/crear/guardar] Datos recibidos - Nombre: {}, Imagen: {} bytes",
+                request.getName(), imageFile != null ? imageFile.getSize() : 0);
+
         try {
+            long startTime = System.currentTimeMillis();
             categoryService.createCategory(request, imageFile);
+            long endTime = System.currentTimeMillis();
+
+            log.info("[POST /admin/categorias/crear/guardar] Categoría '{}' creada exitosamente en {} ms",
+                    request.getName(), (endTime - startTime));
+
             redirectAttributes.addFlashAttribute("success", "Categoría creada exitosamente");
+
+            logAudit("CREATE_CATEGORY",
+                    String.format("Categoría '%s' creada", request.getName()));
+
         } catch (Exception e) {
+            log.error("[POST /admin/categorias/crear/guardar] Error al crear categoría '{}': {}",
+                    request.getName(), e.getMessage(), e);
+            logAudit("CREATE_CATEGORY_ERROR",
+                    String.format("Error creando categoría '%s': %s", request.getName(), e.getMessage()));
             redirectAttributes.addFlashAttribute("error", "Error al crear categoría: " + e.getMessage());
         }
+
         return "redirect:/admin/categorias";
     }
 
+    @Operation(summary = "Eliminar categoría", description = "Elimina una categoría específica del sistema")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "302", description = "Redirección exitosa después de eliminar"),
+            @ApiResponse(responseCode = "404", description = "Categoría no encontrada"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
     @PostMapping("/categorias/eliminar/{id}")
-    public String deleteCategory(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    public String deleteCategory(
+            @Parameter(description = "ID de la categoría a eliminar", required = true, example = "1") @PathVariable Long id,
+            RedirectAttributes redirectAttributes) {
+
+        log.info("[POST /admin/categorias/eliminar/{}] Eliminando categoría", id);
+
         try {
+            long startTime = System.currentTimeMillis();
             categoryService.deleteCategory(id);
+            long endTime = System.currentTimeMillis();
+
+            log.info("[POST /admin/categorias/eliminar/{}] Categoría eliminada exitosamente en {} ms",
+                    id, (endTime - startTime));
+
             redirectAttributes.addFlashAttribute("success", "Categoría eliminada exitosamente");
+
+            logAudit("DELETE_CATEGORY",
+                    String.format("Categoría ID: %d eliminada", id));
+
         } catch (ResourceNotFoundException e) {
+            log.error("[POST /admin/categorias/eliminar/{}] Categoría no encontrada: {}", id, e.getMessage());
+            logAudit("DELETE_CATEGORY_ERROR",
+                    String.format("Categoría no encontrada ID: %d", id));
             redirectAttributes.addFlashAttribute("error", "Error: " + e.getMessage());
+        } catch (Exception e) {
+            log.error("[POST /admin/categorias/eliminar/{}] Error inesperado: {}", id, e.getMessage(), e);
+            logAudit("DELETE_CATEGORY_ERROR",
+                    String.format("Error inesperado eliminando categoría ID: %d - %s", id, e.getMessage()));
+            redirectAttributes.addFlashAttribute("error", "Error inesperado al eliminar categoría: " + e.getMessage());
         }
+
         return "redirect:/admin/categorias";
     }
 
@@ -387,7 +469,7 @@ public class AdminController {
                     id, (endTime - startTime), updatedSubCategory.getName());
 
             redirectAttributes.addFlashAttribute("success", "Subcategoría actualizada exitosamente");
-            
+
             logAudit("UPDATE_SUBCATEGORY",
                     String.format("Subcategoría ID: %d actualizada a nombre '%s'",
                             id, updatedSubCategory.getName()));

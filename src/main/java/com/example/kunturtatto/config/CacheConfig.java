@@ -21,7 +21,9 @@ public class CacheConfig {
             "subcategoryById",
             "subcategoriesByCategoryRepo",
             "subcategoryWithDesigns",
-            "categoriesList"
+            "categoriesList",
+            "categoriesWithSubcategories",
+            "categoryById"
         );
         
         cacheManager.setCaffeine(Caffeine.newBuilder()
