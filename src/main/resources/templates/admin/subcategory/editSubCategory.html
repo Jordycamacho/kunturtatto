@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:insert="~{admin/templateAdmin.html::header}">
+    <title>Editar Subcategoría - Kuntur Tattoo Admin</title>
+</head>
+<body>
+    <div th:insert="~{admin/templateAdmin.html::nav_user}"></div>
+    <div th:insert="~{admin/templateAdmin.html::nav_admin}"></div>
+
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="mb-0">
+                            <i class="bi bi-pencil-square me-2"></i>Editar Subcategoría
+                        </h3>
+                    </div>
+                    
+                    <div class="card-body">
+                        <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                            <span th:text="${success}"></span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        
+                        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <span th:text="${error}"></span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        
+                        <form th:action="@{/admin/subcategorias/editar/guardar/{id}(id=${subCategory.id})}" 
+                              method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                            
+                            <input type="hidden" name="id" th:value="${subCategory.id}">
+                            
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Nombre de la Subcategoría *</label>
+                                <input type="text" class="form-control" id="name" 
+                                       name="name" th:value="${subCategory.name}" required>
+                                <div class="invalid-feedback">
+                                    Por favor ingrese un nombre para la subcategoría.
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="categoryId" class="form-label">Categoría Padre *</label>
+                                <select class="form-select" id="categoryId" name="categoryId" required>
+                                    <option value="">Seleccione una categoría</option>
+                                    <option th:each="category : ${categories}" 
+                                            th:value="${category.id}" 
+                                            th:text="${category.name}"
+                                            th:selected="${category.id == subCategory.categoryId}">
+                                    </option>
+                                </select>
+                                <div class="invalid-feedback">
+                                    Por favor seleccione una categoría padre.
+                                </div>
+                                <div class="form-text">
+                                    Actualmente asignada a: <strong th:text="${subCategory.categoryName}"></strong>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="imageFile" class="form-label">Imagen</label>
+                                <input type="file" class="form-control" id="imageFile" 
+                                       name="imageFile" accept="image/*">
+                                <div class="form-text">
+                                    Si no selecciona una nueva imagen, se mantendrá la actual.
+                                    Formatos aceptados: JPG, PNG, GIF. Tamaño máximo: 10MB.
+                                </div>
+                                
+                                <div class="mt-3">
+                                    <label class="form-label">Imagen actual:</label>
+                                    <div class="border rounded p-3 bg-light">
+                                        <img th:src="@{'/images/' + ${subCategory.image}}" 
+                                             alt="Imagen actual" 
+                                             class="img-fluid rounded" 
+                                             style="max-height: 200px;">
+                                        <div class="mt-2">
+                                            <small class="text-muted">
+                                                Nombre del archivo: <span th:text="${subCategory.image}"></span>
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between mt-4">
+                                <a th:href="@{/admin/subcategorias}" class="btn btn-secondary">
+                                    <i class="bi bi-arrow-left me-1"></i> Cancelar
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-check-circle me-1"></i> Guardar Cambios
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <div class="card-footer text-muted">
+                        <small>
+                            <i class="bi bi-info-circle me-1"></i>
+                            Los campos marcados con * son obligatorios.
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+            
+            var forms = document.querySelectorAll('.needs-validation');
+            
+            Array.prototype.slice.call(forms)
+                .forEach(function(form) {
+                    form.addEventListener('submit', function(event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+        })();
+        
+        document.getElementById('imageFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    console.log('Nueva imagen seleccionada:', file.name);
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+
+    <div th:insert="~{admin/templateAdmin.html::script}"></div>
+</body>
+</html>

@@ -40,7 +40,7 @@ public class DesignServiceImpl implements DesignService {
         SubCategory subCategory = subCategoryRepository.findById(request.getSubCategoryId())
                 .orElseThrow(() -> {
                     log.error("SubCategory not found with ID: {}", request.getSubCategoryId());
-                    return new ResourceNotFoundException("SubCategory not found with ID: " + request.getSubCategoryId());
+                    return new ResourceNotFoundException("SubCategory not found with ID: " + request.getSubCategoryId(), null, null);
                 });
 
         String imageName = imageFile != null && !imageFile.isEmpty() ? 
@@ -68,7 +68,7 @@ public class DesignServiceImpl implements DesignService {
         Design design = designRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Design not found with ID: {}", id);
-                    return new ResourceNotFoundException("Design not found with ID: " + id);
+                    return new ResourceNotFoundException("Design not found with ID: " + id, null, id);
                 });
 
         if (imageFile != null && !imageFile.isEmpty()) {
@@ -83,7 +83,7 @@ public class DesignServiceImpl implements DesignService {
             SubCategory newSubCategory = subCategoryRepository.findById(request.getSubCategoryId())
                     .orElseThrow(() -> {
                         log.error("SubCategory not found with ID: {}", request.getSubCategoryId());
-                        return new ResourceNotFoundException("SubCategory not found with ID: " + request.getSubCategoryId());
+                        return new ResourceNotFoundException("SubCategory not found with ID: " + request.getSubCategoryId(), null, id);
                     });
             design.setSubCategory(newSubCategory);
         }
@@ -105,7 +105,7 @@ public class DesignServiceImpl implements DesignService {
         Design design = designRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Design not found with ID: {}", id);
-                    return new ResourceNotFoundException("Design not found with ID: " + id);
+                    return new ResourceNotFoundException("Design not found with ID: " + id, null, id);
                 });
         
         return designMapper.toDesignDto(design);
@@ -153,7 +153,7 @@ public class DesignServiceImpl implements DesignService {
         Design design = designRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Design not found for deletion with ID: {}", id);
-                    return new ResourceNotFoundException("Design not found with ID: " + id);
+                    return new ResourceNotFoundException("Design not found with ID: " + id, null, id);
                 });
 
         // Delete associated image
@@ -178,7 +178,7 @@ public class DesignServiceImpl implements DesignService {
         Design design = designRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Design not found with ID: {}", id);
-                    return new ResourceNotFoundException("Design not found with ID: " + id);
+                    return new ResourceNotFoundException("Design not found with ID: " + id, null, id);
                 });
 
         String oldImage = design.getImage();

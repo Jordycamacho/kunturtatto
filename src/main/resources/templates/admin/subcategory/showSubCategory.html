@@ -17,6 +17,7 @@
             <table class="table table-striped">
                 <thead class="table-dark">
                     <tr>
+                        <th>ID</th>
                         <th>Nombre</th>
                         <th>Categoría Padre</th>
                         <th>Imagen</th>
@@ -25,20 +26,30 @@
                 </thead>
                 <tbody>
                     <tr th:each="subCategory : ${subCategories}">
+                        <td th:text="${subCategory.id}">ID</td>
                         <td th:text="${subCategory.name}">Nombre</td>
                         <td th:text="${subCategory.categoryName}">Categoría</td>
                         <td>
                             <img th:src="@{'/images/' + ${subCategory.image}}" 
-                                 alt="SubCategory Image" style="max-width: 100px;">
+                                 alt="SubCategory Image" style="max-width: 100px; height: auto;" 
+                                 class="img-thumbnail">
+                            <div class="small text-muted mt-1" th:text="${subCategory.image}"></div>
                         </td>
                         <td>
-                            <form th:action="@{/admin/subcategorias/eliminar/{id}(id=${subCategory.id})}" 
-                                  method="post" style="display:inline;">
-                                <button type="submit" class="btn btn-danger btn-sm" 
-                                        onclick="return confirm('¿Estás seguro de eliminar esta subcategoría?')">
-                                    Eliminar
-                                </button>
-                            </form>
+                            <div class="btn-group" role="group">
+                                <a th:href="@{/admin/subcategorias/editar/{id}(id=${subCategory.id})}" 
+                                   class="btn btn-warning btn-sm me-1">
+                                    <i class="bi bi-pencil"></i> Editar
+                                </a>
+                                
+                                <form th:action="@{/admin/subcategorias/eliminar/{id}(id=${subCategory.id})}" 
+                                      method="post" style="display:inline;">
+                                    <button type="submit" class="btn btn-danger btn-sm" 
+                                            onclick="return confirm('¿Estás seguro de eliminar esta subcategoría? Esta acción no se puede deshacer.')">
+                                        <i class="bi bi-trash"></i> Eliminar
+                                    </button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                 </tbody>

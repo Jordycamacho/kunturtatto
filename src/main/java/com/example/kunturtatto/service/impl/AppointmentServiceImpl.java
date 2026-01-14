@@ -45,7 +45,7 @@ public class AppointmentServiceImpl implements AppointmentService {
             Design design = designRepository.findById(request.getDesignId())
                     .orElseThrow(() -> {
                         log.error("Design not found with ID: {}", request.getDesignId());
-                        return new ResourceNotFoundException("Design not found");
+                        return new ResourceNotFoundException("Design not found", null, null);
                     });
             appointment.setDesign(design);
         }
@@ -66,7 +66,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         Appointment appointment = appointmentRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Appointment not found with ID: {}", id);
-                    return new ResourceNotFoundException("Appointment not found");
+                    return new ResourceNotFoundException("Appointment not found", null, id);
                 });
 
         validateAppointmentTime(request.getDate(), request.getTime());
@@ -76,7 +76,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         if (request.getDesignId() != null &&
                 (appointment.getDesign() == null || !appointment.getDesign().getId().equals(request.getDesignId()))) {
             Design design = designRepository.findById(request.getDesignId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Design not found"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Design not found", null, id));
             appointment.setDesign(design);
         }
 
@@ -95,7 +95,7 @@ public class AppointmentServiceImpl implements AppointmentService {
                 .map(appointmentMapper::toResponse)
                 .orElseThrow(() -> {
                     log.error("Appointment not found with ID: {}", id);
-                    return new ResourceNotFoundException("Appointment not found");
+                    return new ResourceNotFoundException("Appointment not found", null, id);
                 });
     }
 
@@ -105,7 +105,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         Appointment appointment = appointmentRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Appointment not found with ID: {}", id);
-                    return new ResourceNotFoundException("Appointment not found");
+                    return new ResourceNotFoundException("Appointment not found", null, id);
                 });
 
         appointmentRepository.delete(appointment);
@@ -148,7 +148,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     public void cancelAppointment(Long id) {
         log.info("Cancelling appointment with ID: {}", id);
         Appointment appointment = appointmentRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Appointment not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Appointment not found", null, id));
 
         appointment.setStatus(AppointmentStatus.CANCELLED);
         appointmentRepository.save(appointment);
@@ -160,7 +160,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     public void confirmAppointment(Long id) {
         log.info("Confirming appointment with ID: {}", id);
         Appointment appointment = appointmentRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Appointment not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Appointment not found", null, id));
 
         appointment.setStatus(AppointmentStatus.CONFIRMED);
         appointmentRepository.save(appointment);
@@ -172,7 +172,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     public void completeAppointment(Long id) {
         log.info("Completing appointment with ID: {}", id);
         Appointment appointment = appointmentRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Appointment not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Appointment not found", null, id));
 
         appointment.setStatus(AppointmentStatus.COMPLETED);
         appointmentRepository.save(appointment);
@@ -183,7 +183,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         log.info("Changing status of appointment ID: {} to {}", id, newStatus);
 
         Appointment appointment = appointmentRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Appointment not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Appointment not found", null, id));
 
         if (appointment.getStatus() == AppointmentStatus.COMPLETED && newStatus != AppointmentStatus.COMPLETED) {
             throw new IllegalStateException("No se puede modificar una cita completada");

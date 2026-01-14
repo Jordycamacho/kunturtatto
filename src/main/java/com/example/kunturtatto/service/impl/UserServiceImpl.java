@@ -62,7 +62,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserDto updateUser(Long id, UserRequest request) throws ResourceNotFoundException, EmailAlreadyExistsException {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado", null, id));
 
                 if (!user.getEmail().equals(request.getEmail())) {
                     if (userRepository.findUserByEmail(request.getEmail()).isPresent()) {
@@ -89,7 +89,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public UserDto getUserById(Long id) throws ResourceNotFoundException {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado", null, id));
         return userMapper.toUserDto(user);
     }
 
@@ -97,7 +97,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public UserDto getUserByEmail(String email) throws ResourceNotFoundException {
         User user = userRepository.findUserByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado", email, null));
         return userMapper.toUserDto(user);
     }
 
@@ -113,7 +113,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void deleteUser(Long id) throws ResourceNotFoundException {
         if (!userRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Usuario no encontrado");
+            throw new ResourceNotFoundException("Usuario no encontrado", null, id);
         }
         userRepository.deleteById(id);
         log.info("Usuario eliminado con ID: {}", id);
@@ -123,7 +123,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserDto enableUser(Long id) throws ResourceNotFoundException {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado", null, id));
         user.setEnabled(true);
         User updatedUser = userRepository.save(user);
         log.info("Usuario habilitado con ID: {}", id);
@@ -134,7 +134,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserDto disableUser(Long id) throws ResourceNotFoundException {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado", null, id));
         user.setEnabled(false);
         User updatedUser = userRepository.save(user);
         log.info("Usuario deshabilitado con ID: {}", id);

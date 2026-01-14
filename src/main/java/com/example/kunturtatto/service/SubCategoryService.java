@@ -14,5 +14,6 @@ public interface SubCategoryService {
     List<SubCategoryDto> getAllSubCategories();
     List<SubCategoryDto> getSubCategoriesByCategory(Long categoryId);
     void deleteSubCategory(Long id);
+    public void deleteSubCategoryWithCascade(Long id);
     SubCategoryDto updateSubCategoryImage(Long id, MultipartFile imageFile);
 }

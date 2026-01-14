@@ -113,8 +113,7 @@ public class AppointmentController {
 
     @PostMapping("/{id}/delete")
     public String deleteAppointment(
-            @PathVariable Long id,
-            RedirectAttributes redirectAttributes) {
+            @PathVariable Long id, RedirectAttributes redirectAttributes) {
 
         try {
             appointmentService.deleteAppointment(id);
