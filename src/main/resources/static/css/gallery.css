@@ -225,11 +225,11 @@
 
 .gallery-filters__item:hover {
   border-color: var(--primary-color);
-  color: var(--primary-color);
+  color: var(--title-color);
   transform: translateY(-2px);
   box-shadow:
-    0 8px 25px rgba(221, 185, 68, 0.15),
-    0 0 0 1px rgba(221, 185, 68, 0.1);
+    0 8px 25px var(--primary-hover),
+    0 0 0 1px var(--primary-hover);
 }
 
 .gallery-filters__item:hover i {
@@ -242,7 +242,7 @@
   border-color: var(--primary-color);
   transform: translateY(-2px);
   box-shadow:
-    0 8px 25px rgba(221, 185, 68, 0.25),
+    0 8px 25px var(--primary-hover),
     0 0 0 1px var(--primary-color);
 }
 
@@ -288,6 +288,7 @@
   .gallery-filters__item {
     padding: 0.8rem 1.4rem;
     font-size: 0.88rem;
+    color: var(--primary-color);
   }
 }
 
@@ -496,7 +497,7 @@
   box-shadow:
     0 20px 40px rgba(0, 0, 0, 0.25),
     0 0 0 1px var(--primary-color),
-    0 0 30px rgba(221, 185, 68, 0.2);
+    0 0 30px var(--primary-hover);
 }
 
 .gallery .image:hover img {
@@ -803,10 +804,10 @@
 }
 
 .pagination a {
-  color: #333;
+  color: var(--text-color);
   padding: 8px 16px;
   text-decoration: none;
-  border: 1px solid #ddd;
+  border: 1px solid var(--primary-color);
   transition: background-color 0.3s;
 }
 
@@ -839,21 +840,21 @@
 }
 
 .pagination a {
-  color: #333;
+  color: #ffffff;
   padding: 8px 16px;
   text-decoration: none;
-  border: 1px solid #ddd;
+  border: 1px solid var(--primary-color);
   transition: background-color 0.3s;
 }
 
 .pagination a.active {
-  background-color: var(--title-color);
-  color: white;
-  border: 1px solid var(--title-color);
+  background-color: var(--primary-hover);
+  color: rgb(255, 255, 255);
+  border: 1px solid var(--primary-color);
 }
 
 .pagination a:hover:not(.active) {
-  background-color: #ddd;
+  background-color: var(--primary-hover);
 }
 
 .pagination a:first-child {
