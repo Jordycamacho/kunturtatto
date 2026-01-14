@@ -1,11 +1,10 @@
-package com.example.kunturtatto.service.impl;
+package com.example.kunturtatto.service;
 
 import com.example.kunturtatto.dto.CategoryDto;
 import com.example.kunturtatto.mapper.CategoryMapper;
 import com.example.kunturtatto.model.Category;
 import com.example.kunturtatto.repository.CategoryRepository;
 import com.example.kunturtatto.request.CategoryRequest;
-import com.example.kunturtatto.service.ImageService;
 import com.example.kunturtatto.service.impl.CategoryServiceImpl;
 
 import org.junit.jupiter.api.BeforeEach;
