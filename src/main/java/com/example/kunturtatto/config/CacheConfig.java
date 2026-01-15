@@ -28,13 +28,19 @@ public class CacheConfig {
             "designById",
             "designsBySubCategory",
             "designsByCategory",
-            "searchDesigns"
+            "searchDesigns",
+            "appointmentsAll",
+            "appointmentById",
+            "appointmentsByDate",
+            "appointmentsToday",
+            "appointmentsUpcoming",
+            "appointmentsByStatus"
         );
         
         cacheManager.setCaffeine(Caffeine.newBuilder()
             .initialCapacity(100)
             .maximumSize(1000)
-            .expireAfterWrite(30, TimeUnit.MINUTES)
+            .expireAfterWrite(10, TimeUnit.MINUTES)
             .recordStats()
             .weakKeys()
             .removalListener((key, value, cause) -> 
@@ -47,7 +53,7 @@ public class CacheConfig {
     @Bean
     public Caffeine<Object, Object> caffeineConfig() {
         return Caffeine.newBuilder()
-            .expireAfterWrite(30, TimeUnit.MINUTES)
+            .expireAfterWrite(10, TimeUnit.MINUTES)
             .maximumSize(1000);
     }
 }

@@ -21,35 +21,43 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AppointmentRequest {
-    @NotBlank
+    @NotBlank(message = "El nombre del cliente es obligatorio")
+    @Size(min = 2, max = 100, message = "El nombre debe tener entre 2 y 100 caracteres")
     private String customerName;
     
-    @NotBlank @Email
+    @NotBlank(message = "El email es obligatorio")
+    @Email(message = "El email debe tener un formato válido")
     private String customerEmail;
     
-    @NotBlank @Pattern(regexp = "^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\\s\\./0-9]*$")
+    @NotBlank(message = "El teléfono es obligatorio")
+    @Pattern(regexp = "^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\\s\\./0-9]*$", 
+             message = "El teléfono debe tener un formato válido")
     private String customerPhone;
     
-    @NotNull @FutureOrPresent
+    @NotNull(message = "La fecha es obligatoria")
+    @FutureOrPresent(message = "La fecha debe ser hoy o en el futuro")
     private LocalDate date;
     
-    @NotBlank
+    @NotBlank(message = "La hora es obligatoria")
+    @Pattern(regexp = "^([01]?[0-9]|2[0-3]):[0-5][0-9]$", 
+             message = "La hora debe tener formato HH:mm")
     private String time;
     
-    @NotNull @Positive
+    @NotNull(message = "El precio es obligatorio")
+    @Positive(message = "El precio debe ser mayor a 0")
     private Double price;
     
     private Long designId;
     
-    @Positive
+    @Positive(message = "El tamaño del tatuaje debe ser mayor a 0")
     private Double tattooSize;
     
-    @NotBlank
+    @NotBlank(message = "La parte del cuerpo es obligatoria")
     private String bodyPart;
     
-    @URL
+    @URL(message = "Los enlaces de referencia deben ser URLs válidas")
     private String referenceLinks;
     
-    @Size(max = 1000)
+    @Size(max = 1000, message = "La descripción no puede superar los 1000 caracteres")
     private String customDescription;
 }

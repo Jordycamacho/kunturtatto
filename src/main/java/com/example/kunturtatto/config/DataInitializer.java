@@ -51,7 +51,6 @@ public class DataInitializer implements CommandLineRunner {
             Set.of(readPerm)
         );
 
-        // 3. Crear usuarios iniciales
         createUserIfNotExists(
             "kunturtattoo@gmail.com", 
             "kunturtattoo012890.", 
