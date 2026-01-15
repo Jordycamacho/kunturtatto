@@ -34,7 +34,9 @@ public class CacheConfig {
             "appointmentsByDate",
             "appointmentsToday",
             "appointmentsUpcoming",
-            "appointmentsByStatus"
+            "appointmentsByStatus",
+            "emailAuditStats",
+            "emailAuditLogs"
         );
         
         cacheManager.setCaffeine(Caffeine.newBuilder()

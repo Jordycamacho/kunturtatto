@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @RestController
 @RequestMapping("/api/cache")
 public class CacheMonitorController {
@@ -30,6 +33,14 @@ public class CacheMonitorController {
                 cacheInfo.put("name", cacheName);
                 Object nativeCache = cache.getNativeCache();
                 cacheInfo.put("nativeCacheType", nativeCache.getClass().getSimpleName());
+                
+                if (nativeCache instanceof com.github.benmanes.caffeine.cache.Cache) {
+                    com.github.benmanes.caffeine.cache.Cache<?, ?> caffeineCache = 
+                        (com.github.benmanes.caffeine.cache.Cache<?, ?>) nativeCache;
+                    cacheInfo.put("estimatedSize", caffeineCache.estimatedSize());
+                    cacheInfo.put("stats", caffeineCache.stats());
+                }
+                
                 stats.put(cacheName, cacheInfo);
             }
         });
@@ -42,8 +53,10 @@ public class CacheMonitorController {
         Cache cache = cacheManager.getCache(cacheName);
         if (cache != null) {
             cache.clear();
+            log.info("[CACHE_CONTROLLER] Cache limpiado: {}", cacheName);
             return ResponseEntity.ok().build();
         }
+        log.warn("[CACHE_CONTROLLER] Cache no encontrado: {}", cacheName);
         return ResponseEntity.notFound().build();
     }
 
@@ -55,6 +68,26 @@ public class CacheMonitorController {
                 cache.clear();
             }
         });
+        log.info("[CACHE_CONTROLLER] Todos los caches han sido limpiados");
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/email-audit/stats")
+    public ResponseEntity<Map<String, Object>> getEmailAuditCacheStats() {
+        Cache emailAuditCache = cacheManager.getCache("emailAuditStats");
+        Map<String, Object> stats = new HashMap<>();
+        
+        if (emailAuditCache != null) {
+            Object nativeCache = emailAuditCache.getNativeCache();
+            if (nativeCache instanceof com.github.benmanes.caffeine.cache.Cache) {
+                com.github.benmanes.caffeine.cache.Cache<?, ?> caffeineCache = 
+                    (com.github.benmanes.caffeine.cache.Cache<?, ?>) nativeCache;
+                stats.put("estimatedSize", caffeineCache.estimatedSize());
+                stats.put("stats", caffeineCache.stats().toString());
+                stats.put("hitRate", caffeineCache.stats().hitRate());
+            }
+        }
+        
+        return ResponseEntity.ok(stats);
     }
 }

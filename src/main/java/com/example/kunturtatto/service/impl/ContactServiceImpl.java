@@ -1,7 +1,9 @@
 package com.example.kunturtatto.service.impl;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
@@ -12,6 +14,8 @@ import org.springframework.stereotype.Service;
 
 import com.example.kunturtatto.exception.EmailException;
 import com.example.kunturtatto.model.Appointment;
+import com.example.kunturtatto.model.EmailAuditLog;
+import com.example.kunturtatto.repository.EmailAuditLogRepository;
 import com.example.kunturtatto.request.ContactRequest;
 import com.example.kunturtatto.service.IContactService;
 
@@ -27,86 +31,236 @@ public class ContactServiceImpl implements IContactService {
     @Value("${email.sender}")
     private String myEmail;
 
+    @Value("${spring.application.name:KunturTattoo}")
+    private String applicationName;
+
     private final JavaMailSender javaMailSender;
+    private final EmailAuditLogRepository emailAuditLogRepository;
 
     @Override
     @Transactional
     public void sendContactEmail(ContactRequest request) {
-        MimeMessagePreparator messagePreparator = mimeMessage -> {
-            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
-
-            helper.setFrom(myEmail);
-            helper.setTo(myEmail);
-            helper.setSubject("Nuevo mensaje de contacto: " + request.getSubject());
-
-            String htmlContent = buildContactEmailHtml(request);
-            helper.setText(htmlContent, true);
-        };
-
+        long startTime = System.currentTimeMillis();
+        String auditId = UUID.randomUUID().toString();
+        
+        log.info("[EMAIL_SERVICE] Iniciando envío de email de contacto. AuditId={}, emailRemitente={}, asunto={}",
+                auditId, request.getEmail(), request.getSubject());
+        
         try {
+            MimeMessagePreparator messagePreparator = mimeMessage -> {
+                MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
+                helper.setFrom(myEmail);
+                helper.setTo(myEmail);
+                helper.setSubject("Nuevo mensaje de contacto: " + request.getSubject());
+                String htmlContent = buildContactEmailHtml(request);
+                helper.setText(htmlContent, true);
+            };
+
+            log.debug("[EMAIL_SERVICE] Preparando email de contacto. AuditId={}", auditId);
+            
             javaMailSender.send(messagePreparator);
-            log.info("Email de contacto enviado correctamente a {}", myEmail);
+            
+            long endTime = System.currentTimeMillis();
+            long executionTime = endTime - startTime;
+            
+            log.info("[EMAIL_SERVICE] Email de contacto enviado exitosamente. AuditId={}, destinatario={}, tiempoEjecucion={}ms",
+                    auditId, myEmail, executionTime);
+            
+            saveAuditLog(
+                auditId,
+                "CONTACT_EMAIL",
+                request.getEmail(),
+                myEmail,
+                "Nuevo mensaje de contacto: " + request.getSubject(),
+                "SUCCESS",
+                executionTime,
+                null
+            );
+            
         } catch (MailException e) {
-            log.error("Error al enviar email de contacto", e);
-            throw new EmailException("Error al enviar el email de contacto");
+            long endTime = System.currentTimeMillis();
+            long executionTime = endTime - startTime;
+            
+            log.error("[EMAIL_SERVICE] Error al enviar email de contacto. AuditId={}, error={}",
+                    auditId, e.getMessage(), e);
+            
+            // Registrar auditoría con error
+            saveAuditLog(
+                auditId,
+                "CONTACT_EMAIL",
+                request.getEmail(),
+                myEmail,
+                "Nuevo mensaje de contacto: " + request.getSubject(),
+                "FAILED",
+                executionTime,
+                e.getMessage()
+            );
+            
+            throw new EmailException("Error al enviar el email de contacto", e);
         }
     }
 
     @Override
+    @Transactional
     public void sendAppointmentCompletion(Appointment appointment) {
         String subject = "¡Gracias por tu visita! - Muthabara";
-        sendHtmlEmail(
-                appointment.getCustomerEmail(),
-                subject,
-                buildAppointmentCompletionHtml(appointment));
+        sendAppointmentEmail(
+            appointment, 
+            subject, 
+            buildAppointmentCompletionHtml(appointment),
+            "APPOINTMENT_COMPLETION"
+        );
     }
 
+    @Override
+    @Transactional
     public void sendAppointmentConfirmation(Appointment appointment) {
         String subject = "Confirmación de Cita - Muthabara";
-        sendHtmlEmail(
-                appointment.getCustomerEmail(),
-                subject,
-                buildAppointmentConfirmationHtml(appointment));
+        sendAppointmentEmail(
+            appointment, 
+            subject, 
+            buildAppointmentConfirmationHtml(appointment),
+            "APPOINTMENT_CONFIRMATION"
+        );
     }
 
     @Override
+    @Transactional
     public void sendAppointmentUpdateNotification(Appointment appointment) {
         String subject = "Actualización de Cita - Muthabara";
-        sendHtmlEmail(
-                appointment.getCustomerEmail(),
-                subject,
-                buildAppointmentUpdateHtml(appointment));
+        sendAppointmentEmail(
+            appointment, 
+            subject, 
+            buildAppointmentUpdateHtml(appointment),
+            "APPOINTMENT_UPDATE"
+        );
     }
 
     @Override
+    @Transactional
     public void sendAppointmentCancellation(Appointment appointment) {
         String subject = "Cancelación de Cita - Muthabara";
-        sendHtmlEmail(
-                appointment.getCustomerEmail(),
-                subject,
-                buildAppointmentCancellationHtml(appointment));
+        sendAppointmentEmail(
+            appointment, 
+            subject, 
+            buildAppointmentCancellationHtml(appointment),
+            "APPOINTMENT_CANCELLATION"
+        );
     }
 
-    /* format Mails */
-    private void sendHtmlEmail(String to, String subject, String htmlContent) {
+    private void sendHtmlEmail(String to, String subject, String htmlContent, String emailType, String auditId) {
         MimeMessagePreparator messagePreparator = mimeMessage -> {
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
             helper.setFrom(myEmail);
             helper.setTo(to);
             helper.setSubject(subject);
             helper.setText(htmlContent, true);
+            
+            helper.getMimeMessage().addHeader("X-Audit-Id", auditId);
+            helper.getMimeMessage().addHeader("X-Email-Type", emailType);
+            helper.getMimeMessage().addHeader("X-Application", applicationName);
         };
 
         try {
+            log.debug("[EMAIL_SERVICE] Enviando email. AuditId={}, tipo={}, destinatario={}",
+                    auditId, emailType, to);
+            
             javaMailSender.send(messagePreparator);
-            log.info("Email enviado a {}", to);
+            
+            log.info("[EMAIL_SERVICE] Email enviado exitosamente. AuditId={}, tipo={}, destinatario={}",
+                    auditId, emailType, to);
+                    
         } catch (MailException e) {
-            log.error("Error al enviar email a {}", to, e);
-            throw new EmailException("Error al enviar el email");
+            log.error("[EMAIL_SERVICE] Error al enviar email. AuditId={}, tipo={}, destinatario={}, error={}",
+                    auditId, emailType, to, e.getMessage(), e);
+            throw new EmailException("Error al enviar el email", e);
         }
     }
 
-    /* Views html */
+    private void sendAppointmentEmail(Appointment appointment, String subject, String htmlContent, String emailType) {
+        long startTime = System.currentTimeMillis();
+        String auditId = UUID.randomUUID().toString();
+        
+        log.info("[EMAIL_SERVICE] Iniciando envío de email de cita. AuditId={}, tipo={}, cliente={}, citaId={}",
+                auditId, emailType, appointment.getCustomerEmail(), appointment.getId());
+        
+        try {
+            sendHtmlEmail(appointment.getCustomerEmail(), subject, htmlContent, emailType, auditId);
+            
+            long endTime = System.currentTimeMillis();
+            long executionTime = endTime - startTime;
+            
+            saveAuditLog(
+                auditId,
+                emailType,
+                myEmail,
+                appointment.getCustomerEmail(),
+                subject,
+                "SUCCESS",
+                executionTime,
+                null,
+                appointment.getId()
+            );
+            
+            log.info("[EMAIL_SERVICE] Email de cita enviado exitosamente. AuditId={}, tipo={}, tiempoEjecucion={}ms",
+                    auditId, emailType, executionTime);
+                    
+        } catch (Exception e) {
+            long endTime = System.currentTimeMillis();
+            long executionTime = endTime - startTime;
+            
+            log.error("[EMAIL_SERVICE] Error al enviar email de cita. AuditId={}, tipo={}, error={}",
+                    auditId, emailType, e.getMessage(), e);
+            
+            saveAuditLog(
+                auditId,
+                emailType,
+                myEmail,
+                appointment.getCustomerEmail(),
+                subject,
+                "FAILED",
+                executionTime,
+                e.getMessage(),
+                appointment.getId()
+            );
+            
+            throw e;
+        }
+    }
+
+    private void saveAuditLog(String auditId, String emailType, String from, String to, 
+                             String subject, String status, long executionTime, String errorMessage) {
+        saveAuditLog(auditId, emailType, from, to, subject, status, executionTime, errorMessage, null);
+    }
+
+    private void saveAuditLog(String auditId, String emailType, String from, String to, 
+                             String subject, String status, long executionTime, String errorMessage, Long appointmentId) {
+        try {
+            EmailAuditLog auditLog = EmailAuditLog.builder()
+                .auditId(auditId)
+                .emailType(emailType)
+                .sender(from)
+                .recipient(to)
+                .subject(subject)
+                .status(status)
+                .executionTime(executionTime)
+                .errorMessage(errorMessage)
+                .appointmentId(appointmentId)
+                .sentAt(LocalDateTime.now())
+                .applicationName(applicationName)
+                .build();
+            
+            emailAuditLogRepository.save(auditLog);
+            
+            log.debug("[EMAIL_AUDIT] Registro de auditoría guardado. AuditId={}, tipo={}, estado={}",
+                    auditId, emailType, status);
+                    
+        } catch (Exception e) {
+            log.warn("[EMAIL_AUDIT] Error al guardar registro de auditoría. AuditId={}, error={}",
+                    auditId, e.getMessage());
+        }
+    }
+
     private String buildContactEmailHtml(ContactRequest request) {
         return """
                 <!DOCTYPE html>
