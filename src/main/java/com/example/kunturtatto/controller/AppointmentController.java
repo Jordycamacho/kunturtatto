@@ -21,15 +21,27 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @Slf4j
 @Controller
 @RequestMapping("/admin/appointments")
 @RequiredArgsConstructor
+@Tag(name = "Gestión de Citas", description = "Operaciones administrativas para la gestión de citas del estudio de tatuajes")
 public class AppointmentController {
     private final AppointmentService appointmentService;
     private final DesignService designService;
     private final CategoryService categoryService;
 
+    @Operation(summary = "Mostrar lista de citas", description = "Muestra la página de administración con todas las citas próximas del sistema")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Página cargada exitosamente"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
     @GetMapping
     public String showAppointments(Model model) {
         log.info("[GET /admin/appointments] Mostrando lista de citas");
@@ -51,6 +63,11 @@ public class AppointmentController {
         return "admin/appointment/listAppointment";
     }
 
+    @Operation(summary = "Formulario de creación de cita", description = "Muestra el formulario para crear una nueva cita")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Formulario cargado exitosamente"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
     @GetMapping("/create")
     public String showCreateForm(Model model) {
         log.info("[GET /admin/appointments/create] Mostrando formulario de creación de cita");
@@ -75,6 +92,11 @@ public class AppointmentController {
         return "admin/appointment/createAppointment";
     }
 
+    @Operation(summary = "Mostrar calendario de citas", description = "Muestra la vista de calendario con todas las citas próximas")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Calendario cargado exitosamente"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
     @GetMapping("/calendar")
     public String showCalendar(Model model) {
         log.info("[GET /admin/appointments/calendar] Mostrando calendario de citas");
@@ -96,8 +118,17 @@ public class AppointmentController {
         return "admin/appointment/calendar";
     }
 
+    @Operation(summary = "Ver detalles de cita", description = "Muestra los detalles de una cita específica")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Detalles de cita cargados exitosamente"),
+            @ApiResponse(responseCode = "404", description = "Cita no encontrada"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
     @GetMapping("/{id}")
-    public String viewAppointment(@PathVariable Long id, Model model) {
+    public String viewAppointment(
+            @Parameter(description = "ID de la cita a visualizar", required = true, example = "1") @PathVariable Long id,
+            Model model) {
+
         log.info("[GET /admin/appointments/{}] Mostrando detalles de cita", id);
 
         try {
@@ -117,8 +148,17 @@ public class AppointmentController {
         return "admin/appointment/viewAppointment";
     }
 
+    @Operation(summary = "Formulario de edición de cita", description = "Muestra el formulario para editar una cita existente")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Formulario cargado exitosamente"),
+            @ApiResponse(responseCode = "404", description = "Cita no encontrada"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
     @GetMapping("/{id}/edit")
-    public String showEditForm(@PathVariable Long id, Model model) {
+    public String showEditForm(
+            @Parameter(description = "ID de la cita a editar", required = true, example = "1") @PathVariable Long id,
+            Model model) {
+
         log.info("[GET /admin/appointments/{}/edit] Mostrando formulario de edición de cita", id);
 
         try {
@@ -142,9 +182,17 @@ public class AppointmentController {
         return "admin/appointment/editAppointment";
     }
 
+    @Operation(summary = "Crear nueva cita", description = "Procesa el formulario y crea una nueva cita en el sistema")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "302", description = "Redirección exitosa después de crear"),
+            @ApiResponse(responseCode = "400", description = "Datos del formulario inválidos"),
+            @ApiResponse(responseCode = "404", description = "Diseño no encontrado (si se especificó)"),
+            @ApiResponse(responseCode = "409", description = "Tiempo de cita inválido"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
     @PostMapping("/create")
     public String createAppointment(
-            @Valid @ModelAttribute AppointmentRequest request,
+            @Parameter(description = "Datos de la cita a crear", required = true) @Valid @ModelAttribute AppointmentRequest request,
             BindingResult bindingResult,
             RedirectAttributes redirectAttributes,
             Model model) {
@@ -196,10 +244,18 @@ public class AppointmentController {
         return "redirect:/admin/appointments";
     }
 
+    @Operation(summary = "Actualizar cita existente", description = "Actualiza una cita existente en el sistema")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "302", description = "Redirección exitosa después de actualizar"),
+            @ApiResponse(responseCode = "400", description = "Datos del formulario inválidos"),
+            @ApiResponse(responseCode = "404", description = "Cita o diseño no encontrado"),
+            @ApiResponse(responseCode = "409", description = "Tiempo de cita inválido"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
     @PostMapping("/{id}/edit")
     public String updateAppointment(
-            @PathVariable Long id,
-            @Valid @ModelAttribute AppointmentRequest request,
+            @Parameter(description = "ID de la cita a actualizar", required = true, example = "1") @PathVariable Long id,
+            @Parameter(description = "Datos actualizados de la cita", required = true) @Valid @ModelAttribute AppointmentRequest request,
             BindingResult bindingResult,
             RedirectAttributes redirectAttributes,
             Model model) {
@@ -251,9 +307,16 @@ public class AppointmentController {
         return "redirect:/admin/appointments/" + id;
     }
 
+    @Operation(summary = "Eliminar cita", description = "Elimina una cita específica del sistema")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "302", description = "Redirección exitosa después de eliminar"),
+            @ApiResponse(responseCode = "404", description = "Cita no encontrada"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
     @PostMapping("/{id}/delete")
     public String deleteAppointment(
-            @PathVariable Long id, RedirectAttributes redirectAttributes) {
+            @Parameter(description = "ID de la cita a eliminar", required = true, example = "1") @PathVariable Long id,
+            RedirectAttributes redirectAttributes) {
 
         log.info("[POST /admin/appointments/{}/delete] Eliminando cita", id);
 
@@ -275,8 +338,18 @@ public class AppointmentController {
         return "redirect:/admin/appointments";
     }
 
+    @Operation(summary = "Cancelar cita", description = "Cancela una cita existente")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "302", description = "Redirección exitosa después de cancelar"),
+            @ApiResponse(responseCode = "404", description = "Cita no encontrada"),
+            @ApiResponse(responseCode = "409", description = "No se puede cancelar una cita completada"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
     @PostMapping("/{id}/cancel")
-    public String cancelAppointment(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    public String cancelAppointment(
+            @Parameter(description = "ID de la cita a cancelar", required = true, example = "1") @PathVariable Long id,
+            RedirectAttributes redirectAttributes) {
+
         log.info("[POST /admin/appointments/{}/cancel] Cancelando cita", id);
 
         try {
@@ -297,8 +370,17 @@ public class AppointmentController {
         return "redirect:/admin/appointments/" + id;
     }
 
+    @Operation(summary = "Confirmar cita", description = "Confirma una cita existente")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "302", description = "Redirección exitosa después de confirmar"),
+            @ApiResponse(responseCode = "404", description = "Cita no encontrada"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
     @PostMapping("/{id}/confirm")
-    public String confirmAppointment(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    public String confirmAppointment(
+            @Parameter(description = "ID de la cita a confirmar", required = true, example = "1") @PathVariable Long id,
+            RedirectAttributes redirectAttributes) {
+
         log.info("[POST /admin/appointments/{}/confirm] Confirmando cita", id);
 
         try {
@@ -319,8 +401,17 @@ public class AppointmentController {
         return "redirect:/admin/appointments/" + id;
     }
 
+    @Operation(summary = "Marcar cita como completada", description = "Marca una cita como completada")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "302", description = "Redirección exitosa después de completar"),
+            @ApiResponse(responseCode = "404", description = "Cita no encontrada"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
     @PostMapping("/{id}/complete")
-    public String completeAppointment(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    public String completeAppointment(
+            @Parameter(description = "ID de la cita a marcar como completada", required = true, example = "1") @PathVariable Long id,
+            RedirectAttributes redirectAttributes) {
+
         log.info("[POST /admin/appointments/{}/complete] Completando cita", id);
 
         try {
@@ -341,10 +432,18 @@ public class AppointmentController {
         return "redirect:/admin/appointments/" + id;
     }
 
+    @Operation(summary = "Cambiar estado de cita", description = "Cambia el estado de una cita a cualquier estado disponible")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "302", description = "Redirección exitosa después de cambiar estado"),
+            @ApiResponse(responseCode = "400", description = "Estado inválido"),
+            @ApiResponse(responseCode = "404", description = "Cita no encontrada"),
+            @ApiResponse(responseCode = "409", description = "No se puede modificar una cita completada"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
     @PostMapping("/{id}/status")
     public String changeStatus(
-            @PathVariable Long id,
-            @RequestParam AppointmentStatus status,
+            @Parameter(description = "ID de la cita a modificar", required = true, example = "1") @PathVariable Long id,
+            @Parameter(description = "Nuevo estado de la cita", required = true, example = "CONFIRMED") @RequestParam AppointmentStatus status,
             RedirectAttributes redirectAttributes) {
 
         log.info("[POST /admin/appointments/{}/status] Cambiando estado de cita. Nuevo estado={}", id, status);
