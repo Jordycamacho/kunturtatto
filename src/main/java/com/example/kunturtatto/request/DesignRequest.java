@@ -15,7 +15,6 @@ public class DesignRequest {
     @Size(max = 500, message = "La descripción no puede superar los 500 caracteres")
     private String description;
 
-    @NotBlank(message = "La imagen no puede estar vacía")
     private String image;
 
     private Long subCategoryId;

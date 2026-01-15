@@ -23,7 +23,12 @@ public class CacheConfig {
             "subcategoryWithDesigns",
             "categoriesList",
             "categoriesWithSubcategories",
-            "categoryById"
+            "categoryById",
+            "designsAll",
+            "designById",
+            "designsBySubCategory",
+            "designsByCategory",
+            "searchDesigns"
         );
         
         cacheManager.setCaffeine(Caffeine.newBuilder()

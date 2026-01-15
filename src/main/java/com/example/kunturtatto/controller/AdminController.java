@@ -58,72 +58,256 @@ public class AdminController {
     }
 
     /* Create Designs */
+    @Operation(summary = "Mostrar diseños", description = "Muestra la página de administración con todos los diseños del sistema")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Página cargada exitosamente"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
     @GetMapping("/disenos")
     public String showDesigns(Model model) {
-        List<DesignDto> designs = designService.getAllDesigns();
-        model.addAttribute("designs", designs);
+        log.info("[GET /admin/disenos] Mostrando página de gestión de diseños");
+
+        try {
+            long startTime = System.currentTimeMillis();
+            List<DesignDto> designs = designService.getAllDesigns();
+            long endTime = System.currentTimeMillis();
+
+            log.info("[GET /admin/disenos] Se cargaron {} diseños en {} ms",
+                    designs.size(), (endTime - startTime));
+
+            model.addAttribute("designs", designs);
+        } catch (Exception e) {
+            log.error("[GET /admin/disenos] Error al cargar diseños: {}", e.getMessage(), e);
+            model.addAttribute("error", "Error al cargar los diseños");
+        }
+
         return "admin/design/showDesign";
     }
 
+    @Operation(summary = "Formulario de creación de diseño", description = "Muestra el formulario para crear un nuevo diseño")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Formulario cargado exitosamente")
+    })
     @GetMapping("/disenos/crear")
     public String createDesignForm(Model model) {
-        model.addAttribute("designRequest", DesignRequest.builder().build());
-        model.addAttribute("categories", categoryService.getCategoriesWithSubcategories());
+        log.info("[GET /admin/disenos/crear] Mostrando formulario para crear nuevo diseño");
+
+        try {
+            long startTime = System.currentTimeMillis();
+            List<CategoryDto> categories = categoryService.getCategoriesWithSubcategories();
+            long endTime = System.currentTimeMillis();
+
+            log.info("[GET /admin/disenos/crear] Se cargaron {} categorías con subcategorías en {} ms",
+                    categories.size(), (endTime - startTime));
+
+            model.addAttribute("categories", categories);
+            model.addAttribute("designRequest", DesignRequest.builder().build());
+        } catch (Exception e) {
+            log.error("[GET /admin/disenos/crear] Error al cargar formulario: {}", e.getMessage(), e);
+            model.addAttribute("error", "Error al cargar el formulario");
+        }
+
         return "admin/design/createDesign";
     }
 
+    @Operation(summary = "Formulario de edición de diseño", description = "Muestra el formulario para editar un diseño existente")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Formulario cargado exitosamente"),
+            @ApiResponse(responseCode = "404", description = "Diseño no encontrado"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
     @GetMapping("/disenos/editar/{id}")
-    public String editDesignForm(@PathVariable Long id, Model model) {
+    public String editDesignForm(
+            @Parameter(description = "ID del diseño a editar", required = true, example = "1") @PathVariable Long id,
+            Model model) {
+
+        log.info("[GET /admin/disenos/editar/{}] Mostrando formulario de edición de diseño", id);
+
         try {
+            long startTime = System.currentTimeMillis();
+
             DesignDto design = designService.getDesignById(id);
+            List<CategoryDto> categories = categoryService.getCategoriesWithSubcategories();
+
+            long endTime = System.currentTimeMillis();
+
+            log.info("[GET /admin/disenos/editar/{}] Formulario cargado exitosamente en {} ms",
+                    id, (endTime - startTime));
+
             model.addAttribute("design", design);
+            model.addAttribute("categories", categories);
             model.addAttribute("designRequest", DesignRequest.builder().build());
-            model.addAttribute("categories", categoryService.getCategoriesWithSubcategories());
-            return "admin/design/editDesign";
+
         } catch (ResourceNotFoundException e) {
+            log.error("[GET /admin/disenos/editar/{}] Diseño no encontrado: {}", id, e.getMessage());
             model.addAttribute("error", e.getMessage());
             return "redirect:/admin/disenos";
+        } catch (Exception e) {
+            log.error("[GET /admin/disenos/editar/{}] Error al cargar formulario: {}", id, e.getMessage(), e);
+            model.addAttribute("error", "Error al cargar el formulario de edición");
+            return "redirect:/admin/disenos";
         }
+
+        return "admin/design/editDesign";
     }
 
+    @Operation(summary = "Crear nuevo diseño", description = "Procesa el formulario y crea un nuevo diseño en el sistema")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "302", description = "Redirección exitosa después de crear"),
+            @ApiResponse(responseCode = "400", description = "Datos del formulario inválidos"),
+            @ApiResponse(responseCode = "404", description = "Subcategoría no encontrada"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
     @PostMapping("/disenos/crear/guardar")
-    public String saveDesign(@Valid @ModelAttribute("designRequest") DesignRequest request,
+    public String saveDesign(
+            @Parameter(description = "Datos del diseño a crear", required = true) @Valid @ModelAttribute("designRequest") DesignRequest request,
+            @Parameter(description = "Archivo de imagen para el diseño", required = true) @RequestParam("imageFile") MultipartFile imageFile,
             BindingResult bindingResult,
-            @RequestParam("imageFile") MultipartFile imageFile,
             RedirectAttributes redirectAttributes) {
 
+        log.info("[POST /admin/disenos/crear/guardar] Procesando creación de diseño: {}", request.getTitle());
+        log.debug(
+                "[POST /admin/disenos/crear/guardar] Datos recibidos - Título: {}, SubcategoríaID: {}, Imagen: {} bytes",
+                request.getTitle(), request.getSubCategoryId(),
+                imageFile != null ? imageFile.getSize() : 0);
+
         try {
+            long startTime = System.currentTimeMillis();
             designService.createDesign(request, imageFile);
+            long endTime = System.currentTimeMillis();
+
+            log.info("[POST /admin/disenos/crear/guardar] Diseño '{}' creado exitosamente en {} ms",
+                    request.getTitle(), (endTime - startTime));
+
             redirectAttributes.addFlashAttribute("success", "Diseño creado exitosamente");
+
+            logAudit("CREATE_DESIGN",
+                    String.format("Diseño '%s' creado bajo subcategoría ID: %d",
+                            request.getTitle(), request.getSubCategoryId()));
+
+        } catch (ResourceNotFoundException e) {
+            log.error("[POST /admin/disenos/crear/guardar] Subcategoría no encontrada ID: {}",
+                    request.getSubCategoryId());
+            logAudit("CREATE_DESIGN_ERROR",
+                    String.format("Subcategoría no encontrada ID: %d", request.getSubCategoryId()));
+            redirectAttributes.addFlashAttribute("error", "Error: La subcategoría seleccionada no existe");
+            redirectAttributes.addFlashAttribute("designRequest", request);
+
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Error al crear diseño: " + e.getMessage());
+            log.error("[POST /admin/disenos/crear/guardar] Error al crear diseño '{}': {}",
+                    request.getTitle(), e.getMessage(), e);
+            logAudit("CREATE_DESIGN_ERROR",
+                    String.format("Error creando diseño '%s': %s",
+                            request.getTitle(), e.getMessage()));
+            redirectAttributes.addFlashAttribute("error",
+                    "Error al crear diseño: " + e.getMessage());
             redirectAttributes.addFlashAttribute("designRequest", request);
         }
+
         return "redirect:/admin/disenos";
     }
 
+    @Operation(summary = "Actualizar diseño", description = "Actualiza un diseño existente en el sistema")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "302", description = "Redirección exitosa después de actualizar"),
+            @ApiResponse(responseCode = "400", description = "Datos del formulario inválidos"),
+            @ApiResponse(responseCode = "404", description = "Diseño o subcategoría no encontrada"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
     @PostMapping("/disenos/editar/guardar/{id}")
-    public String updateDesign(@PathVariable Long id,
-            @ModelAttribute DesignRequest request,
-            @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
+    public String updateDesign(
+            @Parameter(description = "ID del diseño a actualizar", required = true, example = "1") @PathVariable Long id,
+            @Parameter(description = "Datos actualizados del diseño", required = true) @ModelAttribute DesignRequest request,
+            @Parameter(description = "Nueva imagen (opcional)") @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
             RedirectAttributes redirectAttributes) {
+
+        log.info("[POST /admin/disenos/editar/guardar/{}] Procesando actualización de diseño", id);
+        log.debug(
+                "[POST /admin/disenos/editar/guardar/{}] Datos recibidos - Título: {}, SubcategoríaID: {}, Imagen proporcionada: {}",
+                id, request.getTitle(), request.getSubCategoryId(),
+                imageFile != null && !imageFile.isEmpty() ? "sí" : "no");
+
         try {
-            designService.updateDesign(id, request, imageFile);
+            long startTime = System.currentTimeMillis();
+            DesignDto updatedDesign = designService.updateDesign(id, request, imageFile);
+            long endTime = System.currentTimeMillis();
+
+            log.info(
+                    "[POST /admin/disenos/editar/guardar/{}] Diseño actualizado exitosamente en {} ms. Nuevo título: {}",
+                    id, (endTime - startTime), updatedDesign.getTitle());
+
             redirectAttributes.addFlashAttribute("success", "Diseño actualizado exitosamente");
+
+            logAudit("UPDATE_DESIGN",
+                    String.format("Diseño ID: %d actualizado a título '%s'",
+                            id, updatedDesign.getTitle()));
+
+        } catch (ResourceNotFoundException e) {
+            log.error("[POST /admin/disenos/editar/guardar/{}] Diseño o subcategoría no encontrada: {}", id,
+                    e.getMessage());
+            logAudit("UPDATE_DESIGN_ERROR",
+                    String.format("Diseño o subcategoría no encontrada para diseño ID: %d", id));
+            redirectAttributes.addFlashAttribute("error", "Error: " + e.getMessage());
+
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Error al actualizar diseño: " + e.getMessage());
+            log.error("[POST /admin/disenos/editar/guardar/{}] Error al actualizar diseño: {}", id, e.getMessage(), e);
+            logAudit("UPDATE_DESIGN_ERROR",
+                    String.format("Error actualizando diseño ID: %d - %s", id, e.getMessage()));
+            redirectAttributes.addFlashAttribute("error",
+                    "Error al actualizar diseño: " + e.getMessage());
         }
+
         return "redirect:/admin/disenos";
     }
 
+    @Operation(summary = "Eliminar diseño", description = "Elimina un diseño específico del sistema")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "302", description = "Redirección exitosa después de eliminar"),
+            @ApiResponse(responseCode = "404", description = "Diseño no encontrado"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
     @PostMapping("/disenos/eliminar/{id}")
-    public String deleteDesign(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    public String deleteDesign(
+            @Parameter(description = "ID del diseño a eliminar", required = true, example = "1") @PathVariable Long id,
+            RedirectAttributes redirectAttributes) {
+
+        log.info("[POST /admin/disenos/eliminar/{}] Eliminando diseño", id);
+
         try {
+            try {
+                designService.getDesignById(id);
+            } catch (ResourceNotFoundException e) {
+                log.warn("[POST /admin/disenos/eliminar/{}] Diseño no encontrado: {}", id, e.getMessage());
+                redirectAttributes.addFlashAttribute("error", "El diseño no existe");
+                return "redirect:/admin/disenos";
+            }
+
+            long startTime = System.currentTimeMillis();
             designService.deleteDesign(id);
+            long endTime = System.currentTimeMillis();
+
+            log.info("[POST /admin/disenos/eliminar/{}] Diseño eliminado exitosamente en {} ms",
+                    id, (endTime - startTime));
+
             redirectAttributes.addFlashAttribute("success", "Diseño eliminado exitosamente");
+
+            logAudit("DELETE_DESIGN",
+                    String.format("Diseño ID: %d eliminado", id));
+
         } catch (ResourceNotFoundException e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            log.error("[POST /admin/disenos/eliminar/{}] Diseño no encontrado: {}", id, e.getMessage());
+            logAudit("DELETE_DESIGN_ERROR",
+                    String.format("Diseño no encontrado ID: %d", id));
+            redirectAttributes.addFlashAttribute("error", "Error: " + e.getMessage());
+
+        } catch (Exception e) {
+            log.error("[POST /admin/disenos/eliminar/{}] Error inesperado: {}", id, e.getMessage(), e);
+            logAudit("DELETE_DESIGN_ERROR",
+                    String.format("Error inesperado eliminando diseño ID: %d - %s", id, e.getMessage()));
+            redirectAttributes.addFlashAttribute("error",
+                    "Error inesperado al eliminar diseño: " + e.getMessage());
         }
+
         return "redirect:/admin/disenos";
     }
 
