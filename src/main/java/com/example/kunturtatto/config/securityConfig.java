@@ -36,6 +36,8 @@ public class securityConfig {
                         .permitAll()
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/robots.txt").permitAll()
                         .requestMatchers("/admin/appointments/**").authenticated()
+                        .requestMatchers("/Muthabara/estadisticas/**").authenticated()
+                        .requestMatchers("/Muthabara//limpiar-rate-limiting/**").authenticated()
                         .requestMatchers("/api/cache/**").hasRole("ADMIN")
                         .requestMatchers("/Muthabara/**").permitAll()
                         .requestMatchers("/admin/**").authenticated()
