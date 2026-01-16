@@ -1,5 +1,9 @@
 package com.example.kunturtatto.config;
 
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,13 +24,17 @@ import com.example.kunturtatto.service.impl.IUserDetailServiceImpl;
 @EnableMethodSecurity
 public class securityConfig {
 
+    private static final Logger log = LoggerFactory.getLogger(securityConfig.class);
+
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/api-docs/**", "/v3/api-docs/**").permitAll()
-                        .requestMatchers("/css/**", "/js/**", "/images/**","/robots.txt").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/api-docs/**", "/v3/api-docs/**")
+                        .permitAll()
+                        .requestMatchers("/css/**", "/js/**", "/images/**", "/robots.txt").permitAll()
                         .requestMatchers("/admin/appointments/**").authenticated()
                         .requestMatchers("/api/cache/**").hasRole("ADMIN")
                         .requestMatchers("/Muthabara/**").permitAll()
@@ -36,10 +44,33 @@ public class securityConfig {
                 .formLogin(form -> form
                         .loginPage("/Muthabara/ingresar")
                         .defaultSuccessUrl("/admin/disenos", true)
+                        .successHandler((request, response, authentication) -> {
+                            log.info("[SECURITY] Login exitoso para usuario: {}",
+                                    authentication.getName());
+                            log.info("[SECURITY] Roles: {}",
+                                    authentication.getAuthorities().stream()
+                                            .map(Object::toString)
+                                            .collect(Collectors.joining(", ")));
+                            response.sendRedirect("/admin/disenos");
+                        })
+                        .failureHandler((request, response, exception) -> {
+                            String email = request.getParameter("username");
+                            log.warn("[SECURITY] Login fallido para usuario: {}, IP: {}, Razón: {}",
+                                    email,
+                                    request.getRemoteAddr(),
+                                    exception.getMessage());
+                            response.sendRedirect("/Muthabara/ingresar?error=true");
+                        })
                         .permitAll())
                 .logout(logout -> logout
                         .logoutUrl("/Muthabara/logout")
                         .logoutSuccessUrl("/Muthabara")
+                        .addLogoutHandler((request, response, authentication) -> {
+                            if (authentication != null) {
+                                log.info("[SECURITY] Logout exitoso para usuario: {}",
+                                        authentication.getName());
+                            }
+                        })
                         .invalidateHttpSession(true)
                         .permitAll());
         return http.build();

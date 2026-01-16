@@ -6,6 +6,7 @@ import org.springframework.cache.Cache;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,7 +26,7 @@ public class CacheMonitorController {
     @GetMapping("/stats")
     public Map<String, Object> getCacheStats() {
         Map<String, Object> stats = new HashMap<>();
-        
+
         cacheManager.getCacheNames().forEach(cacheName -> {
             Cache cache = cacheManager.getCache(cacheName);
             if (cache != null) {
@@ -33,19 +34,50 @@ public class CacheMonitorController {
                 cacheInfo.put("name", cacheName);
                 Object nativeCache = cache.getNativeCache();
                 cacheInfo.put("nativeCacheType", nativeCache.getClass().getSimpleName());
-                
+
                 if (nativeCache instanceof com.github.benmanes.caffeine.cache.Cache) {
-                    com.github.benmanes.caffeine.cache.Cache<?, ?> caffeineCache = 
-                        (com.github.benmanes.caffeine.cache.Cache<?, ?>) nativeCache;
+                    com.github.benmanes.caffeine.cache.Cache<?, ?> caffeineCache = (com.github.benmanes.caffeine.cache.Cache<?, ?>) nativeCache;
                     cacheInfo.put("estimatedSize", caffeineCache.estimatedSize());
                     cacheInfo.put("stats", caffeineCache.stats());
                 }
-                
+
                 stats.put(cacheName, cacheInfo);
             }
         });
-        
+
         return stats;
+    }
+
+    @GetMapping("/users/stats")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Map<String, Object>> getUserCacheStats() {
+        Map<String, Object> stats = new HashMap<>();
+
+        String[] userCaches = { "usersAll", "userById", "userByEmail", "authenticatedUser" };
+
+        for (String cacheName : userCaches) {
+            Cache cache = cacheManager.getCache(cacheName);
+            if (cache != null) {
+                Map<String, Object> cacheInfo = new HashMap<>();
+                cacheInfo.put("name", cacheName);
+                Object nativeCache = cache.getNativeCache();
+
+                if (nativeCache instanceof com.github.benmanes.caffeine.cache.Cache) {
+                    com.github.benmanes.caffeine.cache.Cache<?, ?> caffeineCache = (com.github.benmanes.caffeine.cache.Cache<?, ?>) nativeCache;
+                    cacheInfo.put("estimatedSize", caffeineCache.estimatedSize());
+                    cacheInfo.put("stats", caffeineCache.stats().toString());
+                    cacheInfo.put("hitRate", caffeineCache.stats().hitRate());
+                    cacheInfo.put("missRate", caffeineCache.stats().missRate());
+                    cacheInfo.put("loadSuccessCount", caffeineCache.stats().loadSuccessCount());
+                    cacheInfo.put("loadFailureCount", caffeineCache.stats().loadFailureCount());
+                }
+
+                stats.put(cacheName, cacheInfo);
+            }
+        }
+
+        log.info("[CACHE_CONTROLLER] Obteniendo estadísticas de cache de usuarios");
+        return ResponseEntity.ok(stats);
     }
 
     @PostMapping("/clear/{cacheName}")
@@ -76,18 +108,17 @@ public class CacheMonitorController {
     public ResponseEntity<Map<String, Object>> getEmailAuditCacheStats() {
         Cache emailAuditCache = cacheManager.getCache("emailAuditStats");
         Map<String, Object> stats = new HashMap<>();
-        
+
         if (emailAuditCache != null) {
             Object nativeCache = emailAuditCache.getNativeCache();
             if (nativeCache instanceof com.github.benmanes.caffeine.cache.Cache) {
-                com.github.benmanes.caffeine.cache.Cache<?, ?> caffeineCache = 
-                    (com.github.benmanes.caffeine.cache.Cache<?, ?>) nativeCache;
+                com.github.benmanes.caffeine.cache.Cache<?, ?> caffeineCache = (com.github.benmanes.caffeine.cache.Cache<?, ?>) nativeCache;
                 stats.put("estimatedSize", caffeineCache.estimatedSize());
                 stats.put("stats", caffeineCache.stats().toString());
                 stats.put("hitRate", caffeineCache.stats().hitRate());
             }
         }
-        
+
         return ResponseEntity.ok(stats);
     }
 }

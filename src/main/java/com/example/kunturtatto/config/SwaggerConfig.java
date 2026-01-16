@@ -17,43 +17,51 @@ import java.util.List;
 @Configuration
 public class SwaggerConfig {
 
-    @Value("${app.version:1.0.0}")
-    private String appVersion;
+        @Value("${app.version:1.0.0}")
+        private String appVersion;
 
-    @Value("${app.name:Kuntur Tattoo Studio}")
-    private String appName;
+        @Value("${app.name:Kuntur Tattoo Studio}")
+        private String appName;
 
-    @Value("${app.description:Sistema de gestión para estudio de tatuajes}")
-    private String appDescription;
+        @Value("${app.description:Sistema de gestión para estudio de tatuajes}")
+        private String appDescription;
 
-    @Value("${app.url:http://localhost:8080}")
-    private String appUrl;
+        @Value("${app.url:http://localhost:8080}")
+        private String appUrl;
 
-    /**
-     * Configuración principal de OpenAPI.
-     */
-    @Bean
-    public OpenAPI customOpenAPI() {
-        return new OpenAPI()
-                .info(new Info()
-                        .title(appName + " - API Documentation")
-                        .version(appVersion)
-                        .description(appDescription)
-                        .termsOfService("http://Muthabara.com/terms")
-                        .contact(new Contact()
-                                .name("Soporte Kuntur Tattoo")
-                                .email("soporte@Muthabara.com")
-                                .url("http://Muthabara.com/support"))
-                        .license(new License()
-                                .name("Licencia Propietaria")
-                                .url("http://Muthabara.com/license")))
-                .servers(List.of(
-                        new Server()
-                                .url(appUrl)
-                                .description("Servidor de Desarrollo"),
-                        new Server()
-                                .url("https://api.Muthabara.com")
-                                .description("Servidor de Producción")
-                ));
-    }
+        /**
+         * Configuración principal de OpenAPI.
+         */
+        @Bean
+        public OpenAPI customOpenAPI() {
+                return new OpenAPI()
+                                .info(new Info()
+                                                .title(appName + " - API Documentation")
+                                                .version(appVersion)
+                                                .description(appDescription +
+                                                                "\n\n## Seguridad\n" +
+                                                                "- Solo administradores pueden acceder a la gestión de usuarios\n"
+                                                                +
+                                                                "- Los usuarios regulares no tienen acceso al sistema\n"
+                                                                +
+                                                                "- Autenticación básica con roles y permisos\n\n" +
+                                                                "## Cache\n" +
+                                                                "- Los datos de usuarios se cachean por 10 minutos\n" +
+                                                                "- Cache disponible: usersAll, userById, userByEmail, authenticatedUser")
+                                                .termsOfService("http://Muthabara.com/terms")
+                                                .contact(new Contact()
+                                                                .name("Soporte Kuntur Tattoo")
+                                                                .email("soporte@Muthabara.com")
+                                                                .url("http://Muthabara.com/support"))
+                                                .license(new License()
+                                                                .name("Licencia Propietaria")
+                                                                .url("http://Muthabara.com/license")))
+                                .servers(List.of(
+                                                new Server()
+                                                                .url(appUrl)
+                                                                .description("Servidor de Desarrollo"),
+                                                new Server()
+                                                                .url("https://api.Muthabara.com")
+                                                                .description("Servidor de Producción")));
+        }
 }
