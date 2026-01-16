@@ -19,13 +19,18 @@ public interface UserMapper {
 
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
+    @Mapping(source = "idUser", target = "id")
     @Mapping(target = "roles", source = "roles", qualifiedByName = "mapRoles")
     UserDto toUserDto(User user);
 
+    @Mapping(target = "idUser", source = "id")
     @Mapping(target = "roles", ignore = true)
     @Mapping(target = "password", ignore = true)
     User toUser(UserDto userDto);
     
+    @Mapping(target = "idUser", ignore = true)
+    @Mapping(target = "roles", ignore = true)
+    @Mapping(target = "password", ignore = true)
     User toUser(UserRequest request);
 
     @Named("mapRoles")

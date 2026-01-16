@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:insert="~{admin/templateAdmin.html::header}">
+    <style>
+        .card {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <div th:insert="~{admin/templateAdmin.html::nav_user}"></div>
+    <div th:insert="~{admin/templateAdmin.html::nav_admin}"></div>
+
+    <div class="container mt-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="card-title mb-0">
+                    <i class="fas fa-user-plus"></i> Crear Nuevo Usuario
+                </h4>
+            </div>
+            <div class="card-body">
+                
+                <!-- Mensajes de éxito/error -->
+                <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <span th:text="${success}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <span th:text="${error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+
+                <form th:action="@{/admin/usuarios/crear/guardar}" method="post" th:object="${userRequest}">
+                    
+                    <!-- Email -->
+                    <div class="mb-3">
+                        <label for="email" class="form-label">
+                            <i class="fas fa-envelope"></i> Correo Electrónico
+                        </label>
+                        <input type="email" 
+                               class="form-control" 
+                               id="email" 
+                               th:field="*{email}"
+                               required
+                               placeholder="ejemplo@dominio.com">
+                        <div class="form-text">
+                            El email será usado para iniciar sesión en el sistema.
+                        </div>
+                        <div th:if="${#fields.hasErrors('email')}" class="text-danger small">
+                            <span th:errors="*{email}"></span>
+                        </div>
+                    </div>
+                    
+                    <!-- Contraseña -->
+                    <div class="mb-3">
+                        <label for="password" class="form-label">
+                            <i class="fas fa-lock"></i> Contraseña
+                        </label>
+                        <input type="password" 
+                               class="form-control" 
+                               id="password" 
+                               th:field="*{password}"
+                               required
+                               placeholder="Mínimo 6 caracteres"
+                               minlength="6">
+                        <div class="form-text">
+                            La contraseña debe tener al menos 6 caracteres.
+                        </div>
+                        <div th:if="${#fields.hasErrors('password')}" class="text-danger small">
+                            <span th:errors="*{password}"></span>
+                        </div>
+                    </div>
+                    
+                    <!-- Confirmar Contraseña -->
+                    <div class="mb-3">
+                        <label for="confirmPassword" class="form-label">
+                            <i class="fas fa-lock"></i> Confirmar Contraseña
+                        </label>
+                        <input type="password" 
+                               class="form-control" 
+                               id="confirmPassword"
+                               required
+                               placeholder="Repite la contraseña"
+                               minlength="6"
+                               oninput="checkPasswordMatch()">
+                        <div id="passwordMatch" class="form-text"></div>
+                    </div>
+                    
+                    <!-- Roles (Opcional) -->
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <i class="fas fa-user-tag"></i> Tipo de Usuario
+                        </label>
+                        <select class="form-select" disabled>
+                            <option selected>Administrador</option>
+                            <option>Usuario Regular</option>
+                        </select>
+                        <div class="form-text">
+                            Actualmente solo se crean usuarios administradores.
+                        </div>
+                    </div>
+                    
+                    <!-- Botones -->
+                    <div class="d-flex justify-content-between mt-4">
+                        <a th:href="@{/admin/usuarios}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary" id="submitBtn">
+                            <i class="fas fa-save"></i> Crear Usuario
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer text-muted">
+                <small>
+                    <i class="fas fa-info-circle"></i> El nuevo usuario tendrá acceso completo al sistema administrativo.
+                </small>
+            </div>
+        </div>
+    </div>
+
+    <div th:insert="~{admin/templateAdmin.html::script}"></div>
+    
+    <script>
+        function checkPasswordMatch() {
+            const password = document.getElementById('password');
+            const confirmPassword = document.getElementById('confirmPassword');
+            const matchDiv = document.getElementById('passwordMatch');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            if (password.value && confirmPassword.value) {
+                if (password.value === confirmPassword.value) {
+                    matchDiv.innerHTML = '<span class="text-success"><i class="fas fa-check"></i> Las contraseñas coinciden</span>';
+                    submitBtn.disabled = false;
+                } else {
+                    matchDiv.innerHTML = '<span class="text-danger"><i class="fas fa-times"></i> Las contraseñas no coinciden</span>';
+                    submitBtn.disabled = true;
+                }
+            } else {
+                matchDiv.innerHTML = 'Introduce y confirma la contraseña';
+                submitBtn.disabled = false;
+            }
+        }
+        
+        // Validación en tiempo real
+        document.getElementById('password').addEventListener('input', checkPasswordMatch);
+        document.getElementById('confirmPassword').addEventListener('input', checkPasswordMatch);
+    </script>
+</body>
+</html>

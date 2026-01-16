@@ -1,35 +1,206 @@
 <!DOCTYPE html>
-<html lang="en">
-<head th:insert="~{admin/templateAdmin.html::header}"></head>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:insert="~{admin/templateAdmin.html::header}">
+    <style>
+        .status-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+        }
+
+        .btn-group-sm .btn {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .action-buttons {
+            white-space: nowrap;
+        }
+    </style>
+</head>
+
 <body>
     <div th:insert="~{admin/templateAdmin.html::nav_user}"></div>
     <div th:insert="~{admin/templateAdmin.html::nav_admin}"></div>
 
     <div class="container mt-4">
-        <h1>Usuarios</h1>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="mb-0">Gestión de Usuarios</h1>
+            <a th:href="@{/admin/usuarios/crear}" class="btn btn-primary">
+                <i class="fas fa-user-plus"></i> Nuevo Usuario
+            </a>
+        </div>
 
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Email</th>
-                    <th>Fecha de Registro</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="user : ${users}">
-                    <td th:text="${user.email}">Email del Usuario</td>
-                    <td th:text="${#dates.format(user.registrationDate, 'yyyy-MM-dd HH:mm:ss')}">Fecha de Registro</td>
-                    <td>
-                        <form th:action="@{'/admin/usuarios/eliminar/' + ${user.id}}" method="post" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este usuario?');">
-                            <button type="submit" class="btn btn-danger">Eliminar</button>
-                        </form>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <!-- Mensajes de éxito/error -->
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <span th:text="${success}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <!-- Estadísticas -->
+        <!-- Estadísticas calculadas en el controlador -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card bg-primary text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Usuarios</h5>
+                        <h2 th:text="${totalCount}" class="card-text">0</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-success text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">Habilitados</h5>
+                        <h2 th:text="${enabledCount}" class="card-text">0</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-warning text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">Deshabilitados</h5>
+                        <h2 th:text="${disabledCount}" class="card-text">0</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-info text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">Administradores</h5>
+                        <h2 th:text="${adminCount}" class="card-text">0</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla de usuarios -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Lista de Usuarios Registrados</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Email</th>
+                                <th>Fecha de Registro</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="user : ${users}">
+                                <td th:text="${user.id}"></td>
+                                <td>
+                                    <strong th:text="${user.email}"></strong>
+                                    <div th:if="${user.roles}" class="small text-muted">
+                                        <span th:each="role, stat : ${user.roles}" th:text="${role.name}"
+                                            th:classappend="${stat.last} ? '' : ', '"></span>
+                                    </div>
+                                </td>
+                                <td th:text="${#dates.format(user.registrationDate, 'dd/MM/yyyy HH:mm')}"></td>
+                                <td>
+                                    <span th:if="${user.enabled}" class="badge bg-success status-badge">
+                                        <i class="fas fa-check-circle"></i> Habilitado
+                                    </span>
+                                    <span th:unless="${user.enabled}" class="badge bg-danger status-badge">
+                                        <i class="fas fa-times-circle"></i> Deshabilitado
+                                    </span>
+                                </td>
+                                <td class="action-buttons">
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <!-- Editar -->
+                                        <a th:href="@{'/admin/usuarios/editar/' + ${user.id}}"
+                                            class="btn btn-outline-primary" title="Editar usuario">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+
+                                        <!-- Habilitar/Deshabilitar -->
+                                        <form th:action="@{'/admin/usuarios/habilitar/' + ${user.id}}" method="post"
+                                            th:if="${not user.enabled}" style="display: inline;">
+                                            <button type="submit" class="btn btn-outline-success"
+                                                title="Habilitar usuario"
+                                                onclick="return confirm('¿Estás seguro de habilitar este usuario?');">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                        </form>
+
+                                        <form th:action="@{'/admin/usuarios/deshabilitar/' + ${user.id}}" method="post"
+                                            th:if="${user.enabled}" style="display: inline;">
+                                            <button type="submit" class="btn btn-outline-warning"
+                                                title="Deshabilitar usuario"
+                                                onclick="return confirm('¿Estás seguro de deshabilitar este usuario?');">
+                                                <i class="fas fa-ban"></i>
+                                            </button>
+                                        </form>
+
+                                        <!-- Eliminar -->
+                                        <form th:action="@{'/admin/usuarios/eliminar/' + ${user.id}}" method="post"
+                                            style="display: inline;" th:if="${user.id != 1}">
+                                            <!-- Proteger usuario principal -->
+                                            <button type="submit" class="btn btn-outline-danger"
+                                                title="Eliminar usuario"
+                                                onclick="return confirm('¿Estás SEGURO de eliminar este usuario? Esta acción no se puede deshacer.');">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer text-muted">
+                <small>
+                    <i class="fas fa-info-circle"></i> Solo administradores pueden gestionar usuarios.
+                    El usuario ID:1 está protegido.
+                </small>
+            </div>
+        </div>
+
+        <!-- Información de cache -->
+        <div class="alert alert-info mt-4">
+            <h5><i class="fas fa-database"></i> Información del Sistema</h5>
+            <ul class="mb-0">
+                <li>Los datos de usuarios se cachean por 10 minutos para mejorar el rendimiento</li>
+                <li>Cada operación se registra en los logs de auditoría</li>
+                <li>Los usuarios deshabilitados no pueden iniciar sesión</li>
+                <li>Los cambios se reflejan inmediatamente en el sistema</li>
+            </ul>
+        </div>
     </div>
 
     <div th:insert="~{admin/templateAdmin.html::script}"></div>
+
+    <script>
+        // Confirmación mejorada para eliminación
+        function confirmDelete(email) {
+            return confirm(`¿Está seguro que desea eliminar al usuario: \${email}?\n\nEsta acción no se puede deshacer.`);
+        }
+
+        // Mostrar/ocultar contraseña en formularios (si aplica)
+        $(document).ready(function () {
+            // Configuración de tooltips
+            $('[title]').tooltip({
+                placement: 'top',
+                trigger: 'hover'
+            });
+
+            // Auto-ocultar mensajes después de 5 segundos
+            setTimeout(function () {
+                $('.alert').alert('close');
+            }, 5000);
+        });
+    </script>
 </body>
+
 </html>

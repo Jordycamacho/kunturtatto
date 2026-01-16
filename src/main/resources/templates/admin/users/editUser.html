@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:insert="~{admin/templateAdmin.html::header}">
+    <style>
+        .card {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .user-info {
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div th:insert="~{admin/templateAdmin.html::nav_user}"></div>
+    <div th:insert="~{admin/templateAdmin.html::nav_admin}"></div>
+
+    <div class="container mt-4">
+        <div class="card">
+            <div class="card-header bg-warning text-white">
+                <h4 class="card-title mb-0">
+                    <i class="fas fa-user-edit"></i> Editar Usuario
+                </h4>
+            </div>
+            <div class="card-body">
+                
+                <!-- Información del usuario -->
+                <div class="user-info">
+                    <h6><i class="fas fa-user"></i> Información Actual</h6>
+                    <p class="mb-1"><strong>Email:</strong> <span th:text="${user.email}"></span></p>
+                    <p class="mb-1"><strong>ID:</strong> <span th:text="${user.id}"></span></p>
+                    <p class="mb-1"><strong>Registrado:</strong> 
+                        <span th:text="${#dates.format(user.registrationDate, 'dd/MM/yyyy HH:mm')}"></span>
+                    </p>
+                    <p class="mb-0">
+                        <strong>Estado:</strong>
+                        <span th:if="${user.enabled}" class="badge bg-success">Habilitado</span>
+                        <span th:unless="${user.enabled}" class="badge bg-danger">Deshabilitado</span>
+                    </p>
+                </div>
+
+                <!-- Mensajes de éxito/error -->
+                <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <span th:text="${success}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <span th:text="${error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+
+                <form th:action="@{'/admin/usuarios/editar/guardar/' + ${user.id}}" method="post" th:object="${userRequest}">
+                    
+                    <!-- Email -->
+                    <div class="mb-3">
+                        <label for="email" class="form-label">
+                            <i class="fas fa-envelope"></i> Nuevo Correo Electrónico
+                        </label>
+                        <input type="email" 
+                               class="form-control" 
+                               id="email" 
+                               th:field="*{email}"
+                               required
+                               th:value="${user.email}">
+                        <div class="form-text">
+                            Cambiar el email afectará el inicio de sesión.
+                        </div>
+                        <div th:if="${#fields.hasErrors('email')}" class="text-danger small">
+                            <span th:errors="*{email}"></span>
+                        </div>
+                    </div>
+                    
+                    <!-- Contraseña -->
+                    <div class="mb-3">
+                        <label for="password" class="form-label">
+                            <i class="fas fa-lock"></i> Nueva Contraseña (opcional)
+                        </label>
+                        <input type="password" 
+                               class="form-control" 
+                               id="password" 
+                               th:field="*{password}"
+                               placeholder="Dejar en blanco para no cambiar"
+                               minlength="6">
+                        <div class="form-text">
+                            Completa solo si deseas cambiar la contraseña (mínimo 6 caracteres).
+                        </div>
+                        <div th:if="${#fields.hasErrors('password')}" class="text-danger small">
+                            <span th:errors="*{password}"></span>
+                        </div>
+                    </div>
+                    
+                    <!-- Confirmar Contraseña -->
+                    <div class="mb-3">
+                        <label for="confirmPassword" class="form-label">
+                            <i class="fas fa-lock"></i> Confirmar Nueva Contraseña
+                        </label>
+                        <input type="password" 
+                               class="form-control" 
+                               id="confirmPassword"
+                               placeholder="Solo si cambias la contraseña"
+                               minlength="6"
+                               oninput="checkPasswordMatch()">
+                        <div id="passwordMatch" class="form-text"></div>
+                    </div>
+                    
+                    <!-- Botones -->
+                    <div class="d-flex justify-content-between mt-4">
+                        <div>
+                            <a th:href="@{/admin/usuarios}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Volver
+                            </a>
+                        </div>
+                        <div>
+                            <button type="submit" class="btn btn-warning" id="submitBtn">
+                                <i class="fas fa-save"></i> Guardar Cambios
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer text-muted">
+                <small>
+                    <i class="fas fa-info-circle"></i> Los cambios se aplicarán inmediatamente al usuario.
+                </small>
+            </div>
+        </div>
+    </div>
+
+    <div th:insert="~{admin/templateAdmin.html::script}"></div>
+    
+    <script>
+        function checkPasswordMatch() {
+            const password = document.getElementById('password');
+            const confirmPassword = document.getElementById('confirmPassword');
+            const matchDiv = document.getElementById('passwordMatch');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            // Solo validar si se está cambiando la contraseña
+            if (password.value || confirmPassword.value) {
+                if (password.value === confirmPassword.value) {
+                    matchDiv.innerHTML = '<span class="text-success"><i class="fas fa-check"></i> Las contraseñas coinciden</span>';
+                    submitBtn.disabled = false;
+                } else {
+                    matchDiv.innerHTML = '<span class="text-danger"><i class="fas fa-times"></i> Las contraseñas no coinciden</span>';
+                    submitBtn.disabled = true;
+                }
+            } else {
+                matchDiv.innerHTML = 'Deja en blanco para no cambiar la contraseña';
+                submitBtn.disabled = false;
+            }
+        }
+        
+        // Validación en tiempo real
+        document.getElementById('password').addEventListener('input', checkPasswordMatch);
+        document.getElementById('confirmPassword').addEventListener('input', checkPasswordMatch);
+    </script>
+</body>
+</html>
