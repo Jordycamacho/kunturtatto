@@ -1,9 +1,19 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
-<head th:fragment="header">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1RQQVKEJ4T"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-1RQQVKEJ4T');
+    </script>
+
     <link rel="icon" th:href="@{/images/Logo_negro.png}" type="image/png">
     <!--=============== FAVICON ===============-->
     <link rel="shortcut icon" href="assets/img/favicon.png" type="image/x-icon">
@@ -356,7 +366,7 @@
             </div>
         </section>
         -->
-        
+
         <!--==================== DRAWINGS ====================-->
         <section class="drawings section" id="drawings">
             <div class="drawings__container container">
@@ -486,7 +496,7 @@
                 </div>
             </div>
         </section>
-        
+
         <!--==================== COOKIES SECTION ====================-->
         <div id="cookie-banner" class="cookie-banner">
             <div class="cookie-banner__container">

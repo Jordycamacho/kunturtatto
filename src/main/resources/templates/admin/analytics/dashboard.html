@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:insert="~{admin/templateAdmin.html::header}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .stat-card {
+            transition: transform 0.3s;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div th:insert="~{admin/templateAdmin.html::nav_user}"></div>
+    <div th:insert="~{admin/templateAdmin.html::nav_admin}"></div>
+
+    <div class="container-fluid mt-4">
+        <h1><i class="fas fa-chart-line"></i> Dashboard de Analytics</h1>
+        
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card stat-card bg-primary text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">Vistas de Página</h5>
+                        <h2 th:text="${analyticsStats.pageViews}">0</h2>
+                        <p class="card-text">Total de páginas vistas</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card bg-success text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">Visitantes Únicos</h5>
+                        <h2 th:text="${analyticsStats.uniqueVisitors}">0</h2>
+                        <p class="card-text">IPs diferentes</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card bg-warning text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">Eventos Totales</h5>
+                        <h2 th:text="${analyticsStats.totalEvents}">0</h2>
+                        <p class="card-text">Todos los eventos registrados</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card bg-info text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">Google Analytics</h5>
+                        <h6 th:text="${googleAnalyticsId}">ID</h6>
+                        <p class="card-text">Código de seguimiento</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Eventos por Categoría</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="categoryChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Información de Google Analytics</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <h6><i class="fas fa-info-circle"></i> Configuración Actual</h6>
+                            <ul class="mb-0">
+                                <li>Tracking ID: <code th:text="${googleAnalyticsId}"></code></li>
+                                <li>IP Anonimizada: Sí</li>
+                                <li>Respetar DNT: Sí</li>
+                                <li>Seguimiento mejorado: Activado</li>
+                            </ul>
+                        </div>
+                        <a href="https://analytics.google.com" target="_blank" class="btn btn-primary">
+                            <i class="fas fa-external-link-alt"></i> Ir a Google Analytics
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5>Eventos Recientes</h5>
+            </div>
+            <div class="card-body">
+                <div th:if="${analyticsStats.eventsByCategory}">
+                    <ul class="list-group">
+                        <li th:each="entry : ${analyticsStats.eventsByCategory}" 
+                            class="list-group-item d-flex justify-content-between align-items-center">
+                            <span th:text="${entry.key}">Categoría</span>
+                            <span class="badge bg-primary rounded-pill" th:text="${entry.value}">0</span>
+                        </li>
+                    </ul>
+                </div>
+                <div th:unless="${analyticsStats.eventsByCategory}" class="text-center text-muted">
+                    <p>No hay eventos registrados aún</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        document.addEventListener('DOMContentLoaded', function() {
+            const eventsByCategory = /*[[${analyticsStats.eventsByCategory}]]*/ {};
+            
+            if (eventsByCategory && Object.keys(eventsByCategory).length > 0) {
+                const ctx = document.getElementById('categoryChart').getContext('2d');
+                const chart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(eventsByCategory),
+                        datasets: [{
+                            label: 'Eventos por Categoría',
+                            data: Object.values(eventsByCategory),
+                            backgroundColor: [
+                                '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
+                                '#9966FF', '#FF9F40', '#8AC926', '#1982C4'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+        });
+        /*]]>*/
+    </script>
+</body>
+</html>

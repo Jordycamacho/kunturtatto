@@ -3,10 +3,10 @@ package com.example.kunturtatto.controller;
 import com.example.kunturtatto.dto.CategoryDto;
 import com.example.kunturtatto.dto.DesignDto;
 import com.example.kunturtatto.dto.SubCategoryDto;
+import com.example.kunturtatto.service.AnalyticsService;
 import com.example.kunturtatto.service.CategoryService;
 import com.example.kunturtatto.service.DesignService;
 import com.example.kunturtatto.service.SubCategoryService;
-import com.example.kunturtatto.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -45,7 +45,7 @@ public class UserController {
     @Autowired
     private DesignService designService;
     @Autowired
-    private UserService userService;
+    private AnalyticsService analyticsService;
 
     // Mapa para rate limiting por IP
     private final ConcurrentHashMap<String, RateLimitInfo> rateLimitMap = new ConcurrentHashMap<>();
@@ -72,6 +72,13 @@ public class UserController {
                 clientIp, userAgent);
 
         try {
+
+            if (analyticsService != null) {
+                analyticsService.trackPageView("Página de Inicio", "/Muthabara", request);
+            } else {
+                log.warn("[USER_CONTROLLER] AnalyticsService is null - skipping tracking");
+            }
+
             long startTime = System.currentTimeMillis();
 
             List<SubCategoryDto> tattooSubcategories = subCategoryService.getSubCategoriesByCategory(1L);
@@ -111,6 +118,7 @@ public class UserController {
     public String showLogin(Model model, HttpServletRequest request) {
         String clientIp = getClientIp(request);
         log.info("[USER_CONTROLLER] [LOGIN_FORM] Acceso al formulario de login desde IP: {}", clientIp);
+        analyticsService.trackPageView("Página de Login", "/Muthabara/ingresar", request);
 
         logAudit("PAGE_VIEW", "Formulario de login", clientIp, null);
 
@@ -137,6 +145,7 @@ public class UserController {
         log.info("[USER_CONTROLLER] [REGISTER_FORM] Acceso al formulario de registro desde IP: {}", clientIp);
 
         logAudit("PAGE_VIEW", "Formulario de registro", clientIp, null);
+        analyticsService.trackPageView("Página de registro", "/Muthabara/registro", request);
 
         return "user/singup";
     }
@@ -230,6 +239,21 @@ public class UserController {
             logAudit("ERROR", "Error al cargar página de diseños", clientIp, e.getMessage());
         }
 
+        String pageTitle = "Diseños";
+        if (subCategoryId != null) {
+            pageTitle = "Diseños - Subcategoría: " + subCategoryId;
+            analyticsService.trackEvent("gallery", "filter_subcategory",
+                    String.valueOf(subCategoryId), null, request);
+        } else if (categoryId != null) {
+            pageTitle = "Diseños - Categoría: " + categoryId;
+            analyticsService.trackEvent("gallery", "filter_category",
+                    String.valueOf(categoryId), null, request);
+        }
+
+        analyticsService.trackPageView(pageTitle,
+                "/Muthabara/diseños?categoryId=" + categoryId + "&subCategoryId=" + subCategoryId,
+                request);
+
         return "user/designs";
     }
 
@@ -243,8 +267,8 @@ public class UserController {
         String clientIp = getClientIp(request);
         log.info("[USER_CONTROLLER] [CONTACT] Acceso a contacto desde IP: {}", clientIp);
 
-        // Auditoría
         logAudit("PAGE_VIEW", "Formulario de contacto", clientIp, null);
+        analyticsService.trackPageView("Página de Contacto", "/Muthabara/contacto", request);
 
         return "user/contact";
     }
@@ -268,7 +292,6 @@ public class UserController {
         log.info("[USER_CONTROLLER] [CONTACT_SAVE] Intento de envío de contacto desde IP: {}, "
                 + "Nombre: {}, Email: {}", clientIp, nombre, email);
 
-        // Validación básica
         if (nombre == null || nombre.trim().isEmpty() ||
                 email == null || email.trim().isEmpty() ||
                 mensaje == null || mensaje.trim().isEmpty()) {
@@ -298,6 +321,9 @@ public class UserController {
             logAudit("ERROR", "Error en formulario de contacto", clientIp, e.getMessage());
         }
 
+        analyticsService.trackFormSubmission("contact_form", true, request);
+        analyticsService.trackEvent("lead", "contact_form_submitted", email, 1, request);
+
         return "redirect:/Muthabara/contacto";
     }
 
@@ -318,7 +344,6 @@ public class UserController {
                 "Intento de inicio de sesión",
                 clientIp,
                 email != null ? email : "desconocido");
-
         return "redirect:/Muthabara";
     }
 
