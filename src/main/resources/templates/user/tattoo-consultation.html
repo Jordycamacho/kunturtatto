@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" th:href="@{/images/Logo_negro.png}" type="image/png">
+    
+    <!--=============== REMIXICONS ===============-->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.2.0/fonts/remixicon.css" rel="stylesheet">
+
+    <!--=============== CSS ===============-->
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/tattoo-consultation.css}">
+
+    <title>Consulta de Tatuaje - Muthabara</title>
+</head>
+
+<body class="consulta-page">
+    <!-- Video Background -->
+    <div class="consulta-video-bg">
+        <video autoplay muted loop playsinline>
+            <source th:src="@{/images/video_fondo.mp4}" type="video/mp4">
+            Tu navegador no soporta el video.
+        </video>
+    </div>
+    <div class="consulta-video-overlay"></div>
+
+    <div th:insert="~{user/templateUser.html::nav_user}"></div>
+
+    <div class="container-consulta">
+        <!-- Consulta Hero -->
+        <div class="consulta-hero">
+            <div class="consulta-hero__badge">
+                <span>Consulta Personalizada</span>
+            </div>
+            <h1>Cuéntanos tu idea de tatuaje</h1>
+            <p class="consulta-hero__description">
+                Responde estas preguntas para que podamos crear un diseño único y personalizado para ti.
+            </p>
+            
+            <div class="consulta-notice">
+                <i class="ri-information-line"></i>
+                <p>Esta información nos ayuda a entender mejor lo que buscas y a crear un diseño que realmente te represente.</p>
+            </div>
+        </div>
+
+        <!-- Consulta Form -->
+        <form class="consulta-form" th:action="@{/Muthabara/consulta-tatuaje/guardar}" method="post">
+            <div class="form-section">
+                <h3><i class="ri-user-line"></i> Información Básica</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <input type="text" name="nombre" placeholder=" " required>
+                        <label>Nombre Completo *</label>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" name="email" placeholder=" " required>
+                        <label>Email *</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3><i class="ri-body-scan-line"></i> Detalles del Tatuaje</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <input type="text" name="parteCuerpo" placeholder=" " required>
+                        <label>¿En qué parte del cuerpo quieres tu tatuaje? *</label>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" name="tamano" placeholder=" " required>
+                        <label>¿De qué tamaño deseas tu tatuaje? *</label>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group full-width">
+                        <select name="tipoTatuaje" required>
+                            <option value="" disabled selected> </option>
+                            <option value="nuevo">Tatuaje nuevo</option>
+                            <option value="cobertura">Cobertura de tatuaje existente</option>
+                            <option value="ampliacion">Ampliación de tatuaje</option>
+                            <option value="retocado">Retocado</option>
+                        </select>
+                        <label>¿Es una cobertura o un tatuaje nuevo? *</label>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group full-width">
+                        <select name="abiertoASugerencias" required>
+                            <option value="" disabled selected> </option>
+                            <option value="si">Sí, estoy abierto a sugerencias</option>
+                            <option value="no">Prefiero seguir exactamente mi idea</option>
+                        </select>
+                        <label>¿Estás abierto a sugerencias propias para un mejor diseño? *</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3><i class="ri-lightbulb-flash-line"></i> Concepto y Elementos</h3>
+                <div class="form-row">
+                    <div class="form-group full-width">
+                        <textarea name="expresion" placeholder=" " rows="3" required></textarea>
+                        <label>¿Qué quieres expresar o reflejar en tu tattoo? *</label>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group full-width">
+                        <textarea name="elementosObligatorios" placeholder=" " rows="3"></textarea>
+                        <label>¿Qué elementos no pueden faltar dentro de tu tatuaje?</label>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group full-width">
+                        <textarea name="elementosEvitar" placeholder=" " rows="3"></textarea>
+                        <label>¿Qué elementos no te gustaría ver dentro de tu tatuaje?</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3><i class="ri-image-line"></i> Referencias y Estilo</h3>
+                <div class="form-row">
+                    <div class="form-group full-width">
+                        <textarea name="tipoTatuajeGusto" placeholder=" " rows="2"></textarea>
+                        <label>¿Tienes algún tipo de tatuaje que te guste más? (ej: realista, tradicional, acuarela, geométrico, etc.)</label>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group full-width">
+                        <textarea name="referentes" placeholder=" " rows="3"></textarea>
+                        <label>¿Tienes algunos referentes del tatuaje? (artistas, estudios, estilos - mínimo 3 si es posible)</label>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group full-width">
+                        <textarea name="linksReferencia" placeholder=" " rows="4"></textarea>
+                        <label>Links de referencia (Instagram, Pinterest, imágenes, etc.)</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3><i class="ri-heart-line"></i> Significado Personal</h3>
+                <div class="form-row">
+                    <div class="form-group full-width">
+                        <textarea name="cargaSimbolica" placeholder=" " rows="4"></textarea>
+                        <label>¿El tatuaje tiene alguna carga simbólica referente a un familiar, mascota, deidad, experiencia o algún otro vínculo?</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3><i class="ri-information-line"></i> Información Adicional</h3>
+                <div class="form-row">
+                    <div class="form-group full-width">
+                        <textarea name="comoConociste" placeholder=" " rows="2"></textarea>
+                        <label>¿Cómo llegaste a conocer mi trabajo?</label>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group full-width">
+                        <textarea name="informacionAdicional" placeholder=" " rows="3"></textarea>
+                        <label>Cualquier otra información que consideres importante</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-notice">
+                <i class="ri-alarm-warning-line"></i>
+                <p><strong>Importante:</strong> Al enviar esta consulta, confirmas que has leído y aceptas las <a th:href="@{/Muthabara/instrucciones-senal}" target="_blank">instrucciones de señal</a>. Para reservar tu cita será necesario realizar una señal de 50€.</p>
+            </div>
+
+            <div class="submit-container">
+                <button type="submit" class="submit-button">
+                    <i class="ri-send-plane-line"></i> Enviar Consulta
+                </button>
+            </div>
+        </form>
+
+        <!-- Success Message -->
+        <div th:if="${mensajeEnviado}">
+            <div class="message-success">
+                <i class="ri-checkbox-circle-line"></i>
+                <div>
+                    <h3>¡Consulta enviada exitosamente!</h3>
+                    <p>Hemos recibido tu consulta. Te contactaremos pronto para discutir los detalles y coordinar la señal para tu cita.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:insert="~{user/templateUser.html::footer}"></div>
+
+    <!-- JavaScript -->
+    <script th:src="@{/js/tattoo-consultation.js}"></script>
+    <div th:insert="~{user/templateUser.html::script}"></div>
+</body>
+
+</html>
