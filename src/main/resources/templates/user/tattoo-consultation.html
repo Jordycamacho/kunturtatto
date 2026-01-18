@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" th:href="@{/images/Logo_negro.png}" type="image/png">
-    
+
     <!--=============== REMIXICONS ===============-->
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.2.0/fonts/remixicon.css" rel="stylesheet">
 
@@ -28,7 +28,24 @@
 
     <div th:insert="~{user/templateUser.html::nav_user}"></div>
 
+
     <div class="container-consulta">
+
+        <!-- Mensajes de error -->
+        <div th:if="${error}" class="message-error">
+            <i class="ri-error-warning-line"></i>
+            <div>
+                <h3>Error al enviar la consulta</h3>
+                <p th:text="${error}"></p>
+            </div>
+        </div>
+
+        <div th:if="${erroresValidacion}" class="validation-errors">
+            <h4><i class="ri-alert-line"></i> Errores de validación:</h4>
+            <ul>
+                <li th:each="error : ${erroresValidacion}" th:text="${error}"></li>
+            </ul>
+        </div>
         <!-- Consulta Hero -->
         <div class="consulta-hero">
             <div class="consulta-hero__badge">
@@ -38,10 +55,11 @@
             <p class="consulta-hero__description">
                 Responde estas preguntas para que podamos crear un diseño único y personalizado para ti.
             </p>
-            
+
             <div class="consulta-notice">
                 <i class="ri-information-line"></i>
-                <p>Esta información nos ayuda a entender mejor lo que buscas y a crear un diseño que realmente te represente.</p>
+                <p>Esta información nos ayuda a entender mejor lo que buscas y a crear un diseño que realmente te
+                    represente.</p>
             </div>
         </div>
 
@@ -73,7 +91,7 @@
                         <label>¿De qué tamaño deseas tu tatuaje? *</label>
                     </div>
                 </div>
-                
+
                 <div class="form-row">
                     <div class="form-group full-width">
                         <select name="tipoTatuaje" required>
@@ -86,10 +104,10 @@
                         <label>¿Es una cobertura o un tatuaje nuevo? *</label>
                     </div>
                 </div>
-                
+
                 <div class="form-row">
                     <div class="form-group full-width">
-                        <select name="abiertoASugerencias" required>
+                        <select name="abiertoSugerencias" required>
                             <option value="" disabled selected> </option>
                             <option value="si">Sí, estoy abierto a sugerencias</option>
                             <option value="no">Prefiero seguir exactamente mi idea</option>
@@ -107,14 +125,14 @@
                         <label>¿Qué quieres expresar o reflejar en tu tattoo? *</label>
                     </div>
                 </div>
-                
+
                 <div class="form-row">
                     <div class="form-group full-width">
                         <textarea name="elementosObligatorios" placeholder=" " rows="3"></textarea>
                         <label>¿Qué elementos no pueden faltar dentro de tu tatuaje?</label>
                     </div>
                 </div>
-                
+
                 <div class="form-row">
                     <div class="form-group full-width">
                         <textarea name="elementosEvitar" placeholder=" " rows="3"></textarea>
@@ -128,17 +146,19 @@
                 <div class="form-row">
                     <div class="form-group full-width">
                         <textarea name="tipoTatuajeGusto" placeholder=" " rows="2"></textarea>
-                        <label>¿Tienes algún tipo de tatuaje que te guste más? (ej: realista, tradicional, acuarela, geométrico, etc.)</label>
+                        <label>¿Tienes algún tipo de tatuaje que te guste más? (ej: realista, tradicional, acuarela,
+                            geométrico, etc.)</label>
                     </div>
                 </div>
-                
+
                 <div class="form-row">
                     <div class="form-group full-width">
                         <textarea name="referentes" placeholder=" " rows="3"></textarea>
-                        <label>¿Tienes algunos referentes del tatuaje? (artistas, estudios, estilos - mínimo 3 si es posible)</label>
+                        <label>¿Tienes algunos referentes del tatuaje? (artistas, estudios, estilos - mínimo 3 si es
+                            posible)</label>
                     </div>
                 </div>
-                
+
                 <div class="form-row">
                     <div class="form-group full-width">
                         <textarea name="linksReferencia" placeholder=" " rows="4"></textarea>
@@ -152,7 +172,8 @@
                 <div class="form-row">
                     <div class="form-group full-width">
                         <textarea name="cargaSimbolica" placeholder=" " rows="4"></textarea>
-                        <label>¿El tatuaje tiene alguna carga simbólica referente a un familiar, mascota, deidad, experiencia o algún otro vínculo?</label>
+                        <label>¿El tatuaje tiene alguna carga simbólica referente a un familiar, mascota, deidad,
+                            experiencia o algún otro vínculo?</label>
                     </div>
                 </div>
             </div>
@@ -165,7 +186,7 @@
                         <label>¿Cómo llegaste a conocer mi trabajo?</label>
                     </div>
                 </div>
-                
+
                 <div class="form-row">
                     <div class="form-group full-width">
                         <textarea name="informacionAdicional" placeholder=" " rows="3"></textarea>
@@ -176,7 +197,9 @@
 
             <div class="form-notice">
                 <i class="ri-alarm-warning-line"></i>
-                <p><strong>Importante:</strong> Al enviar esta consulta, confirmas que has leído y aceptas las <a th:href="@{/Muthabara/instrucciones-senal}" target="_blank">instrucciones de señal</a>. Para reservar tu cita será necesario realizar una señal de 50€.</p>
+                <p><strong>Importante:</strong> Al enviar esta consulta, confirmas que has leído y aceptas las <a
+                        th:href="@{/Muthabara/instrucciones-senal}" target="_blank">instrucciones de señal</a>. Para
+                    reservar tu cita será necesario realizar una señal de 50€.</p>
             </div>
 
             <div class="submit-container">
@@ -192,7 +215,8 @@
                 <i class="ri-checkbox-circle-line"></i>
                 <div>
                     <h3>¡Consulta enviada exitosamente!</h3>
-                    <p>Hemos recibido tu consulta. Te contactaremos pronto para discutir los detalles y coordinar la señal para tu cita.</p>
+                    <p>Hemos recibido tu consulta. Te contactaremos pronto para discutir los detalles y coordinar la
+                        señal para tu cita.</p>
                 </div>
             </div>
         </div>

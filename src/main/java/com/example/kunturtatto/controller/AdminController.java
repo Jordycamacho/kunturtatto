@@ -4,6 +4,10 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -15,6 +19,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.example.kunturtatto.dto.CategoryDto;
 import com.example.kunturtatto.dto.DesignDto;
 import com.example.kunturtatto.dto.SubCategoryDto;
+import com.example.kunturtatto.dto.TattooConsultationDto;
 import com.example.kunturtatto.dto.UserDto;
 import com.example.kunturtatto.exception.EmailAlreadyExistsException;
 import com.example.kunturtatto.exception.ResourceNotFoundException;
@@ -25,6 +30,7 @@ import com.example.kunturtatto.request.UserRequest;
 import com.example.kunturtatto.service.CategoryService;
 import com.example.kunturtatto.service.DesignService;
 import com.example.kunturtatto.service.SubCategoryService;
+import com.example.kunturtatto.service.TattooConsultationService;
 import com.example.kunturtatto.service.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -52,6 +58,7 @@ public class AdminController {
         private final CategoryService categoryService;
         private final DesignService designService;
         private final UserService userService;
+        private final TattooConsultationService tattooConsultationService;
 
         @ModelAttribute("categories")
         public List<CategoryDto> categories() {
@@ -1013,6 +1020,221 @@ public class AdminController {
                 }
 
                 return "redirect:/admin/usuarios";
+        }
+
+        /*
+         * ==============================
+         * GESTIÓN DE CONSUTAS DE TATUAJES
+         * ==============================
+         */
+
+        @Operation(summary = "Listar consultas de tatuajes", description = "Muestra todas las consultas de tatuajes con paginación")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "200", description = "Consultas cargadas exitosamente"),
+                        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+        })
+        @GetMapping("/consultas")
+        public String listConsultas(
+                        @Parameter(description = "Número de página (por defecto 0)") @RequestParam(defaultValue = "0") int page,
+                        @Parameter(description = "Tamaño de página (por defecto 10)") @RequestParam(defaultValue = "10") int size,
+                        @Parameter(description = "Filtro por estado: 'todos', 'leidos', 'noleidos'") @RequestParam(defaultValue = "todos") String estado,
+                        @Parameter(description = "Término de búsqueda (opcional)") @RequestParam(required = false) String search,
+                        Model model) {
+
+                log.info("[ADMIN_CONTROLLER] [LIST_CONSULTAS] Listando consultas, página: {}, estado: {}, búsqueda: {}",
+                                page, estado, search);
+
+                try {
+                        Pageable pageable = PageRequest.of(page, size, Sort.by("fechaCreacion").descending());
+                        Page<TattooConsultationDto> consultasPage;
+
+                        if (search != null && !search.trim().isEmpty()) {
+                                consultasPage = tattooConsultationService.searchConsultations(search, pageable);
+                                model.addAttribute("searchTerm", search);
+                        } else {
+                                switch (estado) {
+                                        case "leidos":
+                                                consultasPage = tattooConsultationService.getAllConsultations(pageable)
+                                                                .map(dto -> {
+                                                                        dto.setEstado("LEIDO");
+                                                                        return dto;
+                                                                });
+                                                break;
+                                        case "noleidos":
+                                                consultasPage = tattooConsultationService
+                                                                .getUnreadConsultations(pageable)
+                                                                .map(dto -> {
+                                                                        dto.setEstado("NO_LEIDO");
+                                                                        return dto;
+                                                                });
+                                                break;
+                                        default:
+                                                consultasPage = tattooConsultationService.getAllConsultations(pageable)
+                                                                .map(dto -> {
+                                                                        dto.setEstado(dto.getLeido() ? "LEIDO"
+                                                                                        : "NO_LEIDO");
+                                                                        return dto;
+                                                                });
+                                                break;
+                                }
+                        }
+
+                        model.addAttribute("consultas", consultasPage.getContent());
+                        model.addAttribute("currentPage", consultasPage.getNumber());
+                        model.addAttribute("totalPages", consultasPage.getTotalPages());
+                        model.addAttribute("totalItems", consultasPage.getTotalElements());
+                        model.addAttribute("pageSize", size);
+                        model.addAttribute("estado", estado);
+
+                        model.addAttribute("totalConsultas", tattooConsultationService.countTotalConsultations());
+                        model.addAttribute("consultasNoLeidas", tattooConsultationService.countUnread());
+                        model.addAttribute("consultasHoy", tattooConsultationService.countTodayConsultations());
+
+                        model.addAttribute("consultasRecientes", tattooConsultationService.getRecentConsultations(5));
+
+                        log.info("[ADMIN_CONTROLLER] [LIST_CONSULTAS] Consultas cargadas: {} de {} totales",
+                                        consultasPage.getNumberOfElements(), consultasPage.getTotalElements());
+
+                } catch (Exception e) {
+                        log.error("[ADMIN_CONTROLLER] [LIST_CONSULTAS] Error al cargar consultas: {}", e.getMessage(),
+                                        e);
+                        model.addAttribute("error", "Error al cargar las consultas");
+                }
+
+                return "admin/consultas/list";
+        }
+
+        @Operation(summary = "Ver detalle de consulta", description = "Muestra los detalles completos de una consulta específica")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "200", description = "Consulta cargada exitosamente"),
+                        @ApiResponse(responseCode = "404", description = "Consulta no encontrada"),
+                        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+        })
+        @GetMapping("/consultas/{id}")
+        public String viewConsulta(
+                        @Parameter(description = "ID de la consulta") @PathVariable Long id,
+                        Model model,
+                        RedirectAttributes redirectAttributes) {
+
+                log.info("[ADMIN_CONTROLLER] [VIEW_CONSULTA] Viendo consulta ID: {}", id);
+
+                try {
+                        TattooConsultationDto consulta = tattooConsultationService.getConsultationById(id);
+                        model.addAttribute("consulta", consulta);
+
+                        if (consulta.getLeido() != null && !consulta.getLeido()) {
+                                tattooConsultationService.markAsRead(id);
+                                log.info("[ADMIN_CONTROLLER] [VIEW_CONSULTA] Consulta ID: {} marcada como leída", id);
+                        }
+
+                        return "admin/consultas/detail";
+
+                } catch (ResourceNotFoundException e) {
+                        log.warn("[ADMIN_CONTROLLER] [VIEW_CONSULTA] Consulta no encontrada ID: {}", id);
+                        redirectAttributes.addFlashAttribute("error", "Consulta no encontrada");
+                        return "redirect:/admin/consultas";
+                } catch (Exception e) {
+                        log.error("[ADMIN_CONTROLLER] [VIEW_CONSULTA] Error al cargar consulta ID: {}: {}", id,
+                                        e.getMessage(), e);
+                        redirectAttributes.addFlashAttribute("error", "Error al cargar la consulta");
+                        return "redirect:/admin/consultas";
+                }
+        }
+
+        @Operation(summary = "Marcar consulta como leída", description = "Marca una consulta como leída sin tener que ver el detalle")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "302", description = "Redirección exitosa"),
+                        @ApiResponse(responseCode = "404", description = "Consulta no encontrada"),
+                        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+        })
+        @PostMapping("/consultas/{id}/leer")
+        public String markAsRead(
+                        @Parameter(description = "ID de la consulta") @PathVariable Long id,
+                        RedirectAttributes redirectAttributes) {
+
+                log.info("[ADMIN_CONTROLLER] [MARK_AS_READ] Marcando consulta como leída ID: {}", id);
+
+                try {
+                        tattooConsultationService.markAsRead(id);
+                        redirectAttributes.addFlashAttribute("success", "Consulta marcada como leída");
+
+                        logAudit("CONSULTA_MARKED_READ",
+                                        String.format("Consulta ID: %d marcada como leída", id));
+
+                } catch (ResourceNotFoundException e) {
+                        log.warn("[ADMIN_CONTROLLER] [MARK_AS_READ] Consulta no encontrada ID: {}", id);
+                        redirectAttributes.addFlashAttribute("error", "Consulta no encontrada");
+                } catch (Exception e) {
+                        log.error("[ADMIN_CONTROLLER] [MARK_AS_READ] Error al marcar consulta como leída ID: {}: {}",
+                                        id, e.getMessage(), e);
+                        redirectAttributes.addFlashAttribute("error", "Error al marcar como leída");
+                }
+
+                return "redirect:/admin/consultas";
+        }
+
+        @Operation(summary = "Marcar consulta como no leída", description = "Marca una consulta como no leída")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "302", description = "Redirección exitosa"),
+                        @ApiResponse(responseCode = "404", description = "Consulta no encontrada"),
+                        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+        })
+        @PostMapping("/consultas/{id}/noleer")
+        public String markAsUnread(
+                        @Parameter(description = "ID de la consulta") @PathVariable Long id,
+                        RedirectAttributes redirectAttributes) {
+
+                log.info("[ADMIN_CONTROLLER] [MARK_AS_UNREAD] Marcando consulta como no leída ID: {}", id);
+
+                try {
+                        tattooConsultationService.markAsUnread(id);
+                        redirectAttributes.addFlashAttribute("success", "Consulta marcada como no leída");
+
+                        logAudit("CONSULTA_MARKED_UNREAD",
+                                        String.format("Consulta ID: %d marcada como no leída", id));
+
+                } catch (ResourceNotFoundException e) {
+                        log.warn("[ADMIN_CONTROLLER] [MARK_AS_UNREAD] Consulta no encontrada ID: {}", id);
+                        redirectAttributes.addFlashAttribute("error", "Consulta no encontrada");
+                } catch (Exception e) {
+                        log.error("[ADMIN_CONTROLLER] [MARK_AS_UNREAD] Error al marcar consulta como no leída ID: {}: {}",
+                                        id, e.getMessage(), e);
+                        redirectAttributes.addFlashAttribute("error", "Error al marcar como no leída");
+                }
+
+                return "redirect:/admin/consultas";
+        }
+
+        @Operation(summary = "Eliminar consulta", description = "Elimina una consulta específica del sistema")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "302", description = "Redirección exitosa"),
+                        @ApiResponse(responseCode = "404", description = "Consulta no encontrada"),
+                        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+        })
+        @PostMapping("/consultas/{id}/eliminar")
+        public String deleteConsulta(
+                        @Parameter(description = "ID de la consulta") @PathVariable Long id,
+                        RedirectAttributes redirectAttributes) {
+
+                log.info("[ADMIN_CONTROLLER] [DELETE_CONSULTA] Eliminando consulta ID: {}", id);
+
+                try {
+                        tattooConsultationService.deleteConsultation(id);
+                        redirectAttributes.addFlashAttribute("success", "Consulta eliminada exitosamente");
+
+                        logAudit("CONSULTA_DELETED",
+                                        String.format("Consulta ID: %d eliminada", id));
+
+                } catch (ResourceNotFoundException e) {
+                        log.warn("[ADMIN_CONTROLLER] [DELETE_CONSULTA] Consulta no encontrada ID: {}", id);
+                        redirectAttributes.addFlashAttribute("error", "Consulta no encontrada");
+                } catch (Exception e) {
+                        log.error("[ADMIN_CONTROLLER] [DELETE_CONSULTA] Error al eliminar consulta ID: {}: {}",
+                                        id, e.getMessage(), e);
+                        redirectAttributes.addFlashAttribute("error", "Error al eliminar la consulta");
+                }
+
+                return "redirect:/admin/consultas";
         }
 
         /*

@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:insert="~{admin/templateAdmin.html::header}">
+    <style>
+        .info-label {
+            font-weight: bold;
+            color: #495057;
+            min-width: 200px;
+        }
+        
+        .info-value {
+            word-break: break-word;
+        }
+        
+        .section-title {
+            border-bottom: 2px solid #dee2e6;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+            color: #343a40;
+        }
+        
+        .section-card {
+            border-left: 4px solid;
+            transition: transform 0.2s;
+        }
+        
+        .section-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .email-link:hover {
+            text-decoration: underline !important;
+        }
+        
+        .links-container a {
+            word-break: break-all;
+        }
+        
+        .unread-badge {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div th:insert="~{admin/templateAdmin.html::nav_user}"></div>
+    <div th:insert="~{admin/templateAdmin.html::nav_admin}"></div>
+
+    <div class="container-fluid mt-4">
+        <!-- Mensajes Flash -->
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
+            <span th:text="${success}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <!-- Botón de volver -->
+        <a th:href="@{/admin/consultas}" class="btn btn-outline-secondary mb-3">
+            <i class="fas fa-arrow-left me-2"></i> Volver a consultas
+        </a>
+
+        <!-- Encabezado de la consulta -->
+        <div class="card mb-4" th:classappend="${consulta.leido} ? 'border-success' : 'border-warning unread-badge'">
+            <div class="card-header" th:classappend="${consulta.leido} ? 'bg-success text-white' : 'bg-warning text-white'">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h3 class="card-title mb-0">
+                            <i class="fas fa-file-alt me-2"></i> Consulta #<span th:text="${consulta.id}"></span>
+                        </h3>
+                        <p class="mb-0 opacity-75">
+                            <i class="fas fa-calendar me-1"></i>
+                            <span th:text="${consulta.fechaCreacionFormateada}"></span>
+                        </p>
+                    </div>
+                    <div>
+                        <span th:if="${consulta.leido}" class="badge bg-success fs-6 px-3 py-2">
+                            <i class="fas fa-check-circle me-1"></i> LEÍDA
+                        </span>
+                        <span th:unless="${consulta.leido}" class="badge bg-warning fs-6 px-3 py-2">
+                            <i class="fas fa-envelope me-1"></i> NO LEÍDA
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5><i class="fas fa-user me-2"></i> Información del Cliente</h5>
+                        <dl class="row">
+                            <dt class="col-sm-4">Nombre:</dt>
+                            <dd class="col-sm-8" th:text="${consulta.nombre}"></dd>
+                            
+                            <dt class="col-sm-4">Email:</dt>
+                            <dd class="col-sm-8">
+                                <a th:href="'mailto:' + ${consulta.email}" 
+                                   th:text="${consulta.email}" 
+                                   class="email-link text-decoration-none">
+                                </a>
+                            </dd>
+                            
+                            <dt class="col-sm-4">Cómo nos conoció:</dt>
+                            <dd class="col-sm-8">
+                                <span th:text="${consulta.comoConociste != null && !consulta.comoConociste.isEmpty() ? consulta.comoConociste : 'No especificado'}" 
+                                      th:classappend="${consulta.comoConociste == null || consulta.comoConociste.isEmpty()} ? 'text-muted fst-italic' : ''">
+                                </span>
+                            </dd>
+                        </dl>
+                    </div>
+                    <div class="col-md-6">
+                        <h5><i class="fas fa-question-circle me-2"></i> Acciones Rápidas</h5>
+                        <div class="d-grid gap-2 d-md-block">
+                            <!-- Responder por email -->
+                            <a th:href="'mailto:' + ${consulta.email} + '?subject=Respuesta a consulta de tatuaje #' + ${consulta.id} + '&body=Hola ' + ${consulta.nombre} + ',%0D%0A%0D%0A'" 
+                               class="btn btn-primary me-2 mb-2">
+                                <i class="fas fa-reply me-1"></i> Responder por Email
+                            </a>
+                            
+                            <!-- Marcar como leída/no leída -->
+                            <form th:action="@{'/admin/consultas/' + ${consulta.id} + '/leer'}" 
+                                  method="post" 
+                                  th:if="${!consulta.leido}" 
+                                  class="d-inline-block mb-2">
+                                <button type="submit" 
+                                        class="btn btn-success"
+                                        onclick="return confirm('¿Marcar esta consulta como leída?');">
+                                    <i class="fas fa-envelope-open me-1"></i> Marcar como Leída
+                                </button>
+                            </form>
+                            
+                            <form th:action="@{'/admin/consultas/' + ${consulta.id} + '/noleer'}" 
+                                  method="post" 
+                                  th:if="${consulta.leido}" 
+                                  class="d-inline-block mb-2">
+                                <button type="submit" 
+                                        class="btn btn-warning"
+                                        onclick="return confirm('¿Marcar esta consulta como no leída?');">
+                                    <i class="fas fa-envelope me-1"></i> Marcar como No Leída
+                                </button>
+                            </form>
+                            
+                            <!-- Eliminar -->
+                            <form th:action="@{'/admin/consultas/' + ${consulta.id} + '/eliminar'}" 
+                                  method="post" 
+                                  class="d-inline-block mb-2">
+                                <button type="submit" 
+                                        class="btn btn-danger"
+                                        onclick="return confirm('¿Está seguro de eliminar esta consulta? Esta acción no se puede deshacer.');">
+                                    <i class="fas fa-trash me-1"></i> Eliminar Consulta
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detalles del Tatuaje -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">
+                    <i class="fas fa-palette me-2"></i> Detalles del Tatuaje
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Parte del cuerpo:</label>
+                            <div class="form-control bg-light" th:text="${consulta.parteCuerpo}"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Tamaño:</label>
+                            <div class="form-control bg-light" th:text="${consulta.tamano}"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Tipo de tatuaje:</label>
+                            <div class="form-control bg-light" th:text="${consulta.tipoTatuaje}"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">¿Abierto a sugerencias?</label>
+                            <div class="form-control bg-light" th:text="${consulta.abiertoSugerencias}"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Concepto y Elementos -->
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0">
+                    <i class="fas fa-lightbulb me-2"></i> Concepto y Elementos
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">¿Qué quiere expresar o reflejar en su tattoo?</label>
+                    <div class="form-control bg-light" style="min-height: 100px; white-space: pre-wrap;" th:text="${consulta.expresion}"></div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Elementos obligatorios:</label>
+                            <div class="form-control bg-light" style="min-height: 100px; white-space: pre-wrap;"
+                                 th:text="${consulta.elementosObligatorios != null && !consulta.elementosObligatorios.isEmpty() ? consulta.elementosObligatorios : 'No especificado'}"
+                                 th:classappend="${consulta.elementosObligatorios == null || consulta.elementosObligatorios.isEmpty()} ? 'text-muted fst-italic' : ''">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Elementos a evitar:</label>
+                            <div class="form-control bg-light" style="min-height: 100px; white-space: pre-wrap;"
+                                 th:text="${consulta.elementosEvitar != null && !consulta.elementosEvitar.isEmpty() ? consulta.elementosEvitar : 'No especificado'}"
+                                 th:classappend="${consulta.elementosEvitar == null || consulta.elementosEvitar.isEmpty()} ? 'text-muted fst-italic' : ''">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Referencias y Estilo -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h4 class="mb-0">
+                    <i class="fas fa-images me-2"></i> Referencias y Estilo
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Tipo de tatuaje favorito:</label>
+                    <div class="form-control bg-light"
+                         th:text="${consulta.tipoTatuajeGusto != null && !consulta.tipoTatuajeGusto.isEmpty() ? consulta.tipoTatuajeGusto : 'No especificado'}"
+                         th:classappend="${consulta.tipoTatuajeGusto == null || consulta.tipoTatuajeGusto.isEmpty()} ? 'text-muted fst-italic' : ''">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Referentes del tatuaje:</label>
+                    <div class="form-control bg-light" style="min-height: 100px; white-space: pre-wrap;"
+                         th:text="${consulta.referentes != null && !consulta.referentes.isEmpty() ? consulta.referentes : 'No especificado'}"
+                         th:classappend="${consulta.referentes == null || consulta.referentes.isEmpty()} ? 'text-muted fst-italic' : ''">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Links de referencia:</label>
+                    <div class="form-control bg-light" style="min-height: 100px;">
+                        <div th:if="${consulta.linksReferencia != null && !consulta.linksReferencia.isEmpty()}">
+                            <!-- Versión simplificada - muestra el texto como está -->
+                            <div style="white-space: pre-wrap;" th:text="${consulta.linksReferencia}"></div>
+                        </div>
+                        <span th:if="${consulta.linksReferencia == null || consulta.linksReferencia.isEmpty()}" 
+                              class="text-muted fst-italic">No especificado</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Significado Personal -->
+        <div th:if="${consulta.cargaSimbolica != null && !consulta.cargaSimbolica.isEmpty()}" class="card mb-4">
+            <div class="card-header bg-danger text-white">
+                <h4 class="mb-0">
+                    <i class="fas fa-heart me-2"></i> Significado Personal
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Carga simbólica:</label>
+                    <div class="form-control bg-light" style="min-height: 100px; white-space: pre-wrap;" th:text="${consulta.cargaSimbolica}"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Información Adicional -->
+        <div th:if="${consulta.informacionAdicional != null && !consulta.informacionAdicional.isEmpty()}" class="card mb-4">
+            <div class="card-header bg-secondary text-white">
+                <h4 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i> Información Adicional
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <div class="form-control bg-light" style="min-height: 100px; white-space: pre-wrap;" th:text="${consulta.informacionAdicional}"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botones de acción en el pie -->
+        <div class="card mb-4">
+            <div class="card-body text-center">
+                <div class="d-flex flex-wrap justify-content-center gap-2">
+                    <a th:href="'mailto:' + ${consulta.email} + '?subject=Respuesta a consulta de tatuaje #' + ${consulta.id} + '&body=Hola ' + ${consulta.nombre} + ',%0D%0A%0D%0A'" 
+                       class="btn btn-primary">
+                        <i class="fas fa-reply me-1"></i> Responder por Email
+                    </a>
+                    
+                    <form th:action="@{'/admin/consultas/' + ${consulta.id} + '/leer'}" 
+                          method="post" 
+                          th:if="${!consulta.leido}" 
+                          class="d-inline">
+                        <button type="submit" 
+                                class="btn btn-success"
+                                onclick="return confirm('¿Marcar esta consulta como leída?');">
+                            <i class="fas fa-envelope-open me-1"></i> Marcar como Leída
+                        </button>
+                    </form>
+                    
+                    <form th:action="@{'/admin/consultas/' + ${consulta.id} + '/noleer'}" 
+                          method="post" 
+                          th:if="${consulta.leido}" 
+                          class="d-inline">
+                        <button type="submit" 
+                                class="btn btn-warning"
+                                onclick="return confirm('¿Marcar esta consulta como no leída?');">
+                            <i class="fas fa-envelope me-1"></i> Marcar como No Leída
+                        </button>
+                    </form>
+                    
+                    <a th:href="@{/admin/consultas}" class="btn btn-secondary">
+                        <i class="fas fa-list me-1"></i> Volver al Listado
+                    </a>
+                    
+                    <form th:action="@{'/admin/consultas/' + ${consulta.id} + '/eliminar'}" 
+                          method="post" 
+                          class="d-inline">
+                        <button type="submit" 
+                                class="btn btn-danger"
+                                onclick="return confirm('¿Está seguro de eliminar esta consulta? Esta acción no se puede deshacer.');">
+                            <i class="fas fa-trash me-1"></i> Eliminar Consulta
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Información de Auditoría -->
+        <div class="alert alert-info">
+            <h5><i class="fas fa-history me-2"></i> Información de Auditoría</h5>
+            <ul class="mb-0">
+                <li>Consulta creada el: <span th:text="${consulta.fechaCreacionFormateada}"></span></li>
+                <li>Estado actual: 
+                    <span th:if="${consulta.leido}" class="badge bg-success">Leída</span>
+                    <span th:unless="${consulta.leido}" class="badge bg-warning">No leída</span>
+                </li>
+                <li>Esta consulta fue marcada automáticamente como leída al abrirla</li>
+                <li>Todas las acciones son registradas en el sistema de auditoría</li>
+            </ul>
+        </div>
+    </div>
+
+    <div th:insert="~{admin/templateAdmin.html::script}"></div>
+
+    <script>
+        // Auto-ocultar mensajes después de 5 segundos
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+
+        // Convertir URLs en texto a enlaces clickeables
+        document.addEventListener('DOMContentLoaded', function() {
+            const textElements = document.querySelectorAll('.form-control.bg-light');
+            
+            textElements.forEach(element => {
+                const text = element.textContent;
+                if (text) {
+                    // Expresión regular para encontrar URLs
+                    const urlRegex = /(https?:\/\/[^\s]+)/g;
+                    
+                    // Reemplazar URLs con enlaces
+                    const html = text.replace(urlRegex, function(url) {
+                        return '<a href="' + url + '" target="_blank" class="text-primary text-decoration-none">' + 
+                               '<i class="fas fa-external-link-alt me-1"></i>' + url + '</a>';
+                    });
+                    
+                    // Solo actualizar si encontramos URLs
+                    if (html !== text) {
+                        element.innerHTML = html;
+                    }
+                }
+            });
+        });
+
+        // Copiar email al portapapeles
+        document.addEventListener('DOMContentLoaded', function() {
+            const copyButtons = document.querySelectorAll('.copy-email');
+            
+            copyButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const email = this.getAttribute('data-email');
+                    
+                    navigator.clipboard.writeText(email).then(() => {
+                        // Mostrar tooltip de confirmación
+                        const tooltip = new bootstrap.Tooltip(this, {
+                            title: '¡Email copiado!',
+                            trigger: 'manual'
+                        });
+                        tooltip.show();
+                        
+                        setTimeout(() => {
+                            tooltip.hide();
+                            tooltip.dispose();
+                        }, 2000);
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>

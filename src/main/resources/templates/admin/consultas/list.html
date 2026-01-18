@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:insert="~{admin/templateAdmin.html::header}">
+    <style>
+        .unread-row {
+            background-color: rgba(255, 152, 0, 0.1) !important;
+            font-weight: 500;
+        }
+        
+        .unread-row:hover {
+            background-color: rgba(255, 152, 0, 0.15) !important;
+        }
+        
+        .status-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 20px;
+        }
+        
+        .btn-group-sm .btn {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .action-buttons {
+            white-space: nowrap;
+        }
+        
+        .filter-tab {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .badge-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            font-size: 0.7rem;
+            min-width: 20px;
+            height: 20px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div th:insert="~{admin/templateAdmin.html::nav_user}"></div>
+    <div th:insert="~{admin/templateAdmin.html::nav_admin}"></div>
+
+    <div class="container-fluid mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="mb-0">
+                <i class="fas fa-comments me-2"></i> Consultas de Tatuajes
+            </h1>
+        </div>
+
+        <!-- Mensajes Flash -->
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
+            <span th:text="${success}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <!-- Estadísticas -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card bg-primary text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-title mb-1">Total Consultas</h6>
+                                <h2 th:text="${totalConsultas}" class="card-text mb-0">0</h2>
+                            </div>
+                            <i class="fas fa-inbox fa-3x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-warning text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-title mb-1">No Leídas</h6>
+                                <h2 th:text="${consultasNoLeidas}" class="card-text mb-0">0</h2>
+                            </div>
+                            <i class="fas fa-envelope fa-3x opacity-50"></i>
+                        </div>
+                        <div th:if="${consultasNoLeidas > 0}" class="mt-2">
+                            <a th:href="@{/admin/consultas(estado='noleidos')}" 
+                               class="btn btn-sm btn-light text-warning">
+                                Ver todas
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-success text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-title mb-1">Hoy</h6>
+                                <h2 th:text="${consultasHoy}" class="card-text mb-0">0</h2>
+                            </div>
+                            <i class="fas fa-calendar-day fa-3x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-info text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-title mb-1">En esta página</h6>
+                                <h2 th:text="${consultas.size()}" class="card-text mb-0">0</h2>
+                            </div>
+                            <i class="fas fa-list fa-3x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filtros y Búsqueda -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-filter me-2"></i> Filtros y Búsqueda
+                    </h5>
+                    <div class="text-muted small">
+                        Mostrando <span th:text="${currentPage * pageSize + 1}">1</span> a 
+                        <span th:text="${(currentPage * pageSize) + consultas.size()}">10</span> de 
+                        <span th:text="${totalItems}">0</span> consultas
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="btn-group" role="group">
+                            <a th:href="@{/admin/consultas(estado='todos')}" 
+                               th:classappend="${estado == 'todos'} ? 'btn btn-primary' : 'btn btn-outline-primary'"
+                               class="btn filter-tab">
+                                <i class="fas fa-list-check me-1"></i> Todas
+                            </a>
+                            <a th:href="@{/admin/consultas(estado='noleidos')}" 
+                               th:classappend="${estado == 'noleidos'} ? 'btn btn-warning' : 'btn btn-outline-warning'"
+                               class="btn filter-tab">
+                                <i class="fas fa-envelope me-1"></i> No Leídas
+                                <span th:if="${consultasNoLeidas > 0}" 
+                                      class="badge bg-danger badge-count" 
+                                      th:text="${consultasNoLeidas}">
+                                </span>
+                            </a>
+                            <a th:href="@{/admin/consultas(estado='leidos')}" 
+                               th:classappend="${estado == 'leidos'} ? 'btn btn-success' : 'btn btn-outline-success'"
+                               class="btn filter-tab">
+                                <i class="fas fa-envelope-open me-1"></i> Leídas
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <form th:action="@{/admin/consultas}" method="get" class="d-flex">
+                            <input type="hidden" name="estado" th:value="${estado}">
+                            <div class="input-group">
+                                <input type="text" class="form-control" 
+                                       name="search" th:value="${searchTerm}" 
+                                       placeholder="Buscar por nombre o email...">
+                                <button class="btn btn-outline-secondary" type="submit">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                                <a th:if="${searchTerm != null}" 
+                                   th:href="@{/admin/consultas(estado=${estado})}"
+                                   class="btn btn-outline-danger" title="Limpiar búsqueda">
+                                    <i class="fas fa-times"></i>
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla de Consultas -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Lista de Consultas</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Cliente</th>
+                                <th>Email</th>
+                                <th>Parte del Cuerpo</th>
+                                <th>Tamaño</th>
+                                <th>Fecha</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="consulta : ${consultas}" 
+                                th:classappend="${consulta.resaltado} ? 'unread-row' : ''">
+                                <td class="fw-bold" th:text="${consulta.id}"></td>
+                                <td>
+                                    <strong th:text="${consulta.nombre}"></strong>
+                                    <div th:if="${consulta.resaltado}" class="small text-warning">
+                                        <i class="fas fa-exclamation-circle"></i> No leída
+                                    </div>
+                                </td>
+                                <td>
+                                    <a th:href="'mailto:' + ${consulta.email}" 
+                                       th:text="${consulta.email}" 
+                                       class="text-decoration-none">
+                                    </a>
+                                </td>
+                                <td th:text="${consulta.parteCuerpo}"></td>
+                                <td th:text="${consulta.tamano}"></td>
+                                <td th:text="${consulta.fechaCreacionFormateada}"></td>
+                                <td>
+                                    <span th:if="${consulta.leido}" 
+                                          class="badge bg-success status-badge">
+                                        <i class="fas fa-check-circle me-1"></i> Leído
+                                    </span>
+                                    <span th:unless="${consulta.leido}" 
+                                          class="badge bg-warning status-badge">
+                                        <i class="fas fa-envelope me-1"></i> No leído
+                                    </span>
+                                </td>
+                                <td class="action-buttons">
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <!-- Ver detalles -->
+                                        <a th:href="@{'/admin/consultas/' + ${consulta.id}}" 
+                                           class="btn btn-outline-primary" title="Ver detalles">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+
+                                        <!-- Marcar como leída/no leída -->
+                                        <form th:action="@{'/admin/consultas/' + ${consulta.id} + '/leer'}" 
+                                              method="post" 
+                                              th:if="${not consulta.leido}" 
+                                              style="display: inline;">
+                                            <button type="submit" 
+                                                    class="btn btn-outline-success" 
+                                                    title="Marcar como leída"
+                                                    onclick="return confirm('¿Marcar esta consulta como leída?');">
+                                                <i class="fas fa-envelope-open"></i>
+                                            </button>
+                                        </form>
+
+                                        <form th:action="@{'/admin/consultas/' + ${consulta.id} + '/noleer'}" 
+                                              method="post" 
+                                              th:if="${consulta.leido}" 
+                                              style="display: inline;">
+                                            <button type="submit" 
+                                                    class="btn btn-outline-warning" 
+                                                    title="Marcar como no leída"
+                                                    onclick="return confirm('¿Marcar esta consulta como no leída?');">
+                                                <i class="fas fa-envelope"></i>
+                                            </button>
+                                        </form>
+
+                                        <!-- Eliminar -->
+                                        <form th:action="@{'/admin/consultas/' + ${consulta.id} + '/eliminar'}" 
+                                              method="post" 
+                                              style="display: inline;">
+                                            <button type="submit" 
+                                                    class="btn btn-outline-danger" 
+                                                    title="Eliminar consulta"
+                                                    onclick="return confirm('¿Está seguro de eliminar esta consulta? Esta acción no se puede deshacer.');">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:if="${consultas.empty}">
+                                <td colspan="8" class="text-center text-muted py-4">
+                                    <i class="fas fa-inbox fa-3x mb-3 opacity-25"></i>
+                                    <p class="h5">No hay consultas para mostrar</p>
+                                    <p th:if="${searchTerm}" class="text-muted">
+                                        No se encontraron resultados para "<span th:text="${searchTerm}"></span>"
+                                    </p>
+                                    <a th:href="@{/admin/consultas}" class="btn btn-primary mt-2">
+                                        <i class="fas fa-redo me-1"></i> Ver todas las consultas
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Paginación -->
+            <div th:if="${totalPages > 1}" class="card-footer">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="text-muted">
+                            Página <span th:text="${currentPage + 1}"></span> de 
+                            <span th:text="${totalPages}"></span>
+                        </span>
+                    </div>
+                    
+                    <nav aria-label="Paginación de consultas">
+                        <ul class="pagination pagination-sm mb-0">
+                            <!-- Primera página -->
+                            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
+                                <a class="page-link" 
+                                   th:href="@{/admin/consultas(page=0, size=${pageSize}, estado=${estado}, search=${searchTerm})}"
+                                   aria-label="Primera">
+                                    <i class="fas fa-angle-double-left"></i>
+                                </a>
+                            </li>
+                            
+                            <!-- Página anterior -->
+                            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled' : ''">
+                                <a class="page-link" 
+                                   th:href="@{/admin/consultas(page=${currentPage - 1}, size=${pageSize}, estado=${estado}, search=${searchTerm})}"
+                                   aria-label="Anterior">
+                                    <i class="fas fa-angle-left"></i>
+                                </a>
+                            </li>
+                            
+                            <!-- Páginas numeradas -->
+                            <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}" 
+                                th:classappend="${currentPage == i} ? 'page-item active' : 'page-item'">
+                                <a class="page-link" 
+                                   th:href="@{/admin/consultas(page=${i}, size=${pageSize}, estado=${estado}, search=${searchTerm})}" 
+                                   th:text="${i + 1}">
+                                </a>
+                            </li>
+                            
+                            <!-- Página siguiente -->
+                            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
+                                <a class="page-link" 
+                                   th:href="@{/admin/consultas(page=${currentPage + 1}, size=${pageSize}, estado=${estado}, search=${searchTerm})}"
+                                   aria-label="Siguiente">
+                                    <i class="fas fa-angle-right"></i>
+                                </a>
+                            </li>
+                            
+                            <!-- Última página -->
+                            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled' : ''">
+                                <a class="page-link" 
+                                   th:href="@{/admin/consultas(page=${totalPages - 1}, size=${pageSize}, estado=${estado}, search=${searchTerm})}"
+                                   aria-label="Última">
+                                    <i class="fas fa-angle-double-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                    
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary btn-sm dropdown-toggle" 
+                                type="button" 
+                                data-bs-toggle="dropdown">
+                            <span th:text="${pageSize}"></span> por página
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <a class="dropdown-item" 
+                                   th:href="@{/admin/consultas(page=0, size=10, estado=${estado}, search=${searchTerm})}">
+                                    10 por página
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" 
+                                   th:href="@{/admin/consultas(page=0, size=25, estado=${estado}, search=${searchTerm})}">
+                                    25 por página
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" 
+                                   th:href="@{/admin/consultas(page=0, size=50, estado=${estado}, search=${searchTerm})}">
+                                    50 por página
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" 
+                                   th:href="@{/admin/consultas(page=0, size=100, estado=${estado}, search=${searchTerm})}">
+                                    100 por página
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Consultas Recientes -->
+        <div th:if="${not consultasRecientes.empty}" class="card mt-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-history me-2"></i> Consultas Recientes
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div th:each="recent : ${consultasRecientes}" class="col-md-4 col-lg-3">
+                        <div class="card h-100 border">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="flex-shrink-0">
+                                        <div th:classappend="${recent.leido} ? 'bg-success' : 'bg-warning'" 
+                                             class="rounded-circle p-2 text-white d-flex align-items-center justify-content-center"
+                                             style="width: 40px; height: 40px;">
+                                            <i class="fas fa-user"></i>
+                                        </div>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <h6 class="mb-0" th:text="${recent.nombre}"></h6>
+                                        <small class="text-muted" th:text="${recent.email}"></small>
+                                    </div>
+                                </div>
+                                <p class="card-text small text-muted mb-2" th:text="${recent.fechaCreacionFormateada}"></p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span th:classappend="${recent.leido} ? 'badge bg-success' : 'badge bg-warning'"
+                                          class="badge">
+                                        <span th:if="${recent.leido}">
+                                            <i class="fas fa-check-circle me-1"></i> Leído
+                                        </span>
+                                        <span th:unless="${recent.leido}">
+                                            <i class="fas fa-envelope me-1"></i> No leído
+                                        </span>
+                                    </span>
+                                    <a th:href="@{'/admin/consultas/' + ${recent.id}}" 
+                                       class="btn btn-sm btn-outline-primary">
+                                        Ver
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Información de Cache -->
+        <div class="alert alert-info mt-4">
+            <h5><i class="fas fa-database me-2"></i> Información del Sistema</h5>
+            <ul class="mb-0">
+                <li>Las consultas se cachean por 15 minutos para mejorar el rendimiento</li>
+                <li>Cada operación se registra en los logs de auditoría</li>
+                <li>Las consultas no leídas se muestran con fondo amarillo</li>
+                <li>Los cambios se reflejan inmediatamente en el sistema</li>
+            </ul>
+        </div>
+    </div>
+
+    <div th:insert="~{admin/templateAdmin.html::script}"></div>
+
+    <script>
+        // Auto-ocultar mensajes después de 5 segundos
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+
+        // Configuración de tooltips
+        document.addEventListener('DOMContentLoaded', function() {
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+
+        // Resaltar filas no leídas al pasar el mouse
+        document.addEventListener('DOMContentLoaded', function() {
+            const unreadRows = document.querySelectorAll('.unread-row');
+            unreadRows.forEach(row => {
+                row.addEventListener('mouseenter', function() {
+                    this.style.backgroundColor = 'rgba(255, 152, 0, 0.2)';
+                });
+                row.addEventListener('mouseleave', function() {
+                    this.style.backgroundColor = 'rgba(255, 152, 0, 0.1)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

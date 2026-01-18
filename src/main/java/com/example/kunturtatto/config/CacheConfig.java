@@ -40,7 +40,12 @@ public class CacheConfig {
                 "usersAll",
                 "userById",
                 "userByEmail",
-                "authenticatedUser");
+                "authenticatedUser",
+                "consultationById",
+                "consultationsAll",
+                "consultationsUnread",
+                "consultationsStats",
+                "consultationsRecent");
 
         cacheManager.setCaffeine(Caffeine.newBuilder()
                 .initialCapacity(100)
