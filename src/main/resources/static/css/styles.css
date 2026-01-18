@@ -2,7 +2,7 @@
 
 :root {
   --header-height: 4.5rem;
-  --primary-color: rgba(134, 15, 71, 0.877);
+  --primary-color: rgb(88, 23, 58);
   --primary-hover: rgba(108, 9, 75, 0.880);
   --title-color: hsl(0, 0%, 95%);
   --text-color: hsl(0, 0%, 70%);

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instrucciones de Señal - Muthabara</title>
+    <link rel="icon" th:href="@{/images/Logo_negro.png}" type="image/png">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.2.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <style>
+        .legal-container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 3rem;
+            background: var(--container-color);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .legal-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .legal-header h1 {
+            font-family: var(--accent-font);
+            color: var(--title-color);
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .legal-header .last-updated {
+            color: var(--text-color-light);
+            font-size: 0.9rem;
+        }
+
+        .legal-section {
+            margin-bottom: 2.5rem;
+        }
+
+        .legal-section h2 {
+            font-family: var(--accent-font);
+            color: var(--primary-color);
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .legal-section h2 i {
+            font-size: 1.2rem;
+        }
+
+        .legal-section p,
+        .legal-section ul {
+            color: var(--text-color);
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+
+        .legal-section ul {
+            padding-left: 1.5rem;
+        }
+
+        .legal-section li {
+            margin-bottom: 0.5rem;
+            position: relative;
+        }
+
+        .legal-section li:before {
+            content: "•";
+            color: var(--primary-color);
+            font-weight: bold;
+            position: absolute;
+            left: -1rem;
+        }
+
+        .important-note {
+            background: rgba(89, 24, 58, 0.1);
+            padding: 1.5rem;
+            border-radius: 10px;
+            border-left: 4px solid var(--primary-color);
+            margin: 2rem 0;
+        }
+
+        .important-note h3 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .back-home {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .back-home:hover {
+            gap: 0.8rem;
+            color: var(--title-color);
+        }
+
+        @media screen and (max-width: 768px) {
+            .legal-container {
+                padding: 2rem 1.5rem;
+                margin: 1rem;
+            }
+
+            .legal-header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header th:insert="~{user/templateUser.html::nav_user}"></header>
+
+    <main class="main">
+        <section class="legal-section section">
+            <div class="legal-container container">
+                <div class="legal-header">
+                    <h1>Instrucciones de Señal</h1>
+                    <p class="last-updated">Para reservas de tatuajes personalizados
+                    </p>
+                </div>
+
+                <div class="important-note">
+                    <h3><i class="ri-information-line"></i> Información Importante</h3>
+                    <p>Estas instrucciones aplican para todas las reservas de tatuajes personalizados. La señal es requerida para agendar tu cita y cubre los trabajos previos de diseño.</p>
+                </div>
+
+                <div class="legal-section">
+                    <h2><i class="ri-calendar-check-line"></i> Reserva de Cita</h2>
+                    <p>Para reservar día y hora de la cita el cliente deberá dar una señal de <strong>50€</strong> que se restarán del total acordado entre tatuador y cliente.</p>
+                </div>
+
+                <div class="legal-section">
+                    <h2><i class="ri-brush-line"></i> Trabajos Previos</h2>
+                    <p>La señal dada aparte de cubrir fecha y hora del tatuaje, también será para cubrir los trabajos previos de preparación del mismo.</p>
+                </div>
+
+                <div class="legal-section">
+                    <h2><i class="ri-alarm-warning-line"></i> Cancelaciones y Cambios</h2>
+                    <p>En caso del cliente faltar a la cita deberá avisar con antelación el motivo de falta, para así el tatuador disponer de tiempo suficiente para agendar a otra persona.</p>
+                    <p>En tal caso de que el cliente no comunique dicha falta con la debida antelación perderá la señal.</p>
+                </div>
+
+                <div class="legal-section">
+                    <h2><i class="ri-repeat-line"></i> Cambios de Cita</h2>
+                    <p>La cita reservada tendrá un margen de disposición de cambio de un máximo de tres veces, en casos extremos el tatuador evaluará con el cliente la excepción de esta.</p>
+                </div>
+
+                <div class="legal-section">
+                    <h2><i class="ri-money-euro-circle-line"></i> Política de Devolución</h2>
+                    <p>La señal no tiene devolución bajo ninguna circunstancia.</p>
+                </div>
+
+                <div class="important-note">
+                    <h3><i class="ri-question-line"></i> ¿Cómo realizar la señal?</h3>
+                    <p>Para realizar el pago de la señal, por favor contacta directamente con el estudio a través del formulario de contacto o mediante:</p>
+                    <p><strong>Email:</strong> muthabara_art@outlook.com</p>
+                    <p>Te proporcionaremos los detalles de pago y confirmaremos tu reserva.</p>
+                </div>
+
+                <a th:href="@{/Muthabara}" class="back-home">
+                    <i class="ri-arrow-left-line"></i> Volver al Inicio
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <div th:insert="~{user/templateUser.html::footer}"></div>
+
+    <div th:insert="~{user/templateUser.html::script}"></div>
+</body>
+
+</html>
