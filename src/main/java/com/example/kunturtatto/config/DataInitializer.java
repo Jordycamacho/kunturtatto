@@ -52,8 +52,8 @@ public class DataInitializer implements CommandLineRunner {
         );
 
         createUserIfNotExists(
-            "kunturtattoo@gmail.com", 
-            "kunturtattoo012890.", 
+            "luisa_ftc112@outlook.com", 
+            "012890", 
             adminRole
         );
         
