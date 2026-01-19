@@ -1,49 +1,49 @@
-version: '3'
+version: '3.8'
 
 services:
-  kuntur:
-    build: .
-    mem_limit: 512m
-    ports:
-      - "8081:8080"
-    env_file: .env
-    environment:
-      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD} 
-      - DB_URL_KUNTUR=${DB_URL_KUNTUR}
-      - DB_USER_NAME=${DB_USER_NAME}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - EMAIL_USER=${EMAIL_USER}
-      - EMAIL_PASS=${EMAIL_PASS}
-      - APP_UPLOAD_DIR=${APP_UPLOAD_DIR}
-    volumes:
-      - kuntur_images:/app/images
-      - kuntur_logs:/app/logs
-    restart: always
-    depends_on:
-      kuntur_db:
-        condition: service_healthy
-
-  kuntur_db:
-    image: mysql:8.0.33 
+  db:
+    image: mysql:8.0.33
+    container_name: muthabara_db
     ports:
       - "3308:3306"
-    env_file: .env
     environment:
-      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
-      - MYSQL_PASSWORD=${DB_PASSWORD}
-      - MYSQL_DATABASE=${MYSQL_DATABASE}
-      - MYSQL_USER=${DB_USER_NAME}
-      - MYSQL_ROOT_HOST=%
+      MYSQL_ROOT_PASSWORD: 752957
+      MYSQL_DATABASE: kunturtatto
+      MYSQL_USER: kuntur_user
+      MYSQL_PASSWORD: 752957
     command: --default-authentication-plugin=mysql_native_password
     volumes:
-      - kuntur_db_data:/var/lib/mysql
-    restart: always
+      - mysql_data:/var/lib/mysql
+    restart: unless-stopped
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      timeout: 10s
-      retries: 10
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  app:
+    build: .
+    container_name: muthabara_app
+    ports:
+      - "8081:8080"
+    environment:
+      DB_URL_KUNTUR: "jdbc:mysql://db:3306/kunturtatto?createDatabaseIfNotExist=true&serverTimezone=UTC&useSSL=false"
+      DB_USER_NAME: "kuntur_user"
+      DB_PASSWORD: "752957"
+      EMAIL_USER: "kunturtattoo.studio@gmail.com"
+      EMAIL_PASS: "aqfe fbym bumo zlhq"
+      APP_UPLOAD_DIR: "/app/images"
+      SPRING_PROFILES_ACTIVE: "prod"
+    volumes:
+      - uploads:/app/images
+      - logs:/app/logs
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
 
 volumes:
-  kuntur_db_data:
-  kuntur_images:
-  kuntur_logs:
+  mysql_data:
+  uploads:
+  logs:
