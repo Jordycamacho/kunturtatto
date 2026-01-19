@@ -8,6 +8,7 @@ import com.example.kunturtatto.request.TattooConsultationRequest;
 import com.example.kunturtatto.service.AnalyticsService;
 import com.example.kunturtatto.service.CategoryService;
 import com.example.kunturtatto.service.DesignService;
+import com.example.kunturtatto.service.IContactService;
 import com.example.kunturtatto.service.SubCategoryService;
 import com.example.kunturtatto.service.TattooConsultationService;
 
@@ -57,8 +58,9 @@ public class UserController {
         private AnalyticsService analyticsService;
         @Autowired
         private TattooConsultationService tattooConsultationService;
+        @Autowired
+        private IContactService contactService;
 
-        // Mapa para rate limiting por IP
         private final ConcurrentHashMap<String, RateLimitInfo> rateLimitMap = new ConcurrentHashMap<>();
         private static final int MAX_REGISTER_ATTEMPTS = 5;
         private static final long BLOCK_DURATION_MINUTES = 60;
@@ -553,7 +555,6 @@ public class UserController {
                                 return "user/tattoo-consultation";
                         }
 
-                        // Validación adicional manual si es necesario
                         if (request.getAbiertoSugerencias() == null
                                         || request.getAbiertoSugerencias().trim().isEmpty()) {
                                 log.error("[USER_CONTROLLER] [SAVE_CONSULTA] Campo 'abiertoSugerencias' está vacío");
@@ -562,7 +563,6 @@ public class UserController {
                                 return "user/tattoo-consultation";
                         }
 
-                        // Validación de email
                         if (request.getEmail() != null && !isValidEmail(request.getEmail())) {
                                 log.error("[USER_CONTROLLER] [SAVE_CONSULTA] Email inválido: {}", request.getEmail());
                                 model.addAttribute("error", "Por favor, introduce un email válido");
@@ -577,6 +577,15 @@ public class UserController {
 
                         log.info("[USER_CONTROLLER] [SAVE_CONSULTA] Consulta ID: {} guardada exitosamente en {} ms para: {}",
                                         createdConsultation.getId(), (endTime - startTime), request.getEmail());
+
+                        try {
+                                contactService.sendNewConsultationNotification(createdConsultation);
+                                log.info("[USER_CONTROLLER] [SAVE_CONSULTA] Notificación enviada al admin para consulta ID: {}",
+                                                createdConsultation.getId());
+                        } catch (Exception e) {
+                                log.error("[USER_CONTROLLER] [SAVE_CONSULTA] Error al enviar notificación por email: {}",
+                                                e.getMessage());
+                        }
 
                         logAudit("CONSULTA_CREATED",
                                         String.format("Consulta creada ID: %d", createdConsultation.getId()),

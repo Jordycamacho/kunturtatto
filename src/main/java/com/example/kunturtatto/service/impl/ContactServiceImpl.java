@@ -12,6 +12,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.stereotype.Service;
 
+import com.example.kunturtatto.dto.TattooConsultationDto;
 import com.example.kunturtatto.exception.EmailException;
 import com.example.kunturtatto.model.Appointment;
 import com.example.kunturtatto.model.EmailAuditLog;
@@ -143,6 +144,70 @@ public class ContactServiceImpl implements IContactService {
                 "APPOINTMENT_CANCELLATION");
     }
 
+    @Override
+    @Transactional
+    public void sendNewConsultationNotification(TattooConsultationDto consultation) {
+        long startTime = System.currentTimeMillis();
+        String auditId = UUID.randomUUID().toString();
+
+        log.info(
+                "[EMAIL_SERVICE] Iniciando envío de notificación de nueva consulta. AuditId={}, consultaId={}, cliente={}",
+                auditId, consultation.getId(), consultation.getEmail());
+
+        try {
+            String subject = "📱 Nueva Consulta de Tatuaje - " + consultation.getNombre();
+            String htmlContent = buildNewConsultationEmailHtml(consultation);
+
+            MimeMessagePreparator messagePreparator = mimeMessage -> {
+                MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
+                helper.setFrom(myEmail);
+                helper.setTo(myEmail); // Se envía a sí mismo (admin)
+                helper.setSubject(subject);
+                helper.setText(htmlContent, true);
+            };
+
+            log.debug("[EMAIL_SERVICE] Preparando email de notificación de consulta. AuditId={}", auditId);
+
+            javaMailSender.send(messagePreparator);
+
+            long endTime = System.currentTimeMillis();
+            long executionTime = endTime - startTime;
+
+            log.info(
+                    "[EMAIL_SERVICE] Email de notificación de consulta enviado exitosamente. AuditId={}, destinatario={}, tiempoEjecucion={}ms",
+                    auditId, myEmail, executionTime);
+
+            saveAuditLog(
+                    auditId,
+                    "NEW_CONSULTATION_NOTIFICATION",
+                    myEmail,
+                    myEmail,
+                    subject,
+                    "SUCCESS",
+                    executionTime,
+                    null);
+
+        } catch (MailException e) {
+            long endTime = System.currentTimeMillis();
+            long executionTime = endTime - startTime;
+
+            log.error("[EMAIL_SERVICE] Error al enviar email de notificación de consulta. AuditId={}, error={}",
+                    auditId, e.getMessage(), e);
+
+            saveAuditLog(
+                    auditId,
+                    "NEW_CONSULTATION_NOTIFICATION",
+                    myEmail,
+                    myEmail,
+                    "Nueva Consulta de Tatuaje - " + consultation.getNombre(),
+                    "FAILED",
+                    executionTime,
+                    e.getMessage());
+
+            throw new EmailException("Error al enviar el email de notificación de consulta", e);
+        }
+    }
+
     // ========= GENERIC EMAIL SENDING METHOD ========= //
     private void sendHtmlEmail(String to, String subject, String htmlContent, String emailType, String auditId) {
         MimeMessagePreparator messagePreparator = mimeMessage -> {
@@ -256,6 +321,67 @@ public class ContactServiceImpl implements IContactService {
     }
 
     // ========= BUILD HTML CONTENT METHODS ========= //
+    private String buildNewConsultationEmailHtml(TattooConsultationDto consultation) {
+        String fechaFormateada = consultation.getFechaCreacion().format(
+                DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
+        String estado = consultation.getLeido() ? "Leída" : "No leída";
+        String consultaUrl = String.format("https://muthabara.cloud/admin/consultas/%s", consultation.getId());
+
+        return """
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Nueva Consulta de Tatuaje</title>
+                    <style>
+                        /* Estilos iguales que arriba */
+                    </style>
+                </head>
+                <body>
+                    <div class="email-container">
+                        <div class="header">
+                            <h1>📨 Nueva Consulta de Tatuaje</h1>
+                            <p>Has recibido una nueva consulta en Muthabara</p>
+                        </div>
+
+                        <div class="content">
+                            <span class="badge">NUEVA CONSULTA</span>
+
+                            <div class="info-box">
+                                <p><strong>ID:</strong> %s</p>
+                                <p><strong>Cliente:</strong> %s</p>
+                                <p><strong>Fecha:</strong> %s</p>
+                                <p><strong>Estado:</strong> %s</p>
+                            </div>
+
+                            <p>Para ver todos los detalles de la consulta, haz clic en el siguiente botón:</p>
+
+                            <a href="%s" class="button">
+                                👁️ Ver Consulta Completa
+                            </a>
+
+                            <p style="color: #666; font-size: 14px; margin-top: 30px;">
+                                O accede desde: <a href="https://muthabara.cloud/admin/consultas">Panel de Consultas</a>
+                            </p>
+                        </div>
+
+                        <div class="footer">
+                            <p><strong>Muthabara</strong> - Sistema de Gestión de Consultas</p>
+                            <p>© %d Muthabara. Todos los derechos reservados.</p>
+                        </div>
+                    </div>
+                </body>
+                </html>
+                """.formatted(
+                consultation.getId(),
+                consultation.getNombre(),
+                fechaFormateada,
+                estado,
+                consultaUrl,
+                LocalDate.now().getYear());
+    }
+
     private String buildContactEmailHtml(ContactRequest request) {
         return """
                 <!DOCTYPE html>
