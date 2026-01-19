@@ -1,5 +1,14 @@
-com\example\kunturtatto\controller\AdminControllerTest.class
+com\example\kunturtatto\controller\AppointmentControllerTest.class
 com\example\kunturtatto\controller\UserControllerTest.class
-com\example\kunturtatto\KunturtattoApplicationTests.class
 com\example\kunturtatto\config\TestSecurityConfig.class
+com\example\kunturtatto\mapper\SubCategoryMapperTest.class
+com\example\kunturtatto\service\AppointmentServiceImplTest.class
+com\example\kunturtatto\KunturtattoApplicationTests.class
+com\example\kunturtatto\mapper\DesignMapperTest.class
+com\example\kunturtatto\repository\SubCategoryRepositoryTest.class
+com\example\kunturtatto\controller\AdminControllerTest.class
+com\example\kunturtatto\service\SubCategoryServiceImplTest.class
+com\example\kunturtatto\service\DesignServiceImplTest.class
 com\example\kunturtatto\controller\MailControllerTest.class
+com\example\kunturtatto\service\CategoryServiceImplTest.class
+com\example\kunturtatto\service\SubCategoryServiceCacheTest.class

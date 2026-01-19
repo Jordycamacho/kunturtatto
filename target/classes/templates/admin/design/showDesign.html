@@ -6,12 +6,12 @@
     <div th:insert="~{admin/templateAdmin.html::nav_admin}"></div>
 
     <div class="container mt-5">
-        <h1>Diseños</h1>
+        <h1>disenos</h1>
         
         <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
         <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
         
-        <a class="btn btn-primary mb-3" th:href="@{/admin/diseños/crear}">Crear Nuevo Diseño</a>
+        <a class="btn btn-primary mb-3" th:href="@{/admin/disenos/crear}">Crear Nuevo Diseño</a>
 
         <div class="table-responsive">
             <table class="table table-striped">
@@ -36,9 +36,9 @@
                                  alt="Design Image" style="max-width: 100px;">
                         </td>
                         <td>
-                            <a th:href="@{/admin/diseños/editar/{id}(id=${design.id})}" 
+                            <a th:href="@{/admin/disenos/editar/{id}(id=${design.id})}" 
                                class="btn btn-warning btn-sm me-1">Editar</a>
-                            <form th:action="@{/admin/diseños/eliminar/{id}(id=${design.id})}" 
+                            <form th:action="@{/admin/disenos/eliminar/{id}(id=${design.id})}" 
                                   method="post" style="display:inline;">
                                 <button type="submit" class="btn btn-danger btn-sm" 
                                         onclick="return confirm('¿Estás seguro de eliminar este diseño?')">

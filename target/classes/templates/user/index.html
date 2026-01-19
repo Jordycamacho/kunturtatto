@@ -1,10 +1,20 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
-<head th:fragment="header">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" th:href="@{/images/logo.svg}" type="image/png">
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1RQQVKEJ4T"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-1RQQVKEJ4T');
+    </script>
+
+    <link rel="icon" th:href="@{/images/Logo_negro.png}" type="image/png">
     <!--=============== FAVICON ===============-->
     <link rel="shortcut icon" href="assets/img/favicon.png" type="image/x-icon">
 
@@ -15,7 +25,7 @@
     <link rel="stylesheet" th:href="@{/css/styles.css}">
     <link rel="stylesheet" th:href="@{/css/contact.css}">
 
-    <title>KunturTattoo</title>
+    <title>Muthabara</title>
 </head>
 
 <body>
@@ -24,148 +34,556 @@
     <main class="main">
         <!--==================== HOME ====================-->
         <section class="home section" id="home">
-            <img src="./images/img_inicio.jpg" alt="home image" class="home__bg">
-            <div class="home__shadow"></div>
+            <div class="home__video-container">
+                <video autoplay muted loop playsinline class="home__video">
+                    <source th:src="@{/images/video_fondo.mp4}" type="video/mp4">
+                    Tu navegador no soporta el video.
+                </video>
+                <div class="home__video-overlay"></div>
+            </div>
 
-            <div class="home__container container grid">
-                <div class="home__data">
-                    <h3 class="home__subtitle">
-                        Bienvenido a KunturTattoo
-                    </h3>
+            <div class="home__container container">
+                <div class="home__logo">
+                    <img th:src="@{/images/Logo_blanco.jpg}" alt="Kuntur Tattoo" class="logo-main">
+                </div>
+
+                <div class="home__content">
+                    <div class="home__badge">
+                        <span>Arte & Tinta</span>
+                    </div>
+
                     <h1 class="home__title">
-                        Explora <br>
-                        Nuestro contenido
+                        <span class="title-line">MUTHABARA</span>
+
                     </h1>
 
                     <p class="home__description">
-                        <span class="slogan">Tu historia, mi tinta.</span>
+                        Donde cada trazo cuenta una historia única.
+                        Transformamos ideas en arte eterno con pasión y precisión.
                     </p>
 
-                    <a th:href="@{/KunturTattoo/diseños}" class="button" >
-                        Ver todas las categorias<i class="ri-arrow-right-line"></i>
-                    </a>
-                </div>
-
-                <div class="home__cards grid">
-                    <div th:each="subcategory : ${tattooSubcategories}">
-                        <a th:href="@{/KunturTattoo/diseños(subCategoryId=${subcategory.id})}" class="home__card-link">
-                            <article class="home__card">
-                                <img th:src="@{'/images/' + ${subcategory.image}}" alt="subcategory image" class="home__card-img">
-                                <h3 class="home__card-title" th:text="${subcategory.name}">Subcategoría</h3>
-                                <div class="home__card-shadow"></div>
-                            </article>
+                    <div class="home__cta">
+                        <a th:href="@{/Muthabara/diseños}" class="btn btn-primary">
+                            <span>Ver Todas las Categorías</span>
                         </a>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!--==================== ABOUT ====================-->
-        <section class="about section" id="about">
-            <div class="about__container container grid">
-                <div class="about__data">
-                    <h2 class="section__title">
-                        Compromiso con el cliente
-                    </h2>
-
-                    <p class="about__description">
-                        Aquí, el arte se mezcla con calidez humana. Nuestro espacio está diseñado para que te sientas como en casa: 
-                        un ambiente relajado, amistoso y libre de prisas, donde escucho tus ideas con atención y las transformo 
-                        en una pieza única que refleje tu esencia.  
-                        <br>
-                        Ya seas primerizx o unx coleccionista, nuestra prioridad es que vivas un proceso tranquilo y disfrutes cada 
-                        detalle. Porque un gran tatuaje no solo luce bien, sino que también te hace sentir bien.  
-
+        <!--==================== TATTOOS GALLERY ====================-->
+        <section class="gallery section" id="gallery">
+            <div class="gallery__container container">
+                <div class="gallery__header">
+                    <div class="gallery__badge">
+                        <span>Nuestro Trabajo</span>
+                    </div>
+                    <h2 class="gallery__title">Galería de Tatuajes</h2>
+                    <p class="gallery__subtitle">
+                        Explora nuestra colección de trabajos realizados. Cada pieza cuenta una historia única.
                     </p>
-
-                    <a href="#" class="button">
-                        Ver Diseños <i class="ri-arrow-right-line"></i>
-                    </a>
                 </div>
 
-                <div class="about__image">
-                    <img src="./images/img_compromiso.jpg" alt="about image" class="about__img">
-                    <div class="about__shadow"></div>
+                <div class="gallery__grid">
+
+                    <div class="gallery__items grid">
+                        <div th:each="subcategory : ${tattooSubcategories}" class="gallery__item" data-category="all">
+                            <a th:href="@{/Muthabara/diseños(subCategoryId=${subcategory.id})}" class="gallery__link">
+                                <article class="gallery__card">
+                                    <div class="gallery__image-container">
+                                        <img th:src="@{'/images/' + ${subcategory.image}}" th:alt="${subcategory.name}"
+                                            class="gallery__image" loading="lazy"
+                                            onerror="this.src='/images/placeholder.jpg'">
+                                        <div class="gallery__overlay">
+                                            <div class="gallery__content">
+                                                <h3 class="gallery__item-title" th:text="${subcategory.name}">
+                                                    Subcategoría</h3>
+                                                <p class="gallery__item-desc">Ver trabajos</p>
+                                                <div class="gallery__icon">
+                                                    <i class="ri-arrow-right-up-line"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="gallery__shine"></div>
+                                    </div>
+                                </article>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="gallery__cta">
+                    <a th:href="@{/Muthabara/diseños}" class="btn btn-outline">
+                        <span>Ver Galería Completa</span>
+                        <i class="ri-arrow-right-line"></i>
+                    </a>
                 </div>
             </div>
         </section>
 
-        <!--==================== POPULAR ====================-->
-        <section class="popular section" id="popular">
-            <h2 class="section__title">
-                Diseños Propios
-            </h2>
-        
-            <div class="popular__container container grid">
-                <div th:each="subcategory : ${designSubcategories}">
-                    <a th:href="@{/KunturTattoo/diseños(subCategoryId=${subcategory.id})}" class="popular__card-link">
-                        <article class="popular__card">
-                            <div class="popular__image">
-                                <img th:src="@{'/images/' + ${subcategory.image}}" alt="subcategory image" class="popular__img">
-                                <div class="popular__shadow"></div>
+        <!--==================== DECORATIVE CAROUSELS ====================-->
+        <section class="decorative-carousels section">
+            <div class="carousels-container">
+                <div class="carousel carousel--top">
+                    <div class="carousel__track">
+                        <div class="carousel__slide">
+                            <div class="carousel__image">
+                                <img th:src="@{/images/img_noticias.jpg}" alt="Decorativo">
                             </div>
-                            <h2 class="popular__title" th:text="${subcategory.name}">Nombre Subcategoría</h2>
-                        </article>
-                    </a>
+                        </div>
+                        <div class="carousel__slide">
+                            <div class="carousel__image">
+                                <img th:src="@{/images/img_noticias.jpg}" alt="Decorativo">
+                            </div>
+                        </div>
+                        <div class="carousel__slide">
+                            <div class="carousel__image">
+                                <img th:src="@{/images/img_noticias.jpg}" alt="Decorativo">
+                            </div>
+                        </div>
+                        <div class="carousel__slide">
+                            <div class="carousel__image">
+                                <img th:src="@{/images/img_noticias.jpg}" alt="Decorativo">
+                            </div>
+                        </div>
+                        <div class="carousel__slide">
+                            <div class="carousel__image">
+                                <img th:src="@{/images/img_noticias.jpg}" alt="Decorativo">
+                            </div>
+                        </div>
+                        <div class="carousel__slide">
+                            <div class="carousel__image">
+                                <img th:src="@{/images/img_noticias.jpg}" alt="Decorativo">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="carousel carousel--bottom">
+                    <div class="carousel__track">
+                        <div class="carousel__slide">
+                            <div class="carousel__image">
+                                <img th:src="@{/images/img_noticias.jpg}" alt="Decorativo">
+                            </div>
+                        </div>
+                        <div class="carousel__slide">
+                            <div class="carousel__image">
+                                <img th:src="@{/images/img_noticias.jpg}" alt="Decorativo">
+                            </div>
+                        </div>
+                        <div class="carousel__slide">
+                            <div class="carousel__image">
+                                <img th:src="@{/images/img_noticias.jpg}" alt="Decorativo">
+                            </div>
+                        </div>
+                        <div class="carousel__slide">
+                            <div class="carousel__image">
+                                <img th:src="@{/images/img_noticias.jpg}" alt="Decorativo">
+                            </div>
+                        </div>
+                        <div class="carousel__slide">
+                            <div class="carousel__image">
+                                <img th:src="@{/images/img_noticias.jpg}" alt="Decorativo">
+                            </div>
+                        </div>
+                        <div class="carousel__slide">
+                            <div class="carousel__image">
+                                <img th:src="@{/images/img_noticias.jpg}" alt="Decorativo">
+                            </div>
+                        </div>
+                        <div class="carousel__slide">
+                            <div class="carousel__image">
+                                <img th:src="@{/images/img_noticias.jpg}" alt="Decorativo">
+                            </div>
+                        </div>
+                        <div class="carousel__slide">
+                            <div class="carousel__image">
+                                <img th:src="@{/images/img_noticias.jpg}" alt="Decorativo">
+                            </div>
+                        </div>
+                        <div class="carousel__slide">
+                            <div class="carousel__image">
+                                <img th:src="@{/images/img_noticias.jpg}" alt="Decorativo">
+                            </div>
+                        </div>
+                        <div class="carousel__slide">
+                            <div class="carousel__image">
+                                <img th:src="@{/images/img_noticias.jpg}" alt="Decorativo">
+                            </div>
+                        </div>
+                        <div class="carousel__slide">
+                            <div class="carousel__image">
+                                <img th:src="@{/images/img_noticias.jpg}" alt="Decorativo">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="carousels-overlay"></div>
+            </div>
+        </section>
+
+        <!--==================== DESIGNS ====================-->
+        <section class="designs section" id="designs">
+            <div class="designs__container container">
+                <div class="designs__header">
+                    <div class="designs__badge">
+                        <span>Colección Exclusiva</span>
+                    </div>
+                    <h2 class="designs__title">Diseños Propios</h2>
+                    <p class="designs__subtitle">
+                        Creaciones originales donde la imaginación se encuentra con la tinta.
+                        Cada diseño es una pieza única lista para ser transformada en arte corporal.
+                    </p>
+                </div>
+
+                <div class="designs__masonry">
+                    <div th:each="subcategory : ${designSubcategories}" class="designs__item">
+                        <a th:href="@{/Muthabara/diseños(subCategoryId=${subcategory.id})}" class="designs__link">
+                            <article class="designs__card">
+                                <div class="designs__image-wrapper">
+                                    <img th:src="@{'/images/' + ${subcategory.image}}" th:alt="${subcategory.name}"
+                                        class="designs__image" loading="lazy"
+                                        onerror="this.src='/images/placeholder.jpg'">
+                                    <div class="designs__overlay">
+                                        <div class="designs__content">
+                                            <h3 class="designs__name" th:text="${subcategory.name}">Diseño</h3>
+                                            <div class="designs__action">
+                                                <span>Explorar</span>
+                                                <i class="ri-arrow-right-up-line"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="designs__border"></div>
+                                </div>
+                            </article>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="designs__footer">
+                    <div class="designs__pattern">
+                        <div class="pattern__line"></div>
+                        <div class="pattern__dot"></div>
+                        <div class="pattern__line"></div>
+                    </div>
+                    <p class="designs__cta-text">¿Buscas algo personalizado? <a
+                            th:href="@{/Muthabara/contacto}">Hablemos</a></p>
                 </div>
             </div>
         </section>
 
-        <!--==================== EXPLORE ====================-->
-        <section class="explore section" id="explore">
-            <div class="explore__container">
-                <div class="explore__image">
-                    <img src="./images/Tatto-inicio.jpg" alt="" class="explore__img">
-                    <div class="explore__shadow"></div>
-                </div>
+        <!--==================== STORE ====================
+        <section class="store section" id="store">
+            <div class="store__container container">
+                <div class="store__content">
+                    <div class="store__text">
+                        <div class="store__badge">
+                            <span>Nueva Colección</span>
+                        </div>
 
-                <div class="explore__content container grid">
-                    <div class="explore__data">
-                        <h2 class="section__title">
-                            Nuestra Misión
+                        <h2 class="store__title">
+                            <span class="store__title-line">Tienda</span>
+                            <span class="store__title-line">Online</span>
                         </h2>
 
-                        <p class="explore__description">
-                            En KunturTattoo, creemos que el arte corporal va más allá de la piel: es un acto de confianza, 
-                            identidad y conexión humana. Nuestra misión es honrar tus historias a través de diseños únicos, 
-                            creados con ética, respeto y dedicación artesanal.
-                        
+                        <p class="store__description">
+                            Descubre nuestra exclusiva colección de ropa y accesorios de tatuaje.
+                            Desde prendas con diseños únicos hasta equipamiento profesional,
+                            todo creado con la misma pasión que ponemos en nuestro arte.
+                        </p>
+
+                        <div class="store__features">
+                            <div class="store__feature">
+                                <i class="ri-t-shirt-line"></i>
+                                <span>Ropa con Diseño Exclusivo</span>
+                            </div>
+                            <div class="store__feature">
+                                <i class="ri-tools-line"></i>
+                                <span>Equipamiento Profesional</span>
+                            </div>
+                            <div class="store__feature">
+                                <i class="ri-star-smile-line"></i>
+                                <span>Productos de Calidad Premium</span>
+                            </div>
+                        </div>
+
+                        <div class="store__cta">
+                            <a href="https://tu-tienda-online.com" target="_blank" class="btn btn-primary store__btn">
+                                <span>Visitar Tienda</span>
+                                <i class="ri-external-link-line"></i>
+                            </a>
+
+                        </div>
+                    </div>
+
+                    <div class="store__visual">
+                        <div class="store__image-container">
+                            <img th:src="@{/images/store-products.jpg}" alt="Productos de la tienda"
+                                class="store__image" loading="lazy">
+
+                            <div class="store__floating store__floating--1">
+                                <i class="ri-shopping-bag-line"></i>
+                            </div>
+                            <div class="store__floating store__floating--2">
+                                <i class="ri-price-tag-3-line"></i>
+                            </div>
+                            <div class="store__floating store__floating--3">
+                                <i class="ri-heart-line"></i>
+                            </div>
+
+                            <div class="store__shine"></div>
+                        </div>
+
+                        <div class="store__product-cards">
+                            <div class="store__product-card store__product-card--1">
+                                <div class="product-card__icon">
+                                    <i class="ri-t-shirt-fill"></i>
+                                </div>
+                                <span>Ropa</span>
+                            </div>
+                            <div class="store__product-card store__product-card--2">
+                                <div class="product-card__icon">
+                                    <i class="ri-brush-fill"></i>
+                                </div>
+                                <span>Accesorios</span>
+                            </div>
+                            <div class="store__product-card store__product-card--3">
+                                <div class="product-card__icon">
+                                    <i class="ri-star-fill"></i>
+                                </div>
+                                <span>Premium</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="store__pattern">
+                <div class="store__pattern-circle store__pattern-circle--1"></div>
+                <div class="store__pattern-circle store__pattern-circle--2"></div>
+                <div class="store__pattern-circle store__pattern-circle--3"></div>
+            </div>
+        </section>
+        -->
+
+        <!--==================== DRAWINGS ====================-->
+        <section class="drawings section" id="drawings">
+            <div class="drawings__container container">
+                <div class="drawings__header">
+                    <div class="drawings__badge">
+                        <span>Arte en Papel</span>
+                    </div>
+                    <h2 class="drawings__title">Colección de Dibujos</h2>
+                    <p class="drawings__subtitle">
+                        Exploramos el arte en su forma más pura. Dibujos originales donde la creatividad
+                        fluye libremente sobre el papel, mostrando el proceso creativo detrás de cada diseño.
+                    </p>
+                </div>
+
+                <div class="drawings__grid">
+                    <div th:each="subcategory : ${drawingSubcategories}" class="drawings__item">
+                        <a th:href="@{/Muthabara/diseños(subCategoryId=${subcategory.id})}" class="drawings__link">
+                            <article class="drawings__card">
+                                <div class="drawings__image-wrapper">
+                                    <img th:src="@{'/images/' + ${subcategory.image}}" th:alt="${subcategory.name}"
+                                        class="drawings__image" loading="lazy"
+                                        onerror="this.src='/images/placeholder.jpg'">
+
+                                    <!-- Efecto de papel arrugado -->
+                                    <div class="drawings__paper-texture"></div>
+
+                                    <div class="drawings__overlay">
+                                        <div class="drawings__content">
+                                            <h3 class="drawings__name" th:text="${subcategory.name}">Dibujo</h3>
+                                            <div class="drawings__action">
+                                                <span>Explorar Bocetos</span>
+                                                <i class="ri-pencil-line"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Esquinas dobladas -->
+                                    <div class="drawings__corner drawings__corner--tl"></div>
+                                    <div class="drawings__corner drawings__corner--br"></div>
+                                </div>
+                            </article>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="drawings__footer">
+                    <div class="drawings__pattern">
+                        <div class="drawings__pattern-line"></div>
+                        <div class="drawings__pattern-dot">
+                            <i class="ri-pencil-fill"></i>
+                        </div>
+                        <div class="drawings__pattern-line"></div>
+                    </div>
+                    <p class="drawings__cta-text">
+                        ¿Te gusta nuestro estilo? <a th:href="@{/Muthabara/contacto}">Solicita un dibujo
+                            personalizado</a>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!--==================== INSTAGRAM SECTION ====================-->
+        <section class="instagram-section">
+            <div class="instagram-item">
+                <img src="/images/img_noticias.jpg" alt="Tattoo design">
+                <div class="instagram-overlay">
+                    <a href="https://www.instagram.com/muthabara_ink?utm_source=ig_web_button_share_sheet&igsh=YnRleXBpcm56MzN0"
+                        class="instagram-link" target="_blank">
+                        <i class="ri-instagram-line instagram-icon"></i>
+                        <span>Síguenos</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="instagram-item">
+                <img src="/images/Tatto-inicio.jpg" alt="Tattoo design">
+                <div class="instagram-overlay">
+                    <a href="https://www.instagram.com/muthabara_ink?utm_source=ig_web_button_share_sheet&igsh=YnRleXBpcm56MzN0"
+                        class="instagram-link" target="_blank">
+                        <i class="ri-instagram-line instagram-icon"></i>
+                        <span>Síguenos</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="instagram-item">
+                <img src="/images/img_noticias.jpg" alt="Tattoo design">
+                <div class="instagram-overlay">
+                    <a href="https://www.instagram.com/muthabara_ink?utm_source=ig_web_button_share_sheet&igsh=YnRleXBpcm56MzN0"
+                        class="instagram-link" target="_blank">
+                        <i class="ri-instagram-line instagram-icon"></i>
+                        <span>Síguenos</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="instagram-item">
+                <img src="/images/Tatto-inicio.jpg" alt="Tattoo design">
+                <div class="instagram-overlay">
+                    <a href="https://www.instagram.com/muthabara_ink?utm_source=ig_web_button_share_sheet&igsh=YnRleXBpcm56MzN0"
+                        class="instagram-link" target="_blank">
+                        <i class="ri-instagram-line instagram-icon"></i>
+                        <span>Síguenos</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="instagram-item">
+                <img src="/images/img_noticias.jpg" alt="Tattoo design">
+                <div class="instagram-overlay">
+                    <a href="https://www.instagram.com/muthabara_ink?utm_source=ig_web_button_share_sheet&igsh=YnRleXBpcm56MzN0"
+                        class="instagram-link" target="_blank">
+                        <i class="ri-instagram-line instagram-icon"></i>
+                        <span>Síguenos</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="instagram-item">
+                <img src="/images/Tatto-inicio.jpg" alt="Tattoo design">
+                <div class="instagram-overlay">
+                    <a href="https://www.instagram.com/muthabara_ink?utm_source=ig_web_button_share_sheet&igsh=YnRleXBpcm56MzN0"
+                        class="instagram-link" target="_blank">
+                        <i class="ri-instagram-line instagram-icon"></i>
+                        <span>Síguenos</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!--==================== COOKIES SECTION ====================-->
+        <div id="cookie-banner" class="cookie-banner">
+            <div class="cookie-banner__container">
+                <div class="cookie-banner__content">
+                    <div class="cookie-banner__icon">
+                        <i class="ri-cookie-line"></i>
+                    </div>
+
+                    <div class="cookie-banner__text">
+                        <h3 class="cookie-banner__title">Privacidad y Cookies</h3>
+                        <p class="cookie-banner__description">
+                            Utilizamos cookies para mejorar tu experiencia. Al continuar navegando,
+                            aceptas nuestra
+                            <a th:href="@{/Muthabara/politica-privacidad}" class="cookie-banner__link">
+                                Política de Privacidad
+                            </a>
+                            y el uso de cookies.
                         </p>
                     </div>
 
-
-                </div>
-            </div>
-        </section>
-
-        <!--==================== JOIN ====================-->
-        <section class="join section">
-            <div class="join__container container grid">
-                <div class="join__data">
-                    <h2 class="section__title">
-                        ¿Quieres <br>
-                        Más Noticias?
-                    </h2>
-
-                    <p class="join__description">
-                        Suscribete para recibir noticioas 
-                        acerca de tatuajes y ofertas.
-                    </p>
-
-                    <form action="" class="join__form">
-                        <input type="email" placeholder="Ingresa tu correo" class="join__input">
-                        <button class="join__button button">
-                            Suscribete para Noticias<i class="ri-arrow-right-line"></i>
+                    <div class="cookie-banner__actions">
+                        <button id="configure-cookies" class="cookie-banner__btn cookie-banner__btn--secondary">
+                            <i class="ri-settings-3-line"></i>
+                            Configurar
                         </button>
-                    </form>
+                        <button id="accept-cookies" class="cookie-banner__btn cookie-banner__btn--primary">
+                            <i class="ri-check-line"></i>
+                            Aceptar Todas
+                        </button>
+                    </div>
+
+                    <button id="close-cookies" class="cookie-banner__close">
+                        <i class="ri-close-line"></i>
+                    </button>
                 </div>
 
-                <div class="join__image">
-                    <img src="./images/img_noticias.jpg" alt="" class="join__img">
-                    <div class="join__shadow"></div>
+                <!-- Panel de configuración avanzada -->
+                <div class="cookie-banner__settings">
+                    <div class="cookie-settings__header">
+                        <h4>Preferencias de Cookies</h4>
+                        <p>Selecciona las cookies que deseas aceptar</p>
+                    </div>
+
+                    <div class="cookie-settings__options">
+                        <div class="cookie-option">
+                            <div class="cookie-option__info">
+                                <h5>Cookies Esenciales</h5>
+                                <p>Necesarias para el funcionamiento básico del sitio</p>
+                            </div>
+                            <label class="cookie-switch">
+                                <input type="checkbox" checked disabled>
+                                <span class="cookie-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="cookie-option">
+                            <div class="cookie-option__info">
+                                <h5>Cookies de Analytics</h5>
+                                <p>Nos ayudan a mejorar el sitio web</p>
+                            </div>
+                            <label class="cookie-switch">
+                                <input type="checkbox" id="analytics-cookies" checked>
+                                <span class="cookie-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="cookie-option">
+                            <div class="cookie-option__info">
+                                <h5>Cookies de Marketing</h5>
+                                <p>Para mostrar contenido personalizado</p>
+                            </div>
+                            <label class="cookie-switch">
+                                <input type="checkbox" id="marketing-cookies">
+                                <span class="cookie-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="cookie-settings__actions">
+                        <button id="save-preferences" class="cookie-banner__btn cookie-banner__btn--primary">
+                            <i class="ri-save-line"></i>
+                            Guardar Preferencias
+                        </button>
+                    </div>
                 </div>
             </div>
-        </section>
+        </div>
     </main>
 
     <div th:insert="~{user/templateUser.html::footer}"></div>

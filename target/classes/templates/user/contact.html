@@ -4,10 +4,8 @@
 <head th:fragment="header">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" th:href="@{/images/logo.svg}" type="image/png">
-    <!--=============== FAVICON ===============-->
-    <link rel="shortcut icon" href="assets/img/favicon.png" type="image/x-icon">
-
+    <link rel="icon" th:href="@{/images/Logo_negro.png}" type="image/png">
+    
     <!--=============== REMIXICONS ===============-->
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.2.0/fonts/remixicon.css" rel="stylesheet">
 
@@ -15,49 +13,97 @@
     <link rel="stylesheet" th:href="@{/css/styles.css}">
     <link rel="stylesheet" th:href="@{/css/contact.css}">
 
-    <title>KunturTattoo</title>
+    <title>Muthabara</title>
 </head>
 
 <body class="contact-page">
+    <!-- Video Background -->
+    <div class="contact-video-bg">
+        <video autoplay muted loop playsinline>
+            <source th:src="@{/images/video_fondo.mp4}" type="video/mp4">
+            Tu navegador no soporta el video.
+        </video>
+    </div>
+    <div class="contact-video-overlay"></div>
+
     <div th:insert="~{user/templateUser.html::nav_user}"></div>
 
-    <div class="container-contact" id="contact">
-        <h1 class="text-center">CONTACTANOS</h1>
-        
+    <div class="container-contact">
+        <!-- Contact Hero -->
+        <div class="contact-hero">
+            <div class="contact-hero__badge">
+                <span>Contáctanos</span>
+            </div>
+            <h1>Hablemos de Tu Próximo Tatuaje</h1>
+            <p class="contact-hero__description">
+                Cuéntanos tu idea y trabajemos juntos para crear una obra de arte única y personalizada.
+            </p>
+        </div>
 
+        <!-- Contact Form -->
         <form class="contact-form" th:action="@{/mail/contacto/guardar}" method="post">
             <div class="form-row">
-                <input type="email" name="email" placeholder="Email*" required>
-                <input type="text" name="subject" placeholder="Asunto*" required>
-                <input type="text" name="tattooCm" placeholder="Tamaño en CM(aprox.)*">
+                <div class="form-group">
+                    <input type="email" name="email" placeholder=" " required>
+                    <label>Email *</label>
+                </div>
+                <div class="form-group">
+                    <input type="text" name="subject" placeholder=" " required>
+                    <label>Asunto *</label>
+                </div>
             </div>
+            
             <div class="form-row">
-                <select name="body" required>
-                    <option value="" disabled selected>Selecciona la zona del cuerpo*</option>
-                    <option value="Brazo">Brazo</option>
-                    <option value="Pierna">Pierna</option>
-                    <option value="Espalda">Espalda</option>
-                    <option value="Pecho">Pecho</option>
-                    <option value="Otro">Otro</option>
-                </select>
+                <div class="form-group">
+                    <input type="text" name="tattooCm" placeholder=" ">
+                    <label>Tamaño en CM (aprox.)</label>
+                </div>
+                <div class="form-group">
+                    <select name="body" required>
+                        <option value="" disabled selected> </option>
+                        <option value="Brazo">Brazo</option>
+                        <option value="Pierna">Pierna</option>
+                        <option value="Espalda">Espalda</option>
+                        <option value="Pecho">Pecho</option>
+                        <option value="Otro">Otro</option>
+                    </select>
+                    <label>Zona del cuerpo *</label>
+                </div>
             </div>
+
             <div class="form-row">
-                <textarea cols="30" rows="2" name="linksReference" placeholder="Links de referencia"></textarea>
+                <div class="form-group full-width">
+                    <textarea name="linksReference" placeholder=" "></textarea>
+                    <label>Links de referencia</label>
+                </div>
             </div>
+
             <div class="form-row">
-                <textarea cols="30" rows="5" name="message" placeholder="Mensaje*" required></textarea>
+                <div class="form-group full-width">
+                    <textarea name="message" placeholder=" " required></textarea>
+                    <label>Mensaje *</label>
+                </div>
             </div>
-            <div class="form-row">
-                <button type="submit">Enviar Mensaje</button>
+
+            <div class="submit-container">
+                <button type="submit" class="submit-button">
+                    Enviar Mensaje
+                </button>
             </div>
         </form>
+
+        <!-- Success Message -->
         <div th:if="${mensajeEnviado}">
-            <p class="message-success">¡Gracias por tu mensaje! Nos pondremos en contacto contigo pronto.</p>
+            <div class="message-success">
+                ¡Gracias por tu mensaje! Nos pondremos en contacto contigo pronto.
+            </div>
         </div>
     </div>
 
     <div th:insert="~{user/templateUser.html::footer}"></div>
 
+    <!-- JavaScript -->
+    <script th:src="@{/js/contact.js}"></script>
     <div th:insert="~{user/templateUser.html::script}"></div>
 </body>
 
