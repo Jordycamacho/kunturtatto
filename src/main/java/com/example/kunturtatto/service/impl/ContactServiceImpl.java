@@ -216,10 +216,6 @@ public class ContactServiceImpl implements IContactService {
             helper.setTo(to);
             helper.setSubject(subject);
             helper.setText(htmlContent, true);
-
-            helper.getMimeMessage().addHeader("X-Audit-Id", auditId);
-            helper.getMimeMessage().addHeader("X-Email-Type", emailType);
-            helper.getMimeMessage().addHeader("X-Application", applicationName);
         };
 
         try {
