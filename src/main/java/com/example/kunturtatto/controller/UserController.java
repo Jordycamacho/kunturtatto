@@ -4,6 +4,8 @@ import com.example.kunturtatto.dto.CategoryDto;
 import com.example.kunturtatto.dto.DesignDto;
 import com.example.kunturtatto.dto.SubCategoryDto;
 import com.example.kunturtatto.dto.TattooConsultationDto;
+import com.example.kunturtatto.exception.EmailException;
+import com.example.kunturtatto.request.ContactRequest;
 import com.example.kunturtatto.request.TattooConsultationRequest;
 import com.example.kunturtatto.service.AnalyticsService;
 import com.example.kunturtatto.service.CategoryService;
@@ -296,30 +298,43 @@ public class UserController {
         })
         @PostMapping("/contacto/guardar")
         public String saveContact(
-                        @Parameter(description = "Nombre del remitente") @RequestParam String nombre,
-                        @Parameter(description = "Email del remitente") @RequestParam String email,
-                        @Parameter(description = "Mensaje de contacto") @RequestParam String mensaje,
+                        @RequestParam String email,
+                        @RequestParam String subject,
+                        @RequestParam(required = false) String tattooCm,
+                        @RequestParam String body,
+                        @RequestParam(required = false) String linksReference,
+                        @RequestParam String message,
                         HttpServletRequest request,
                         RedirectAttributes redirectAttributes) {
 
                 String clientIp = getClientIp(request);
 
                 log.info("[USER_CONTROLLER] [CONTACT_SAVE] Intento de envío de contacto desde IP: {}, "
-                                + "Nombre: {}, Email: {}", clientIp, nombre, email);
+                                + "Email: {}, Asunto: {}", clientIp, email, subject);
 
-                if (nombre == null || nombre.trim().isEmpty() ||
-                                email == null || email.trim().isEmpty() ||
-                                mensaje == null || mensaje.trim().isEmpty()) {
+                if (email == null || email.trim().isEmpty() ||
+                                subject == null || subject.trim().isEmpty() ||
+                                body == null || body.trim().isEmpty() ||
+                                message == null || message.trim().isEmpty()) {
 
                         log.warn("[USER_CONTROLLER] [CONTACT_SAVE] Datos inválidos desde IP: {}", clientIp);
-                        redirectAttributes.addFlashAttribute("error", "Todos los campos son obligatorios");
+                        redirectAttributes.addFlashAttribute("error", "Los campos obligatorios no pueden estar vacíos");
                         return "redirect:/Muthabara/contacto";
                 }
 
                 try {
-                        log.info("[USER_CONTROLLER] [CONTACT_SAVE] Mensaje recibido: {} caracteres", mensaje.length());
+                        ContactRequest contactRequest = ContactRequest.builder()
+                                        .email(email)
+                                        .subject(subject)
+                                        .tattooCm(tattooCm)
+                                        .body(body)
+                                        .linksReference(linksReference)
+                                        .message(message)
+                                        .build();
 
-                        Thread.sleep(500);
+                        log.info("[USER_CONTROLLER] [CONTACT_SAVE] Enviando email de contacto...");
+
+                        contactService.sendContactEmail(contactRequest);
 
                         redirectAttributes.addFlashAttribute("success",
                                         "¡Mensaje enviado exitosamente! Te contactaremos pronto.");
@@ -328,12 +343,17 @@ public class UserController {
                                         String.format("Mensaje de contacto enviado: %s", email),
                                         clientIp, null);
 
-                } catch (Exception e) {
-                        log.error("[USER_CONTROLLER] [CONTACT_SAVE] Error al procesar contacto: {}",
+                } catch (EmailException e) {
+                        log.error("[USER_CONTROLLER] [CONTACT_SAVE] Error al enviar email: {}",
                                         e.getMessage(), e);
                         redirectAttributes.addFlashAttribute("error",
                                         "Error al enviar el mensaje. Por favor, intente más tarde.");
                         logAudit("ERROR", "Error en formulario de contacto", clientIp, e.getMessage());
+                } catch (Exception e) {
+                        log.error("[USER_CONTROLLER] [CONTACT_SAVE] Error inesperado: {}",
+                                        e.getMessage(), e);
+                        redirectAttributes.addFlashAttribute("error",
+                                        "Ha ocurrido un error inesperado. Por favor, intente más tarde.");
                 }
 
                 analyticsService.trackFormSubmission("contact_form", true, request);

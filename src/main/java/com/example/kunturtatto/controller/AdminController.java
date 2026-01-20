@@ -740,7 +740,7 @@ public class AdminController {
                         model.addAttribute("error", "Error al cargar los usuarios");
                 }
 
-                return "/admin/users/showUser";
+                return "admin/users/showUser";
         }
 
         @Operation(summary = "Formulario de creación de usuario", description = "Muestra el formulario para crear un nuevo usuario administrador")
