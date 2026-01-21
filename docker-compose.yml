@@ -7,10 +7,10 @@ services:
     ports:
       - "3308:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: 752957
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
       MYSQL_DATABASE: kunturtatto
       MYSQL_USER: kuntur_user
-      MYSQL_PASSWORD: 752957
+      MYSQL_PASSWORD: ${DB_PASSWORD}
     command: --default-authentication-plugin=mysql_native_password
     volumes:
       - mysql_data:/var/lib/mysql
@@ -30,9 +30,9 @@ services:
     environment:
       DB_URL_KUNTUR: "jdbc:mysql://db:3306/kunturtatto?createDatabaseIfNotExist=true&serverTimezone=UTC&useSSL=false"
       DB_USER_NAME: "kuntur_user"
-      DB_PASSWORD: "752957"
-      EMAIL_USER: "kunturtattoo.studio@gmail.com"
-      EMAIL_PASS: "aqfe fbym bumo zlhq"
+      DB_PASSWORD: ${DB_PASSWORD}
+      EMAIL_USER: ${EMAIL_USER}
+      EMAIL_PASS: ${EMAIL_PASS}
       APP_UPLOAD_DIR: "/app/images"
       SPRING_PROFILES_ACTIVE: "prod"
     volumes:
