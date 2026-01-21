@@ -391,17 +391,40 @@ class CookieBanner {
         this.analyticsCheckbox = document.getElementById('analytics-cookies');
         this.marketingCheckbox = document.getElementById('marketing-cookies');
 
-        this.cookieConsent = localStorage.getItem('cookieConsent');
+        this.cookieConsent = null;
+
+        try {
+            this.cookieConsent = localStorage.getItem('cookieConsent');
+        } catch (e) {
+            console.warn('localStorage no disponible:', e);
+        }
+
         this.init();
     }
 
     init() {
         if (!this.cookieConsent) {
-            this.showBanner();
+            window.addEventListener('load', () => {
+                setTimeout(() => {
+                    this.showBanner();
+                }, 1000);
+            });
+        } else {
+            this.loadAnalyticsBasedOnConsent();
         }
 
         this.setupEventListeners();
-        this.setupAnalytics();
+    }
+
+    loadAnalyticsBasedOnConsent() {
+        try {
+            const consent = JSON.parse(this.cookieConsent);
+            if (consent.analytics) {
+                this.loadGoogleAnalytics();
+            }
+        } catch (e) {
+            console.error('Error al parsear consentimiento:', e);
+        }
     }
 
     setupEventListeners() {
@@ -438,19 +461,16 @@ class CookieBanner {
     }
 
     showBanner() {
-        setTimeout(() => {
-            if (this.banner) {
-                this.banner.classList.add('show');
-                document.body.style.overflow = 'hidden';
-            }
-        }, 2000);
+        if (this.banner) {
+            this.banner.classList.add('show');
+            console.log('Cookie banner mostrado');
+        }
     }
 
     hideBanner() {
         if (this.banner) {
             this.banner.classList.remove('show');
             this.banner.classList.add('hide');
-            document.body.style.overflow = '';
 
             setTimeout(() => {
                 this.banner.style.display = 'none';
@@ -526,18 +546,27 @@ class CookieBanner {
     }
 
     loadGoogleAnalytics() {
+        const GA_ID = 'G-1RQQVKEJ4T';
+
         const script = document.createElement('script');
         script.async = true;
-        script.src = 'https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID';
+        script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_ID}`;
+
+        script.onload = () => {
+            window.dataLayer = window.dataLayer || [];
+            function gtag() { dataLayer.push(arguments); }
+            gtag('js', new Date());
+            gtag('config', GA_ID);
+            console.log('Google Analytics cargado correctamente');
+        };
+
+        script.onerror = (error) => {
+            console.error('Error cargando Google Analytics:', error);
+        };
+
         document.head.appendChild(script);
-
-        window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
-        gtag('js', new Date());
-        gtag('config', 'GA_MEASUREMENT_ID');
-
-        console.log('Google Analytics cargado');
     }
+
 
     loadMarketingCookies() {
         console.log('Cookies de marketing cargadas');
@@ -607,7 +636,7 @@ class FooterAnimations {
 document.addEventListener('DOMContentLoaded', () => {
     new Navigation();
     new CookieBanner();
-    
+
     if (document.querySelector('.home')) {
         new HomeAnimations();
     }
