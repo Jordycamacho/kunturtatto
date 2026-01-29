@@ -1,4 +1,4 @@
-package com.example.kunturtatto.config;
+package com.example.kunturtatto.controller;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -12,7 +12,7 @@ import java.time.format.DateTimeFormatter;
 @Controller
 public class SeoController {
 
-    @Value("${app.url:https://www.muthabara.cloud}")
+    @Value("${app.url:https://muthabara.cloud}")
     private String appUrl;
 
     @Value("${app.name:Muthabara Tattoo Studio}")

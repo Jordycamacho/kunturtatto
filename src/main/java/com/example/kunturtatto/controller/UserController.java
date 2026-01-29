@@ -690,7 +690,6 @@ public class UserController {
                 }
 
                 info.attemptCount++;
-                info.lastAttemptTime = System.currentTimeMillis();
 
                 log.debug("[RATE_LIMIT] Intento #{}/{} desde IP: {} para acción: {}",
                                 info.attemptCount, MAX_REGISTER_ATTEMPTS, ip, action);
@@ -717,7 +716,6 @@ public class UserController {
         private static class RateLimitInfo {
                 int attemptCount = 0;
                 long firstAttemptTime = 0;
-                long lastAttemptTime = 0;
         }
 
         // ==============================
