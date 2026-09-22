@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.example.kunturtatto.exception.ErrorMessages;
 import com.example.kunturtatto.model.enums.AppointmentStatus;
 import com.example.kunturtatto.request.AppointmentRequest;
 import com.example.kunturtatto.service.AppointmentService;
@@ -227,7 +228,7 @@ public class AppointmentController {
 
         } catch (Exception e) {
             log.error("[POST /admin/appointments/create] Error al crear cita: {}", e.getMessage(), e);
-            redirectAttributes.addFlashAttribute("error", "Error al crear cita: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", ErrorMessages.userMessage("No se pudo crear la cita. Revisa la fecha y el correo.", e));
 
             try {
                 var designs = designService.getAllDesigns();
@@ -290,7 +291,7 @@ public class AppointmentController {
 
         } catch (Exception e) {
             log.error("[POST /admin/appointments/{}/edit] Error al actualizar cita: {}", id, e.getMessage(), e);
-            redirectAttributes.addFlashAttribute("error", "Error al actualizar cita: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", ErrorMessages.userMessage("No se pudo guardar la cita.", e));
 
             try {
                 var designs = designService.getAllDesigns();
@@ -332,7 +333,7 @@ public class AppointmentController {
 
         } catch (Exception e) {
             log.error("[POST /admin/appointments/{}/delete] Error al eliminar cita: {}", id, e.getMessage(), e);
-            redirectAttributes.addFlashAttribute("error", "Error al eliminar cita: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", ErrorMessages.userMessage("No se pudo borrar la cita.", e));
         }
 
         return "redirect:/admin/appointments";
@@ -364,7 +365,7 @@ public class AppointmentController {
 
         } catch (Exception e) {
             log.error("[POST /admin/appointments/{}/cancel] Error al cancelar cita: {}", id, e.getMessage(), e);
-            redirectAttributes.addFlashAttribute("error", "Error al cancelar cita: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", ErrorMessages.userMessage("No se pudo cancelar la cita.", e));
         }
 
         return "redirect:/admin/appointments/" + id;
@@ -395,7 +396,7 @@ public class AppointmentController {
 
         } catch (Exception e) {
             log.error("[POST /admin/appointments/{}/confirm] Error al confirmar cita: {}", id, e.getMessage(), e);
-            redirectAttributes.addFlashAttribute("error", "Error al confirmar cita: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", ErrorMessages.userMessage("No se pudo confirmar la cita.", e));
         }
 
         return "redirect:/admin/appointments/" + id;
@@ -426,7 +427,7 @@ public class AppointmentController {
 
         } catch (Exception e) {
             log.error("[POST /admin/appointments/{}/complete] Error al completar cita: {}", id, e.getMessage(), e);
-            redirectAttributes.addFlashAttribute("error", "Error al completar cita: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", ErrorMessages.userMessage("No se pudo marcar la cita como hecha.", e));
         }
 
         return "redirect:/admin/appointments/" + id;
@@ -460,7 +461,7 @@ public class AppointmentController {
 
         } catch (Exception e) {
             log.error("[POST /admin/appointments/{}/status] Error al actualizar estado: {}", id, e.getMessage(), e);
-            redirectAttributes.addFlashAttribute("error", "Error al actualizar estado: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", ErrorMessages.userMessage("No se pudo cambiar el estado de la cita.", e));
         }
 
         return "redirect:/admin/appointments/" + id;

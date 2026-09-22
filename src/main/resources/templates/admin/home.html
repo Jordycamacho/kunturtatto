@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:insert="~{admin/templateAdmin.html::header}"></head>
+<body>
+    <div th:insert="~{admin/templateAdmin.html::nav_admin}"></div>
+
+    <div class="container mt-4 mb-5">
+        <h1>Panel del estudio</h1>
+        <p class="admin-hint">Desde aquí se atiende a la gente y se cambia lo que se ve en la web. Empieza por la tarjeta que tenga trabajo pendiente.</p>
+
+        <div class="steps">
+            <strong>Para publicar un diseño nuevo, en este orden:</strong>
+            <ol>
+                <li>Crea la categoría si todavía no existe (el grupo grande, por ejemplo Realismo).</li>
+                <li>Crea la subcategoría dentro de esa categoría.</li>
+                <li>Entra en Diseños y sube la foto. Sin subcategoría, el diseño no tiene dónde colocarse.</li>
+            </ol>
+        </div>
+
+        <div class="guide-grid">
+            <a class="guide-card" th:href="@{/admin/consultas}">
+                <strong>Consultas</strong>
+                <span>Personas que rellenaron el formulario de la web. Ábrelas y contéstales por tu correo o WhatsApp. Las que no has abierto salen marcadas.</span>
+                <em th:if="${consultasSinLeer != null and consultasSinLeer > 0}"
+                    th:text="|${consultasSinLeer} sin leer|">0 sin leer</em>
+                <em th:if="${consultasSinLeer == null or consultasSinLeer == 0}">Nada pendiente de leer</em>
+            </a>
+            <a class="guide-card" th:href="@{/admin/appointments}">
+                <strong>Citas</strong>
+                <span>La agenda. Cuando ya has quedado con alguien, créala aquí. Puedes verla en lista o en calendario.</span>
+                <em>Abrir la agenda</em>
+            </a>
+            <a class="guide-card" th:href="@{/admin/disenos}">
+                <strong>Diseños</strong>
+                <span>Las fotos de la galería pública. Lo que subes aquí es lo que ve la gente en la web.</span>
+                <em>Ver las fotos</em>
+            </a>
+            <a class="guide-card" th:href="@{/admin/categorias}">
+                <strong>Categorías</strong>
+                <span>Los grupos grandes de la galería. Primero va la categoría, después la subcategoría.</span>
+                <em>Ver grupos</em>
+            </a>
+            <a class="guide-card" th:href="@{/admin/subcategorias}">
+                <strong>Subcategorías</strong>
+                <span>Apartados dentro de una categoría. Cada diseño se guarda en una de estas.</span>
+                <em>Ver apartados</em>
+            </a>
+            <a class="guide-card" th:href="@{/admin/usuarios}">
+                <strong>Usuarios</strong>
+                <span>Cuentas que pueden entrar a este panel. No borres la tuya.</span>
+                <em>Ver cuentas</em>
+            </a>
+        </div>
+    </div>
+    <div th:insert="~{admin/templateAdmin.html::script}"></div>
+</body>
+</html>

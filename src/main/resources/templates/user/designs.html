@@ -36,6 +36,7 @@
         </div>
     </section>
 
+    <div id="gallery-live">
     <!--==================== GALLERY FILTERS ====================-->
     <section class="gallery-filters section">
         <div class="gallery-filters__container container">
@@ -103,6 +104,8 @@
         </div>
     </section>
 
+    <p class="gallery-count" th:if="${totalItems != null}" th:text="|${totalItems} trabajos|"></p>
+
     <!-- Gallery -->
     <div class="gallery">
         <div th:if="${designs.empty}">
@@ -115,7 +118,7 @@
             th:attr="onclick=|showModal('@{/images/{imageName}(imageName=${design.image})}')|">
             <span>
                 <img th:src="@{/images/{imageName}(imageName=${design.image})}" th:alt="${design.title}"
-                    class="design-image">
+                    class="design-image" loading="lazy" decoding="async">
             </span>
         </div>
     </div>
@@ -148,6 +151,7 @@
             th:href="@{/Muthabara/diseños(categoryId=${selectedCategoryId}, subCategoryId=${selectedSubCategoryId}, page=${totalPages - 1}, size=${pageSize})}">
             Última &raquo;
         </a>
+    </div>
     </div>
 
     <div id="imageModal" class="modal-overlay">

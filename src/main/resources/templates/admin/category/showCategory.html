@@ -7,6 +7,7 @@
 
     <div class="container mt-5">
         <h1>Categorías</h1>
+        <div th:insert="~{admin/templateAdmin.html :: hint('Un grupo grande de la galería, por ejemplo Realismo. Después crea subcategorías dentro.')}"></div>
         
         <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
         <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>

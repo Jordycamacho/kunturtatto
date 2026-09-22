@@ -1,0 +1,210 @@
+@import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=Montserrat:wght@400;500;600&display=swap");
+
+body {
+  background: #f4eef1;
+  color: #241820;
+  font-family: "Montserrat", sans-serif;
+}
+
+.admin-bar {
+  background: #1a0c12;
+  color: #f6eef2;
+  padding: 0.85rem 1.25rem 0.4rem;
+}
+
+.admin-bar__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.admin-brand {
+  color: #fff;
+  text-decoration: none;
+  font-family: "Cinzel", serif;
+  letter-spacing: 0.04em;
+  font-size: 1.15rem;
+}
+
+.admin-brand small {
+  display: block;
+  font-family: "Montserrat", sans-serif;
+  letter-spacing: 0;
+  font-size: 0.75rem;
+  color: #e7c3d4;
+}
+
+.admin-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.admin-links a {
+  color: #f6eef2;
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.86rem;
+}
+
+.admin-links a:hover,
+.admin-links a:focus-visible {
+  background: #58173a;
+  color: #fff;
+}
+
+.admin-links a small {
+  display: block;
+  color: #e7c3d4;
+  font-size: 0.68rem;
+}
+
+.admin-side {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.admin-side a,
+.admin-side button {
+  color: #f6eef2;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.82rem;
+  text-decoration: none;
+}
+
+.admin-hint {
+  margin: 0.85rem 0 1rem;
+  color: #5c4452;
+  font-size: 0.95rem;
+}
+
+.guide-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+.guide-card {
+  display: block;
+  background: #fff;
+  color: #241820;
+  text-decoration: none;
+  border-radius: 16px;
+  padding: 1.1rem 1.15rem 1rem;
+  border: 1px solid #eadde3;
+  box-shadow: 0 8px 24px rgba(88, 23, 58, 0.06);
+  min-height: 150px;
+}
+
+.guide-card:hover {
+  border-color: #58173a;
+  color: #241820;
+}
+
+.guide-card strong {
+  display: block;
+  font-family: "Cinzel", serif;
+  font-size: 1.15rem;
+  margin-bottom: 0.35rem;
+}
+
+.guide-card span {
+  display: block;
+  color: #5c4452;
+  font-size: 0.92rem;
+}
+
+.guide-card em {
+  display: inline-block;
+  margin-top: 0.7rem;
+  color: #58173a;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 0.82rem;
+}
+
+.steps {
+  background: #fff;
+  border-radius: 16px;
+  padding: 1rem 1.2rem;
+  margin-bottom: 1.25rem;
+  border: 1px solid #eadde3;
+}
+
+.steps ol {
+  margin: 0.4rem 0 0;
+  padding-left: 1.2rem;
+}
+
+.steps li + li {
+  margin-top: 0.35rem;
+}
+
+h1 {
+  font-family: "Cinzel", serif;
+  color: #58173a;
+}
+
+.btn-primary {
+  background: #58173a;
+  border-color: #58173a;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background: #6c094b;
+  border-color: #6c094b;
+}
+
+.table {
+  background: #fff;
+}
+
+.admin-empty {
+  background: #fff;
+  border: 1px dashed #c9a8b8;
+  border-radius: 12px;
+  padding: 1rem 1.1rem;
+  color: #5c4452;
+}
+
+.error-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  background: #1a0c12;
+  color: #f6eef2;
+  font-family: "Montserrat", sans-serif;
+  padding: 2rem;
+}
+
+.error-page main {
+  max-width: 34rem;
+}
+
+.error-page h1 {
+  font-family: "Cinzel", serif;
+  color: #fff;
+  margin-bottom: 0.6rem;
+}
+
+.error-page a {
+  color: #f0c6da;
+}
+
+@media (max-width: 720px) {
+  .admin-bar__top,
+  .admin-side {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

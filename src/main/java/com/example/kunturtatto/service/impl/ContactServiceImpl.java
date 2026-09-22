@@ -49,10 +49,13 @@ public class ContactServiceImpl implements IContactService {
 
         try {
             MimeMessagePreparator messagePreparator = mimeMessage -> {
-                MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
+                MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
                 helper.setFrom(myEmail);
                 helper.setTo(myEmail);
-                helper.setSubject("Nuevo mensaje de contacto: " + request.getSubject());
+                if (request.getEmail() != null && request.getEmail().contains("@")) {
+                    helper.setReplyTo(request.getEmail());
+                }
+                helper.setSubject("Nuevo mensaje desde la web de Muthabara");
                 String htmlContent = buildContactEmailHtml(request);
                 helper.setText(htmlContent, true);
             };
@@ -155,13 +158,16 @@ public class ContactServiceImpl implements IContactService {
                 auditId, consultation.getId(), consultation.getEmail());
 
         try {
-            String subject = "📱 Nueva Consulta de Tatuaje - " + consultation.getNombre();
+            String subject = "Nueva consulta en la web de Muthabara";
             String htmlContent = buildNewConsultationEmailHtml(consultation);
 
             MimeMessagePreparator messagePreparator = mimeMessage -> {
-                MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
+                MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
                 helper.setFrom(myEmail);
-                helper.setTo(myEmail); // Se envía a sí mismo (admin)
+                helper.setTo(myEmail);
+                if (consultation.getEmail() != null && consultation.getEmail().contains("@")) {
+                    helper.setReplyTo(consultation.getEmail());
+                }
                 helper.setSubject(subject);
                 helper.setText(htmlContent, true);
             };
@@ -317,6 +323,17 @@ public class ContactServiceImpl implements IContactService {
     }
 
     // ========= BUILD HTML CONTENT METHODS ========= //
+    private static String esc(String value) {
+        if (value == null) {
+            return "";
+        }
+        return value
+                .replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+                .replace("\"", "&quot;");
+    }
+
     private String buildNewConsultationEmailHtml(TattooConsultationDto consultation) {
         String fechaFormateada = consultation.getFechaCreacion().format(
                 DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
@@ -371,7 +388,7 @@ public class ContactServiceImpl implements IContactService {
                 </html>
                 """.formatted(
                 consultation.getId(),
-                consultation.getNombre(),
+                esc(consultation.getNombre()),
                 fechaFormateada,
                 estado,
                 consultaUrl,
@@ -425,12 +442,12 @@ public class ContactServiceImpl implements IContactService {
                 </body>
                 </html>
                 """.formatted(
-                request.getEmail(),
-                request.getSubject(),
-                request.getTattooCm(),
-                request.getBody(),
-                request.getLinksReference(),
-                request.getMessage());
+                esc(request.getEmail()),
+                esc(request.getSubject()),
+                esc(request.getTattooCm()),
+                esc(request.getBody()),
+                esc(request.getLinksReference()),
+                esc(request.getMessage()));
     }
 
     private String buildAppointmentConfirmationHtml(Appointment appointment) {

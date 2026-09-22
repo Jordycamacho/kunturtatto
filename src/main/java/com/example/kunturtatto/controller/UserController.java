@@ -12,7 +12,9 @@ import com.example.kunturtatto.service.CategoryService;
 import com.example.kunturtatto.service.DesignService;
 import com.example.kunturtatto.service.IContactService;
 import com.example.kunturtatto.service.SubCategoryService;
+import com.example.kunturtatto.exception.ErrorMessages;
 import com.example.kunturtatto.service.TattooConsultationService;
+import com.example.kunturtatto.web.PublicFormGuard;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -62,6 +64,17 @@ public class UserController {
         private TattooConsultationService tattooConsultationService;
         @Autowired
         private IContactService contactService;
+        @Autowired
+        private PublicFormGuard publicFormGuard;
+
+        @ModelAttribute("formStartedAt")
+        public String formStartedAt(HttpServletRequest request) {
+                String started = request.getParameter("formStartedAt");
+                if (started != null && !started.isBlank()) {
+                        return started;
+                }
+                return String.valueOf(System.currentTimeMillis());
+        }
 
         private final ConcurrentHashMap<String, RateLimitInfo> rateLimitMap = new ConcurrentHashMap<>();
         private static final int MAX_REGISTER_ATTEMPTS = 5;
@@ -176,7 +189,7 @@ public class UserController {
                         @Parameter(description = "ID de la categoría para filtrar") @RequestParam(required = false) Long categoryId,
                         @Parameter(description = "ID de la subcategoría para filtrar") @RequestParam(required = false) Long subCategoryId,
                         @Parameter(description = "Número de página (por defecto 0)") @RequestParam(defaultValue = "0") int page,
-                        @Parameter(description = "Tamaño de página (por defecto 7)") @RequestParam(defaultValue = "7") int size,
+                        @Parameter(description = "Tamaño de página (por defecto 12)") @RequestParam(defaultValue = "12") int size,
                         Model model,
                         HttpServletRequest request) {
 
@@ -199,7 +212,9 @@ public class UserController {
                                                 subCategory.getName(), effectiveCategoryId);
                         }
 
-                        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
+                        int pageSize = Math.min(Math.max(size, 1), 24);
+                        int pageIndex = Math.max(page, 0);
+                        Pageable pageable = PageRequest.of(pageIndex, pageSize, Sort.by("id").descending());
 
                         String pageTitle;
                         if (subCategoryId != null) {
@@ -231,7 +246,7 @@ public class UserController {
                         model.addAttribute("currentPage", designsPage.getNumber());
                         model.addAttribute("totalPages", designsPage.getTotalPages());
                         model.addAttribute("totalItems", designsPage.getTotalElements());
-                        model.addAttribute("pageSize", size);
+                        model.addAttribute("pageSize", pageSize);
                         model.addAttribute("selectedCategoryId", effectiveCategoryId);
                         model.addAttribute("selectedSubCategoryId", subCategoryId);
                         model.addAttribute("pageTitle", pageTitle);
@@ -309,6 +324,19 @@ public class UserController {
 
                 String clientIp = getClientIp(request);
 
+                if (publicFormGuard.looksAutomated(request)) {
+                        log.warn("[USER_CONTROLLER] [CONTACT_SAVE] Envío descartado por filtro antispam. IP={}",
+                                        request.getRemoteAddr());
+                        redirectAttributes.addFlashAttribute("mensajeEnviado", true);
+                        return "redirect:/Muthabara/contacto";
+                }
+                if (publicFormGuard.isRateLimited(request, "CONTACTO")) {
+                        redirectAttributes.addFlashAttribute("error",
+                                        "Has enviado varios mensajes seguidos. Espera un rato y vuelve a intentarlo.");
+                        return "redirect:/Muthabara/contacto";
+                }
+                publicFormGuard.record(request, "CONTACTO");
+
                 log.info("[USER_CONTROLLER] [CONTACT_SAVE] Intento de envío de contacto desde IP: {}, "
                                 + "Email: {}, Asunto: {}", clientIp, email, subject);
 
@@ -336,6 +364,7 @@ public class UserController {
 
                         contactService.sendContactEmail(contactRequest);
 
+                        redirectAttributes.addFlashAttribute("mensajeEnviado", true);
                         redirectAttributes.addFlashAttribute("success",
                                         "¡Mensaje enviado exitosamente! Te contactaremos pronto.");
 
@@ -553,6 +582,22 @@ public class UserController {
                 String clientIp = getClientIp(servletRequest);
                 log.info("[USER_CONTROLLER] [SAVE_CONSULTA] Guardando consulta desde IP: {}", clientIp);
 
+                if (publicFormGuard.looksAutomated(servletRequest)) {
+                        log.warn("[USER_CONTROLLER] [SAVE_CONSULTA] Envío descartado por filtro antispam. IP={}",
+                                        servletRequest.getRemoteAddr());
+                        redirectAttributes.addFlashAttribute("mensajeEnviado", true);
+                        redirectAttributes.addFlashAttribute("success",
+                                        "¡Consulta enviada exitosamente! Te contactaremos pronto.");
+                        return "redirect:/Muthabara/consulta-tatuaje";
+                }
+                if (publicFormGuard.isRateLimited(servletRequest, "CONSULTA")) {
+                        model.addAttribute("error",
+                                        "Has enviado varias consultas seguidas. Espera un rato y vuelve a intentarlo.");
+                        model.addAttribute("consultaRequest", request);
+                        return "user/tattoo-consultation";
+                }
+                publicFormGuard.record(servletRequest, "CONSULTA");
+
                 try {
                         if (bindingResult.hasErrors()) {
                                 log.error("[USER_CONTROLLER] [SAVE_CONSULTA] Errores de validación: {}",
@@ -620,7 +665,8 @@ public class UserController {
 
                 } catch (IllegalArgumentException e) {
                         log.error("[USER_CONTROLLER] [SAVE_CONSULTA] Error de validación: {}", e.getMessage());
-                        model.addAttribute("error", e.getMessage());
+                        model.addAttribute("error",
+                                        ErrorMessages.userMessage("Revisa los datos de la consulta e inténtalo otra vez.", e));
                         model.addAttribute("consultaRequest", request);
                         analyticsService.trackEvent("consulta_tatuaje", "envio_formulario",
                                         "error_validacion", null, servletRequest);

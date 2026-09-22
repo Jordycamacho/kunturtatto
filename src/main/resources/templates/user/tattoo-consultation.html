@@ -65,6 +65,11 @@
 
         <!-- Consulta Form -->
         <form class="consulta-form" th:action="@{/Muthabara/consulta-tatuaje/guardar}" method="post">
+            <div aria-hidden="true" style="position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden;">
+                <label>Sitio web</label>
+                <input type="text" name="website" tabindex="-1" autocomplete="off">
+            </div>
+            <input type="hidden" name="formStartedAt" th:value="${formStartedAt}">
             <div class="form-section">
                 <h3><i class="ri-user-line"></i> Información Básica</h3>
                 <div class="form-row">

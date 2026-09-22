@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Muthabara</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body class="error-page">
+    <main>
+        <p>Muthabara</p>
+        <h1 th:text="${title} ?: 'Algo ha fallado'">Algo ha fallado</h1>
+        <p th:text="${message} ?: 'No se ha podido completar. Vuelve a intentarlo.'">Mensaje</p>
+        <p>
+            <a th:href="@{/admin}">Volver al panel</a>
+            ·
+            <a th:href="@{/Muthabara}">Ir a la web</a>
+        </p>
+    </main>
+</body>
+</html>

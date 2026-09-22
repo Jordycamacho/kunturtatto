@@ -22,6 +22,7 @@ import com.example.kunturtatto.dto.SubCategoryDto;
 import com.example.kunturtatto.dto.TattooConsultationDto;
 import com.example.kunturtatto.dto.UserDto;
 import com.example.kunturtatto.exception.EmailAlreadyExistsException;
+import com.example.kunturtatto.exception.ErrorMessages;
 import com.example.kunturtatto.exception.ResourceNotFoundException;
 import com.example.kunturtatto.request.CategoryRequest;
 import com.example.kunturtatto.request.DesignRequest;
@@ -64,6 +65,17 @@ public class AdminController {
         public List<CategoryDto> categories() {
                 log.debug("[MODEL] Cargando lista de categorías para el modelo");
                 return categoryService.getAllCategories();
+        }
+
+        @GetMapping({"", "/"})
+        public String home(Model model) {
+                try {
+                        model.addAttribute("consultasSinLeer", tattooConsultationService.countUnread());
+                } catch (Exception e) {
+                        log.error("[GET /admin] No se pudo contar las consultas sin leer", e);
+                        model.addAttribute("consultasSinLeer", null);
+                }
+                return "admin/home";
         }
 
         /* Create Designs */
@@ -149,7 +161,7 @@ public class AdminController {
 
                 } catch (ResourceNotFoundException e) {
                         log.error("[GET /admin/disenos/editar/{}] Diseño no encontrado: {}", id, e.getMessage());
-                        model.addAttribute("error", e.getMessage());
+                        model.addAttribute("error", ErrorMessages.userMessage("Ese diseño no está. Vuelve al listado.", e));
                         return "redirect:/admin/disenos";
                 } catch (Exception e) {
                         log.error("[GET /admin/disenos/editar/{}] Error al cargar formulario: {}", id, e.getMessage(),
@@ -210,7 +222,7 @@ public class AdminController {
                                         String.format("Error creando diseño '%s': %s",
                                                         request.getTitle(), e.getMessage()));
                         redirectAttributes.addFlashAttribute("error",
-                                        "Error al crear diseño: " + e.getMessage());
+                                        ErrorMessages.userMessage("No se pudo crear el diseño. Revisa la foto y la subcategoría.", e));
                         redirectAttributes.addFlashAttribute("designRequest", request);
                 }
 
@@ -257,7 +269,7 @@ public class AdminController {
                                         e.getMessage());
                         logAudit("UPDATE_DESIGN_ERROR",
                                         String.format("Diseño o subcategoría no encontrada para diseño ID: %d", id));
-                        redirectAttributes.addFlashAttribute("error", "Error: " + e.getMessage());
+                        redirectAttributes.addFlashAttribute("error", ErrorMessages.userMessage("No se pudo completar. Inténtalo de nuevo.", e));
 
                 } catch (Exception e) {
                         log.error("[POST /admin/disenos/editar/guardar/{}] Error al actualizar diseño: {}", id,
@@ -265,7 +277,7 @@ public class AdminController {
                         logAudit("UPDATE_DESIGN_ERROR",
                                         String.format("Error actualizando diseño ID: %d - %s", id, e.getMessage()));
                         redirectAttributes.addFlashAttribute("error",
-                                        "Error al actualizar diseño: " + e.getMessage());
+                                        ErrorMessages.userMessage("No se pudo guardar el diseño. Inténtalo de nuevo.", e));
                 }
 
                 return "redirect:/admin/disenos";
@@ -310,7 +322,7 @@ public class AdminController {
                         log.error("[POST /admin/disenos/eliminar/{}] Diseño no encontrado: {}", id, e.getMessage());
                         logAudit("DELETE_DESIGN_ERROR",
                                         String.format("Diseño no encontrado ID: %d", id));
-                        redirectAttributes.addFlashAttribute("error", "Error: " + e.getMessage());
+                        redirectAttributes.addFlashAttribute("error", ErrorMessages.userMessage("No se pudo completar. Inténtalo de nuevo.", e));
 
                 } catch (Exception e) {
                         log.error("[POST /admin/disenos/eliminar/{}] Error inesperado: {}", id, e.getMessage(), e);
@@ -318,7 +330,7 @@ public class AdminController {
                                         String.format("Error inesperado eliminando diseño ID: %d - %s", id,
                                                         e.getMessage()));
                         redirectAttributes.addFlashAttribute("error",
-                                        "Error inesperado al eliminar diseño: " + e.getMessage());
+                                        ErrorMessages.userMessage("No se pudo borrar el diseño.", e));
                 }
 
                 return "redirect:/admin/disenos";
@@ -398,7 +410,7 @@ public class AdminController {
                         logAudit("CREATE_CATEGORY_ERROR",
                                         String.format("Error creando categoría '%s': %s", request.getName(),
                                                         e.getMessage()));
-                        redirectAttributes.addFlashAttribute("error", "Error al crear categoría: " + e.getMessage());
+                        redirectAttributes.addFlashAttribute("error", ErrorMessages.userMessage("No se pudo crear la categoría. Revisa el nombre y la imagen.", e));
                 }
 
                 return "redirect:/admin/categorias";
@@ -435,14 +447,14 @@ public class AdminController {
                                         e.getMessage());
                         logAudit("DELETE_CATEGORY_ERROR",
                                         String.format("Categoría no encontrada ID: %d", id));
-                        redirectAttributes.addFlashAttribute("error", "Error: " + e.getMessage());
+                        redirectAttributes.addFlashAttribute("error", ErrorMessages.userMessage("No se pudo completar. Inténtalo de nuevo.", e));
                 } catch (Exception e) {
                         log.error("[POST /admin/categorias/eliminar/{}] Error inesperado: {}", id, e.getMessage(), e);
                         logAudit("DELETE_CATEGORY_ERROR",
                                         String.format("Error inesperado eliminando categoría ID: %d - %s", id,
                                                         e.getMessage()));
                         redirectAttributes.addFlashAttribute("error",
-                                        "Error inesperado al eliminar categoría: " + e.getMessage());
+                                        ErrorMessages.userMessage("No se pudo borrar la categoría. Si tiene diseños dentro, bórralos antes.", e));
                 }
 
                 return "redirect:/admin/categorias";
@@ -535,7 +547,7 @@ public class AdminController {
                                         String.format("Error creando subcategoría '%s': %s",
                                                         request.getName(), e.getMessage()));
                         redirectAttributes.addFlashAttribute("error",
-                                        "Error al crear subcategoría: " + e.getMessage());
+                                        ErrorMessages.userMessage("No se pudo crear la subcategoría. Elige una categoría y una imagen.", e));
                 }
 
                 return "redirect:/admin/subcategorias";
@@ -580,14 +592,15 @@ public class AdminController {
                         log.warn("Subcategoría no encontrada para eliminar ID: {}", id);
                         logAudit("DELETE_SUBCATEGORY_ERROR",
                                         String.format("Subcategoría no encontrada ID: %d", id));
-                        redirectAttributes.addFlashAttribute("error", "Error: " + e.getMessage());
+                        redirectAttributes.addFlashAttribute("error", ErrorMessages.userMessage("No se pudo completar. Inténtalo de nuevo.", e));
 
                 } catch (IllegalStateException e) {
                         log.warn("No se puede eliminar subcategoría ID: {} - {}", id, e.getMessage());
                         logAudit("DELETE_SUBCATEGORY_REJECTED",
                                         String.format("No se puede eliminar subcategoría ID: %d - %s", id,
                                                         e.getMessage()));
-                        redirectAttributes.addFlashAttribute("error", e.getMessage());
+                        redirectAttributes.addFlashAttribute("error",
+                        ErrorMessages.userMessage("No se pudo borrar. Si tiene diseños dentro, quítalos antes.", e));
 
                 } catch (Exception e) {
                         log.error("Error inesperado al eliminar subcategoría ID: {}: {}",
@@ -596,7 +609,7 @@ public class AdminController {
                                         String.format("Error inesperado eliminando subcategoría ID: %d - %s",
                                                         id, e.getMessage()));
                         redirectAttributes.addFlashAttribute("error",
-                                        "Error inesperado al eliminar subcategoría: " + e.getMessage());
+                                        ErrorMessages.userMessage("No se pudo borrar la subcategoría.", e));
                 }
 
                 return "redirect:/admin/subcategorias";
@@ -690,7 +703,7 @@ public class AdminController {
                                         String.format("Error actualizando subcategoría ID: %d - %s", id,
                                                         e.getMessage()));
                         redirectAttributes.addFlashAttribute("error",
-                                        "Error al actualizar subcategoría: " + e.getMessage());
+                                        ErrorMessages.userMessage("No se pudo guardar la subcategoría.", e));
                 }
 
                 return "redirect:/admin/subcategorias";
@@ -839,7 +852,7 @@ public class AdminController {
                 } catch (Exception e) {
                         log.error("[POST /admin/usuarios/crear/guardar] Error al crear usuario '{}': {}",
                                         request.getEmail(), e.getMessage(), e);
-                        redirectAttributes.addFlashAttribute("error", "Error al crear usuario: " + e.getMessage());
+                        redirectAttributes.addFlashAttribute("error", ErrorMessages.userMessage("No se pudo crear la cuenta. Revisa el correo y la contraseña.", e));
                         redirectAttributes.addFlashAttribute("userRequest", request);
                 }
 
@@ -895,7 +908,7 @@ public class AdminController {
                 } catch (Exception e) {
                         log.error("[POST /admin/usuarios/editar/guardar/{}] Error al actualizar usuario: {}",
                                         id, e.getMessage(), e);
-                        redirectAttributes.addFlashAttribute("error", "Error al actualizar usuario: " + e.getMessage());
+                        redirectAttributes.addFlashAttribute("error", ErrorMessages.userMessage("No se pudo guardar la cuenta.", e));
                 }
 
                 return "redirect:/admin/usuarios";
@@ -936,7 +949,7 @@ public class AdminController {
                 } catch (Exception e) {
                         log.error("[POST /admin/usuarios/eliminar/{}] Error al eliminar usuario: {}",
                                         id, e.getMessage(), e);
-                        redirectAttributes.addFlashAttribute("error", "Error al eliminar usuario: " + e.getMessage());
+                        redirectAttributes.addFlashAttribute("error", ErrorMessages.userMessage("No se pudo borrar esa cuenta.", e));
                 }
 
                 return "redirect:/admin/usuarios";
@@ -975,7 +988,7 @@ public class AdminController {
                 } catch (Exception e) {
                         log.error("[POST /admin/usuarios/habilitar/{}] Error al habilitar usuario: {}",
                                         id, e.getMessage(), e);
-                        redirectAttributes.addFlashAttribute("error", "Error al habilitar usuario: " + e.getMessage());
+                        redirectAttributes.addFlashAttribute("error", ErrorMessages.userMessage("No se pudo activar esa cuenta.", e));
                 }
 
                 return "redirect:/admin/usuarios";
@@ -1016,7 +1029,7 @@ public class AdminController {
                         log.error("[POST /admin/usuarios/deshabilitar/{}] Error al deshabilitar usuario: {}",
                                         id, e.getMessage(), e);
                         redirectAttributes.addFlashAttribute("error",
-                                        "Error al deshabilitar usuario: " + e.getMessage());
+                                        ErrorMessages.userMessage("No se pudo desactivar esa cuenta.", e));
                 }
 
                 return "redirect:/admin/usuarios";

@@ -7,6 +7,7 @@
 
     <div class="container mt-5">
         <h1>Subcategorías</h1>
+        <div th:insert="~{admin/templateAdmin.html :: hint('Un apartado dentro de una categoría. Los diseños se guardan aquí, no en la categoría suelta.')}"></div>
         
         <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
         <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>

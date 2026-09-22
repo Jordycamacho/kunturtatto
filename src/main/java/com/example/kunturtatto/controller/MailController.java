@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.kunturtatto.request.ContactRequest;
 import com.example.kunturtatto.service.IContactService;
+import com.example.kunturtatto.web.PublicFormGuard;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -31,6 +34,8 @@ public class MailController {
 
     @Autowired
     private IContactService contactService;
+    @Autowired
+    private PublicFormGuard publicFormGuard;
 
     @Operation(summary = "Enviar correo de contacto", description = "Procesa el formulario de contacto y envía un correo electrónico")
     @ApiResponses(value = {
@@ -43,7 +48,21 @@ public class MailController {
             @Parameter(description = "Datos del formulario de contacto", required = true) 
             @Valid @ModelAttribute ContactRequest request,
             BindingResult bindingResult,
+            HttpServletRequest httpRequest,
             Model model) {
+
+        if (publicFormGuard.looksAutomated(httpRequest)) {
+            log.warn("[POST /mail/contacto/guardar] Envío descartado por filtro antispam. IP={}",
+                    httpRequest.getRemoteAddr());
+            model.addAttribute("mensajeEnviado", true);
+            return "user/contact";
+        }
+        if (publicFormGuard.isRateLimited(httpRequest, "CONTACTO")) {
+            model.addAttribute("error",
+                    "Has enviado varios mensajes seguidos. Espera un rato y vuelve a intentarlo.");
+            return "user/contact";
+        }
+        publicFormGuard.record(httpRequest, "CONTACTO");
         
         log.info("[POST /mail/contacto/guardar] Procesando envío de correo de contacto. Datos: email={}, asunto={}", 
                 request.getEmail(), request.getSubject());

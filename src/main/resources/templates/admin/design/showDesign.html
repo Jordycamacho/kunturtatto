@@ -6,12 +6,14 @@
     <div th:insert="~{admin/templateAdmin.html::nav_admin}"></div>
 
     <div class="container mt-5">
-        <h1>disenos</h1>
+        <h1>Diseños</h1>
+        <div th:insert="~{admin/templateAdmin.html :: hint('Estas son las fotos de la galería. Para publicar una: categoría, luego subcategoría, luego este botón.')}"></div>
         
         <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
         <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
         
-        <a class="btn btn-primary mb-3" th:href="@{/admin/disenos/crear}">Crear Nuevo Diseño</a>
+        <a class="btn btn-primary mb-3" th:href="@{/admin/disenos/crear}">Subir un diseño</a>
+        <p class="admin-empty" th:if="${designs == null or designs.isEmpty()}">Todavía no hay diseños. Pulsa «Subir un diseño».</p>
 
         <div class="table-responsive">
             <table class="table table-striped">

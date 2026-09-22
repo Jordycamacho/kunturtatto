@@ -148,3 +148,77 @@ document.addEventListener('DOMContentLoaded', function () {
 window.addEventListener('load', function () {
     new GalleryFiltersAnimations();
 });
+
+function revealGalleryImages(root) {
+    (root || document).querySelectorAll('.design-image').forEach((img) => {
+        const mark = () => {
+            img.classList.add('is-shown');
+            img.closest('.image')?.classList.add('is-ready');
+        };
+        if (img.complete && img.naturalWidth > 0) {
+            mark();
+        } else {
+            img.addEventListener('load', mark, { once: true });
+            img.addEventListener('error', mark, { once: true });
+        }
+    });
+}
+
+async function swapGallery(url, push) {
+    const stage = document.getElementById('gallery-live');
+    if (!stage || stage.classList.contains('is-swapping')) {
+        return;
+    }
+    stage.classList.add('is-swapping');
+    try {
+        const response = await fetch(url, { headers: { 'X-Gallery': '1' } });
+        if (!response.ok) {
+            throw new Error('gallery');
+        }
+        const html = await response.text();
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        const next = doc.getElementById('gallery-live');
+        if (!next) {
+            throw new Error('fragment');
+        }
+        stage.innerHTML = next.innerHTML;
+        const nextTitle = doc.querySelector('.gallery-hero__title');
+        const title = document.querySelector('.gallery-hero__title');
+        if (nextTitle && title) {
+            title.textContent = nextTitle.textContent;
+        }
+        if (push) {
+            history.pushState({}, '', url);
+        }
+        revealGalleryImages(stage);
+        const filters = stage.querySelector('.gallery-filters');
+        if (filters && filters.getBoundingClientRect().top < 0) {
+            filters.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    } catch (error) {
+        window.location.href = url;
+    } finally {
+        stage.classList.remove('is-swapping');
+    }
+}
+
+document.addEventListener('click', (event) => {
+    const link = event.target.closest('#gallery-live a');
+    if (!link || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) {
+        return;
+    }
+    const url = new URL(link.href, window.location.origin);
+    if (!url.pathname.includes('/Muthabara/dise')) {
+        return;
+    }
+    event.preventDefault();
+    swapGallery(url.toString(), true);
+});
+
+window.addEventListener('popstate', () => {
+    if (document.getElementById('gallery-live')) {
+        swapGallery(window.location.href, false);
+    }
+});
+
+document.addEventListener('DOMContentLoaded', () => revealGalleryImages(document));

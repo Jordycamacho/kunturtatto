@@ -45,7 +45,7 @@ public class securityConfig {
                         .anyRequest().authenticated())
                 .formLogin(form -> form
                         .loginPage("/Muthabara/ingresar")
-                        .defaultSuccessUrl("/admin/disenos", true)
+                        .defaultSuccessUrl("/admin", true)
                         .successHandler((request, response, authentication) -> {
                             log.info("[SECURITY] Login exitoso para usuario: {}",
                                     authentication.getName());
@@ -53,7 +53,7 @@ public class securityConfig {
                                     authentication.getAuthorities().stream()
                                             .map(Object::toString)
                                             .collect(Collectors.joining(", ")));
-                            response.sendRedirect("/admin/disenos");
+                            response.sendRedirect("/admin");
                         })
                         .failureHandler((request, response, exception) -> {
                             String email = request.getParameter("username");
